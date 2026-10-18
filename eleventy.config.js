@@ -13,6 +13,25 @@ export default function (eleventyConfig) {
     return `${x.getDate()}. ${x.getMonth() + 1}. ${x.getFullYear()}`;
   });
 
+  // Číslo s desetinnou čárkou: 10.6 → 10,6
+  eleventyConfig.addFilter("cz", (n) => (n === null || n === undefined ? "" : String(n).replace(".", ",")));
+
+  // Texty z databáze: čísla a jednotky se nelámou na konci řádku (22 990 Kč, 10 km).
+  // Mění se jen text mezi značkami, atributy HTML zůstanou, jak jsou. Revize vzhledu 18. 10. 2026.
+  eleventyConfig.addFilter("nezalom", (html) => {
+    if (!html) return html;
+    const nbsp = " ";
+    return String(html).split(/(<[^>]*>)/).map((cast) => {
+      if (cast.startsWith("<")) return cast;
+      return cast
+        .replace(/(\d)[  ](?=\d{3}(?!\d))/g, "$1" + nbsp)
+        .replace(/(\d)[  ](?=\d{3}(?!\d))/g, "$1" + nbsp)
+        .replace(/(\d) (?=(?:Kč|km|min|m|h|%)(?![\p{L}\d]))/gu, "$1" + nbsp)
+        // datum 24. 11. 2026 drží pohromadě, rozsah se láme až u pomlčky
+        .replace(/\b(\d{1,2}\.) (\d{1,2}\.) (\d{4})\b/g, "$1" + nbsp + "$2" + nbsp + "$3");
+    }).join("");
+  });
+
   return {
     dir: { input: "src", output: "_site", includes: "_includes", data: "_data" },
     htmlTemplateEngine: "njk",

@@ -12,7 +12,9 @@
     return '<div class="k-platba"><dl class="k-dl k-dl-platba">' +
       radekKopie("Účet", p.ucet) + radekKopie("Variabilní symbol", p.vs) +
       radekKopie("Částka", HBK.kc(p.castka_kc), String(p.castka_kc || "")) + "</dl>" +
-      (p.qr_spayd ? '<div class="k-qr"><div id="k-qr-obr" aria-label="QR kód pro platbu startovného"></div><small>Na počítači naskenuj QR kód v bankovní aplikaci.</small></div>' : "") +
+      // Na telefonu je QR schovaný pod rozbalením – z vlastního displeje ho kapitán nenaskenuje (revize vzhledu 18. 10. 2026).
+      (p.qr_spayd ? '<details class="k-qr-obal"' + (window.matchMedia && matchMedia("(max-width: 600px)").matches ? "" : " open") + '><summary>QR kód pro bankovní aplikaci</summary>' +
+        '<div class="k-qr"><div id="k-qr-obr" aria-label="QR kód pro platbu startovného"></div><small>Naskenuj ho v bankovní aplikaci, třeba z počítače nebo z jiného telefonu.</small></div></details>' : "") +
       "</div>";
   }
   document.addEventListener("click", function (ev) {
@@ -87,7 +89,7 @@
       (p.role === "kapitan" ? "Předat tým jinému kapitánovi nebo změnit zástupce." : "Kdo tým vede. Kapitána a zástupce mění kapitán.") + "</p>" +
       '<div class="k-akce"><a class="k-tlacitko" href="' + HB.zaklad + '/kapitan/kapitan-a-zastupce/">Kapitán a zástupce</a></div></div>');
     // Seznamka (11. 10. 2026): poptávka týmu „Hledáme běžce“
-    m.insertAdjacentHTML("beforeend", '<div class="k-karta"><h2>Chybí vám běžci?</h2><p>Dejte poptávku do seznamky na webu.</p>' +
+    m.insertAdjacentHTML("beforeend", '<div class="k-karta"><h2>Chybí ti běžci?</h2><p>Dej poptávku do seznamky na webu.</p>' +
       '<div class="k-akce"><a class="k-vedlejsi" href="' + HB.zaklad + '/kapitan/seznamka/">Hledáme běžce</a></div></div>');
   }
   // Startovní čas (11. 10. 2026): po zveřejnění startovní listiny karta s časem startu a odkazem na harmonogram (celý tým).

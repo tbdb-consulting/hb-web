@@ -8,7 +8,8 @@
 .k-karta { background: #fff; border: 1px solid var(--ram); border-radius: 8px; padding: 14px 18px; margin: 0 0 18px; }
 .k-karta h2 { margin-top: 0; }
 .k-uzka { max-width: 34rem; }
-.k-mrizka { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0 18px; }
+/* karty přehledu nejvýš ve dvou sloupcích, ať se hodnoty nelámou po slovech (revize vzhledu 18. 10. 2026) */
+.k-mrizka { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 0 18px; }
 .k-dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; }
 .k-dl dt { color: var(--seda); }
 .k-dl dd { margin: 0; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
@@ -77,7 +78,9 @@
 /* Kroky kapitánské sekce (Keksa 4. 10. 2026): ukazatel nahoře, tlačítka Zpět / Dál s nápovědou dole */
 .k-skryte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .k-kroky { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; counter-reset: krok; }
-.k-kroky li { flex: 1 1 9rem; min-width: 0; }
+/* všech pět kroků v jedné řadě i na tabletu, popisky se zalomí uvnitř (revize vzhledu 18. 10. 2026) */
+.k-kroky { flex-wrap: nowrap; }
+.k-kroky li { flex: 1 1 0; min-width: 0; }
 .k-kroky a { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--ram); border-radius: 8px; background: #fff;
   text-decoration: none; color: var(--text); font-size: .9rem; line-height: 1.25; height: 100%; }
 .k-krok-cislo { flex: 0 0 auto; width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; font-weight: 700;
@@ -191,6 +194,17 @@ a.k-vedlejsi.k-tlacitko-s-napovedou, a.k-tlacitko.k-tlacitko-s-napovedou { displ
   .k-etapy-mobil tfoot { display: none; }
 }
 .k-kopie span { white-space: nowrap; }
+
+/* Revize vzhledu 18. 10. 2026: větší Odhlásit a Zkopírovat (na telefonu 44 px), QR pod rozbalením */
+.k-lista #k-odhlasit { text-decoration: none; border: 1px solid #cfc4c5; border-radius: 6px; background: #fff; padding: 6px 14px; min-height: 36px; font-size: .95rem; }
+.k-kopie .k-odkaz { text-decoration: none; border: 1px solid #cfc4c5; border-radius: 6px; background: #fff; padding: 3px 10px; min-height: 32px; font-size: .85rem; }
+.k-qr-obal { margin-top: 4px; }
+.k-qr-obal summary { cursor: pointer; color: var(--hb); font-weight: 600; padding: 6px 0; }
+@media (max-width: 600px) {
+  .k-lista #k-odhlasit { min-height: 44px; padding: 8px 16px; }
+  .k-kopie .k-odkaz { min-height: 44px; padding: 8px 14px; }
+  .k-qr-obal summary { padding: 10px 0; }
+}
 /* Oprava času (9. 10. 2026) */
 .k-uvod { margin: 0 0 14px; }
 .k-volby { border: 0; padding: 0; }

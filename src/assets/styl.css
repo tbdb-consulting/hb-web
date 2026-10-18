@@ -60,12 +60,15 @@ body {
 .jazyk { font-size: .82rem; opacity: .65; letter-spacing: .04em; }
 .jazyk-aktivni { opacity: 1; font-weight: 700; }
 
-@media (min-width: 52rem) {
+/* Menu v řádku až od šířky obsahu (992 px) a celé pod značkou, aby se žádná položka nelámala
+   do dvou řádků. Užší obrazovky (tablet) mají tlačítko Menu. Revize vzhledu 18. 10. 2026. */
+@media (min-width: 62rem) {
   .menu-tlacitko { display: none; }
-  .menu { display: flex; width: auto; margin-left: auto; align-items: center; gap: 18px; }
-  .menu ul { display: flex; gap: 18px; margin: 0; }
+  .hlavicka-obal { row-gap: 4px; }
+  .menu { display: flex; width: 100%; align-items: center; gap: 18px; }
+  .menu ul { display: flex; flex: 1; justify-content: space-between; gap: 12px; margin: 0; }
   .menu li { border: 0; }
-  .menu a { padding: 4px 0; }
+  .menu a { padding: 4px 0; white-space: nowrap; font-size: .94rem; }
   .jazyky { padding: 0; }
 }
 
@@ -83,6 +86,9 @@ a { color: var(--hb); }
 .text th { background: var(--hb); color: #fff; text-align: left; padding: 8px 10px; }
 .text td { border: 1px solid var(--ram); padding: 7px 10px; }
 .table-responsive { overflow-x: auto; }
+/* iPhone při klepnutí do pole s písmem pod 16 px přiblíží stránku – pole formulářů mají aspoň 16 px
+   (mimo administraci, ta je hutná a jen na počítači). Revize vzhledu 18. 10. 2026. */
+body:not(.adm) :is(input:not([type=checkbox], [type=radio], [type=range]), select, textarea) { font-size: max(16px, 1em); }
 .c-btn, .c-formBtn {
   display: inline-block; background: var(--hb); color: #fff !important;
   text-decoration: none; padding: 9px 16px; border-radius: 6px; margin: 4px 6px 4px 0;
@@ -158,7 +164,7 @@ a { color: var(--hb); }
 .profil-osa { position: relative; height: 1.1rem; margin-top: 2px; }
 .profil-osa span {
   position: absolute; top: 0; transform: translateX(-50%);
-  font-size: .72rem; color: var(--seda); white-space: nowrap;
+  font-size: .8rem; color: var(--seda); white-space: nowrap;
 }
 .profil-osa .kotva-start { transform: none; }
 .profil-osa .kotva-end { transform: translateX(-100%); }
@@ -176,7 +182,7 @@ a { color: var(--hb); }
 
 .etapa-popis { max-width: 46rem; }
 .etapa-mapa img, .etapa-parkovani img { max-width: 100%; height: auto; border: 1px solid var(--ram); border-radius: 8px; }
-.etapa-mapa img { max-width: 34rem; }
+.etapa-mapa img { max-width: min(100%, 34rem); }
 .etapa-qr { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
 .etapa-qr img { width: 100px; height: 100px; border: 0; }
 .etapa-qr p { margin: 0; font-size: .9rem; color: var(--seda); }
@@ -349,6 +355,15 @@ a { color: var(--hb); }
 @media (max-width: 600px) {
   .v-mimo-mobil { display: none; }
   .v-tabulka td, .v-tabulka th { padding: 6px 5px; }
+  /* přepínače pohledů a posun času v jedné řadě přes celou šířku (revize vzhledu 18. 10. 2026) */
+  .v-pohledy, .v-tlacitka { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; }
+  .v-pohledy button, .v-tlacitka button { flex: 1 0 auto; padding: 7px 8px; white-space: nowrap; }
+  .v-filtry label { min-width: 0; max-width: 100%; }
+  .v-filtry select { width: 100%; }
+  .v-tabulka a { overflow-wrap: anywhere; }
+}
+@media (max-width: 400px) {
+  .v-pohledy button, .v-tlacitka button { padding: 7px 5px; font-size: .9rem; }
 }
 
 /* Zápis časů na předávce */

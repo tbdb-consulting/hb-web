@@ -7,7 +7,7 @@ permalink: "{{ e.adresa }}index.html"
 layout: zaklad.njk
 eleventyComputed:
   titulek: "Etapa {{ e.cislo }}: {{ e.nazev }}"
-  metaPopis: "Etapa {{ e.cislo }} závodu Hory Bory: {{ e.nazev }}, {{ e.delkaKm }} km, převýšení {{ e.prevyseni }} m."
+  metaPopis: "Etapa {{ e.cislo }} závodu Hory Bory: {{ e.nazev }}, {{ e.delkaKm | cz }} km, převýšení {{ e.prevyseni }} m."
   adresa: "/trasa/"
 ---
 <meta name="hb-rok" content="{{ trasa.rokCislo }}">
@@ -20,7 +20,7 @@ eleventyComputed:
 <h1 class="etapa-nadpis"><span class="etapa-cislo">{{ e.cislo }}</span> {{ e.nazev }}</h1>
 
 <ul class="etapa-cisla">
-  <li><strong>{{ e.delkaKm }} km</strong><span>délka</span></li>
+  <li><strong>{{ e.delkaKm | cz }}&nbsp;km</strong><span>délka</span></li>
   <li><strong>{{ e.prevyseni }} m</strong><span>stoupání</span></li>
   <li><strong>{{ e.klesani }} m</strong><span>klesání</span></li>
   {% if e.penalizace %}<li><strong>{{ e.penalizace }}</strong><span>penalizace</span></li>{% endif %}
@@ -86,7 +86,7 @@ eleventyComputed:
   <h2>Parkování v cíli</h2>
   <img src="{{ web.zaklad }}{{ e.obrazky.parkoviste }}" alt="Letecký snímek parkoviště u cíle etapy {{ e.cislo }}" loading="lazy" width="700" height="450">
   {% if e.autoKm %}
-  <p class="etapa-auto">Autem z předchozí předávky {{ e.autoKm }} km, přibližně {{ e.autoMin }} minut.</p>
+  <p class="etapa-auto">Autem z předchozí předávky {{ e.autoKm | cz }}&nbsp;km, přibližně {{ e.autoMin }} minut.</p>
   {% endif %}
 </section>
 
@@ -101,12 +101,12 @@ eleventyComputed:
     <tbody>
       {% for u in e.useky %}
       <tr>
-        <td>{{ (u.od_m / 1000) | round(1) }}</td>
-        <td>{{ (u.do_m / 1000) | round(1) }}</td>
-        <td>{% if u.delka_m < 1000 %}{{ u.delka_m }} m{% else %}{{ (u.delka_m / 1000) | round(1) }} km{% endif %}</td>
+        <td>{{ (u.od_m / 1000) | round(1) | cz }}</td>
+        <td>{{ (u.do_m / 1000) | round(1) | cz }}</td>
+        <td>{% if u.delka_m < 1000 %}{{ u.delka_m }}&nbsp;m{% else %}{{ (u.delka_m / 1000) | round(1) | cz }}&nbsp;km{% endif %}</td>
         <td>{{ u.raz }}</td>
         <td>{{ u.povrch }}</td>
-        <td>{{ u.sklon_pct }} %</td>
+        <td>{{ u.sklon_pct | cz }}&nbsp;%</td>
         <td>{% if u.auto %}ano{% else %}ne{% endif %}</td>
       </tr>
       {% endfor %}
@@ -157,7 +157,7 @@ eleventyComputed:
         <dt>Cíl</dt><dd><b>{{ e.cil.kod }}</b> {{ e.cil.plny }}</dd>
         <dt>Trasa běžce</dt><dd class="karta-popis">{{ e.popis }}</dd>
         <dt>Délka, povrch,<br>stoupání, klesání</dt>
-        <dd>{{ e.delkaKm }} km, {{ e.povrch }},<br>stoupání {{ e.prevyseni }} m, klesání {{ e.klesani }} m</dd>
+        <dd>{{ e.delkaKm | cz }}&nbsp;km, {{ e.povrch }},<br>stoupání {{ e.prevyseni }} m, klesání {{ e.klesani }} m</dd>
       </dl>
 
       <div class="karta-pas">

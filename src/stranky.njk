@@ -19,19 +19,19 @@ eleventyComputed:
 {% endif %}
 
 {% if stranka.text %}
-  <div class="text">{{ stranka.text | safe }}</div>
+  <div class="text">{{ stranka.text | nezalom | safe }}</div>
 {% endif %}
 
 {% for blok in stranka.bloky %}
   <section class="blok">
     {% if blok.titulek %}<h2>{{ blok.titulek }}</h2>{% endif %}
-    {% if blok.obsah %}<div class="text">{{ blok.obsah | safe }}</div>{% endif %}
+    {% if blok.obsah %}<div class="text">{{ blok.obsah | nezalom | safe }}</div>{% endif %}
   </section>
 {% endfor %}
 
 {% if stranka.kod == "trasa" and trasa.etapy.length %}
   <p class="trasa-souhrn">
-    {{ trasa.celkem.etap }} etap, {{ trasa.celkem.km }} km, celkem {{ trasa.celkem.prevyseni }} m stoupání.
+    {{ trasa.celkem.etap }} etap, {{ trasa.celkem.km | cz }}&nbsp;km, celkem {{ trasa.celkem.prevyseni }} m stoupání.
     Každá etapa má vlastní stránku s profilem, mapou a popisem trasy.
   </p>
   <div class="table-responsive">
@@ -44,9 +44,9 @@ eleventyComputed:
       <tr>
         <td class="trasa-cislo">{{ e.cislo }}</td>
         <td><a href="{{ web.zaklad }}{{ e.adresa }}">{{ e.nazev }}</a></td>
-        <td>{{ e.delkaKm }} km</td>
-        <td>{{ e.prevyseni }} m</td>
-        <td>{{ e.klesani }} m</td>
+        <td>{{ e.delkaKm | cz }}&nbsp;km</td>
+        <td>{{ e.prevyseni }}&nbsp;m</td>
+        <td>{{ e.klesani }}&nbsp;m</td>
         <td class="trasa-povrch">{{ e.povrch }}</td>
         <td>{% if e.pdf %}<a href="{{ web.zaklad }}{{ e.pdf }}">PDF</a>{% endif %}</td>
       </tr>
@@ -61,7 +61,7 @@ eleventyComputed:
   {% for o in obsah.otazky %}
     <details class="otazka">
       <summary>{{ o.otazka | striptags | trim }}</summary>
-      <div class="text">{{ o.odpoved | safe }}</div>
+      <div class="text">{{ o.odpoved | nezalom | safe }}</div>
     </details>
   {% endfor %}
   </div>
