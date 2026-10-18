@@ -1,6 +1,8 @@
 // Registrace týmu (Keksa 13. 10. 2026).
 // Do otevření ukáže termín a odpočet, po otevření formulář, po uzávěrce oznámení.
 // Přihlášku zapíše funkce web_registrace; ta sama hlídá termín, kapacitu (náhradníci) i údaje.
+// Odkud tým přišel (marketing 18. 10. 2026): povinná odpověď z web_zdroj_registrace, u „Jinak“ volný text;
+// utm_source a utm_campaign se čtou z adresy až při odeslání, nikam do prohlížeče se neukládají.
 (function () {
   "use strict";
   var C = window.HB_REG || {};
@@ -104,9 +106,20 @@
         var o = document.createElement("option"); o.value = k.kod; o.textContent = k.nazev; sel.appendChild(o);
       });
     }).catch(function () { el("rg-kategorie").innerHTML = '<option value="">Číselník se nenačetl – obnov stránku</option>'; });
+    cist("web_zdroj_registrace?select=kod,nazev,volny_text&aktivni=eq.true&order=poradi").then(function (r) {
+      el("rg-zdroj").innerHTML = r.map(function (z) {
+        if (z.volny_text) VOLNY[z.kod] = true;
+        return '<label class="rg-volba"><input type="radio" name="zdroj" value="' + esc(z.kod) + '" required><span>' + esc(z.nazev) + "</span></label>";
+      }).join("");
+    }).catch(function () { el("rg-zdroj").innerHTML = '<p class="rg-pozn">Možnosti se nenačetly – obnov stránku.</p>'; });
   }
+  var VOLNY = {};
+  function zdroj() { var z = form.querySelector("input[name=zdroj]:checked"); return z ? z.value : ""; }
+  // UTM jen z aktuální adresy stránky – nic se nepamatuje mezi návštěvami
+  function utm(klic) { return new URLSearchParams(location.search).get(klic) || null; }
 
   form.addEventListener("change", function () {
+    ukaz("rg-zdroj-jinak", !!VOLNY[zdroj()]);
     ukaz("rg-faktura", form.faktura.value === "ano");
     el("rg-popis-kategorie").textContent = POPIS[form.kategorie.value] || "";
   });
@@ -125,7 +138,9 @@
       p_odberatel_nazev: ano ? f.odberatel_nazev.value : null, p_odberatel_ic: ano ? f.odberatel_ic.value : null,
       p_odberatel_dic: ano ? f.odberatel_dic.value : null, p_odberatel_adresa: ano ? f.odberatel_adresa.value : null,
       p_duzp_rok: ano ? parseInt(f.duzp.value, 10) : null,
-      p_poznamka: f.poznamka.value, p_bezim: f.bezim.checked
+      p_poznamka: f.poznamka.value, p_bezim: f.bezim.checked,
+      p_zdroj: zdroj() || null, p_zdroj_jinak: VOLNY[zdroj()] ? f.zdroj_jinak.value : null,
+      p_utm_source: utm("utm_source"), p_utm_campaign: utm("utm_campaign")
     };
     el("rg-odeslat").disabled = true;
     el("rg-odeslat").textContent = "Odesílám…";

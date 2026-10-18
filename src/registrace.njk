@@ -6,7 +6,9 @@ metaPopis: "Registrace týmu na štafetový běh Hory Bory."
 eleventyExcludeFromCollections: true
 ---
 {# Veřejná registrace týmu (Keksa 13. 10. 2026). Formulář volá web_registrace; do otevření ukazuje jen termín a odpočet.
-   Termín, ročník a číselníky se čtou až v prohlížeči, ať se po změně v Nastavení nemusí přestavovat web. #}
+   Termín, ročník a číselníky se čtou až v prohlížeči, ať se po změně v Nastavení nemusí přestavovat web.
+   Odkud tým přišel (marketing 18. 10. 2026): povinná otázka z číselníku web_zdroj_registrace a utm_source/utm_campaign
+   z adresy stránky, přečtené až při odeslání – žádné cookies ani úložiště v prohlížeči. #}
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/registrace.css">
 <h1>Registrace týmu</h1>
 
@@ -64,6 +66,12 @@ eleventyExcludeFromCollections: true
       <p class="rg-pozn">Preferujeme plnění v roce 2027.</p>
       <label class="rg-volba"><input type="radio" name="duzp" value="2026"><span>v roce 2026</span></label>
     </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Odkud znáš Hory Bory? *</legend>
+    <div id="rg-zdroj"><p class="rg-pozn">Načítám…</p></div>
+    <label class="rg-pole rg-odsaz rg-skryte" id="rg-zdroj-jinak">Napiš krátce odkud *<input name="zdroj_jinak" maxlength="200"></label>
   </fieldset>
 
   <fieldset>
