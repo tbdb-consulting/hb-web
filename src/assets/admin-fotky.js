@@ -23,7 +23,45 @@
         "<p>Na webu: " + prehled.na_webu + " · Start " + (s.start || 0) + " · Trasa " + (s.trasa || 0) + " · Cíl " + (s["cil"] || 0) + " · nezařazeno " + (s.bez || 0) + "</p>" +
         (prehled.chybi.length ? '<p class="adm-sub">Chybí např.: ' + prehled.chybi.slice(0, 8).map(function (x) { return HBA.esc(x.soubor); }).join(", ") + (prehled.chybi.length > 8 ? " …" : "") + "</p>" : "");
     } catch (e) { $("fo-prehled").innerHTML = '<p class="adm-chyba">' + HBA.esc(e.message) + "</p>"; }
+    vybrana = null; kresliUvodni(); kresliMrizku();
   }
+
+  // Úvodní fotka ročníku (Keksa 18. 10. 2026): klik na náhled ji vybere, tlačítko ji uloží (web_admin_fotka_uvodni).
+  var NAHLEDY = HB.url + "/storage/v1/object/public/fotky-nahledy/", vybrana = null, filtr = "";
+  function kresliUvodni() {
+    var u = prehled && prehled.uvodni, h = "";
+    if (u) h += '<img src="' + HBA.esc(NAHLEDY + u.nahled) + '" alt=""><span>Teď: <b>' + HBA.esc(u.soubor) + "</b></span>";
+    else h += "<span>Úvodní fotka není nastavená – web bere fotku z první třetiny galerie.</span>";
+    if (vybrana) h += '<span>Vybraná: <b>' + HBA.esc(vybrana[0]) + '</b></span><button type="button" class="adm-tlacitko" id="fo-nastavit">Nastavit jako úvodní</button>';
+    $("fo-uvodni").innerHTML = h;
+  }
+  function kresliMrizku() {
+    var g = (prehled && prehled.galerie) || [];
+    $("fo-filtr").hidden = !g.length;
+    $("fo-mrizka").innerHTML = g.filter(function (x) { return !filtr || x[2] === filtr; }).map(function (x) {
+      return '<button type="button" data-soubor="' + HBA.esc(x[0]) + '" aria-pressed="' + (vybrana && vybrana[0] === x[0]) + '" title="' + HBA.esc(x[0]) + '">' +
+        '<img loading="lazy" src="' + HBA.esc(NAHLEDY + x[1]) + '" alt="' + HBA.esc(x[0]) + '"></button>';
+    }).join("") || (prehled ? '<p class="adm-sub">Ročník zatím nemá na webu žádnou fotku s náhledem.</p>' : "");
+  }
+  $("fo-mrizka").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-soubor]"); if (!b) return;
+    vybrana = ((prehled && prehled.galerie) || []).filter(function (x) { return x[0] === b.dataset.soubor; })[0] || null;
+    $("fo-mrizka").querySelectorAll("button[aria-pressed=true]").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+    b.setAttribute("aria-pressed", "true");
+    kresliUvodni();
+  });
+  $("fo-filtr").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-s]"); if (!b) return;
+    filtr = b.dataset.s;
+    $("fo-filtr").querySelectorAll("button").forEach(function (x) { x.classList.toggle("fo-akt", x === b); });
+    kresliMrizku();
+  });
+  $("fo-uvodni").addEventListener("click", async function (e) {
+    if (!e.target.closest("#fo-nastavit") || !vybrana) return;
+    e.target.disabled = true;
+    try { await HBA.rpc("web_admin_fotka_uvodni", { p_rok: rokSel.value, p_soubor: vybrana[0] }); await nacti(); }
+    catch (err) { e.target.disabled = false; $("fo-uvodni").insertAdjacentHTML("beforeend", '<span class="adm-chyba">' + HBA.esc(err.message) + "</span>"); }
+  });
 
   async function zmensi(soubor) {
     var bmp = await createImageBitmap(soubor, { imageOrientation: "from-image" });

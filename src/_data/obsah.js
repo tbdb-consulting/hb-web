@@ -91,7 +91,8 @@ async function galerie() {
     const sekce = ["start", "trasa", "cil"].filter((k) => fotky.some((f) => f.s === k));
     const letopocet = "20" + g.rok.slice(2);
     return { rok: g.rok, letopocet, adresa: `/fotky/${letopocet}/`, pocet: fotky.length, sekce,
-             obal: fotky[Math.floor(fotky.length / 3)].u, fotky };
+             // úvodní fotka nastavená v administraci, jinak fotka v první třetině (Keksa 18. 10. 2026)
+             obal: g.obal ? zaklad + g.obal : fotky[Math.floor(fotky.length / 3)].u, fotky };
   });
 }
 
