@@ -433,6 +433,10 @@ body:not(.adm) :is(input:not([type=checkbox], [type=radio], [type=range]), selec
   .p-jiny input { font-size: 1.15rem; padding: 6px 8px; }
   .p-jiny label { margin: 0 0 2px; font-size: .9rem; }
 }
+/* telefon na šířku: dlaždice ve třech sloupcích, aby se 6 týmů i pole Jiný tým vešly bez posouvání (revize vzhledu 18. 10. 2026) */
+@media (orientation: landscape) and (max-height: 500px) {
+  .p-tymy { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 /* PŘEDÁVKA TEĎ zůstává přístupné i nad otevřeným oknem – další tým může předávat hned (7. 10. 2026) */
 .p-dobehl { position: relative; z-index: 60; }
 /* potvrzení: velké Uložit přes celou šířku (Keksa 7. 10. 2026) */

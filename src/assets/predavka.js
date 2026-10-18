@@ -377,8 +377,10 @@
     b = ev.target.closest("[data-zpet]"); if (b) { zpet(b.getAttribute("data-zpet")); return; }
     b = ev.target.closest("[data-nahradit]"); if (b) { nahradit(b.getAttribute("data-nahradit")); return; }
     if (ev.target.id === "p-odhlasit") {
-      if (fronta().some(function (z) { return z.stav === "ceka" || z.stav === "bez_tymu" || z.stav === "potvrdit"; }) &&
-          !confirm("Některé zápisy ještě nejsou dokončené nebo odeslané. Opravdu odhlásit? Zůstanou v telefonu a dokončíš je po dalším přihlášení stejným kódem.")) return;
+      // Potvrzení vždy – omylem klepnuté Odhlásit (rukavice) by vyžadovalo znovu zadat kód (revize vzhledu 18. 10. 2026).
+      var nedokoncene = fronta().some(function (z) { return z.stav === "ceka" || z.stav === "bez_tymu" || z.stav === "potvrdit"; });
+      if (!confirm(nedokoncene ? "Některé zápisy ještě nejsou dokončené nebo odeslané. Opravdu odhlásit? Zůstanou v telefonu a dokončíš je po dalším přihlášení stejným kódem."
+                               : "Opravdu odhlásit? Kód předávky pak budeš muset zadat znovu.")) return;
       kod = null; info = null; pis(K_KOD, null); pis(K_INFO, null); vykresli();
     }
   });
