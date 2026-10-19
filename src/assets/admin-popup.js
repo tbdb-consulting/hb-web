@@ -14,6 +14,7 @@
   function ukazCasti() {
     var typ = $("pa-typ").value;
     document.querySelectorAll(".pa-cast").forEach(function (f) { f.hidden = f.dataset.typ !== typ; });
+    if (typ === "karusel" && !$("pa-galerie-obal").open) $("pa-galerie-obal").open = true;
   }
   function kresliKarusel() {
     $("pa-karusel").innerHTML = karusel.map(function (c, i) {
@@ -22,6 +23,7 @@
         '<button type="button" data-k="pryc" data-i="' + i + '" aria-label="Vyřadit">×</button>' +
         '<button type="button" data-k="vpravo" data-i="' + i + '" aria-label="Posunout dozadu">→</button></div></li>';
     }).join("") || '<li class="adm-sub">Karusel je zatím prázdný – přidej aspoň 2 fotky.</li>';
+    if (typeof galerie !== "undefined" && galerie.length) kresliGalerii();
   }
   function vyplnObrazek() { $("pa-obrazek-nahled").innerHTML = P.obrazek ? '<img src="' + esc(verejne(P.obrazek)) + '" alt="">' : ""; }
   function vyplnVideo() { $("pa-video-info").textContent = P.video ? "Nahrané video: " + P.video.split("/").pop() : "Video zatím není nahrané."; }
@@ -101,27 +103,60 @@
     kresliKarusel();
   });
 
-  // Galerie ročníků pro karusel
-  var letos = new Date().getFullYear() % 100 + 1, galerie = [];
+  // Galerie ročníků pro karusel (19. 10. 2026): výběr jako u třídění fotek – klik označí, Shift+klik rozsah,
+  // tlačítko přidá označené na konec karuselu. Fotky, které už v karuselu jsou, mají štítek.
+  var letos = new Date().getFullYear() % 100 + 1, galerie = [], vyber = {}, posledni = null;
   for (var r = letos; r >= 19; r--) { var o = document.createElement("option"); o.value = "HB" + r; o.textContent = "HB" + r + " (20" + r + ")"; $("pa-galerie-rok").appendChild(o); }
   $("pa-galerie-rok").value = "HB26";
   async function nactiGalerii() {
     $("pa-galerie").innerHTML = '<p class="adm-sub">Načítám…</p>';
+    vyber = {}; posledni = null; kresliVyber();
     try { galerie = (await HBA.rpc("web_admin_fotky_prehled", { p_rok: $("pa-galerie-rok").value })).galerie || []; } catch (err) { galerie = []; }
     kresliGalerii();
   }
-  function kresliGalerii() {
+  function zobrazene() {
     var s = $("pa-galerie-sekce").value;
-    $("pa-galerie").innerHTML = galerie.filter(function (x) { return !s || x[2] === s; }).map(function (x) {
-      return '<button type="button" data-c="fotky-nahledy/' + esc(x[1]) + '" title="' + esc(x[0]) + '"><img loading="lazy" src="' + esc(verejne("fotky-nahledy/" + x[1])) + '" alt="' + esc(x[0]) + '"></button>';
+    return galerie.filter(function (x) { return !s || x[2] === s; }).map(function (x) { return "fotky-nahledy/" + x[1]; });
+  }
+  function kresliGalerii() {
+    $("pa-galerie").innerHTML = zobrazene().map(function (c) {
+      var x = galerie.filter(function (g) { return "fotky-nahledy/" + g[1] === c; })[0];
+      return '<button type="button" data-c="' + esc(c) + '" aria-pressed="' + !!vyber[c] + '" title="' + esc(x[0]) + '"><img loading="lazy" src="' + esc(verejne(c)) + '" alt="' + esc(x[0]) + '">' +
+        (karusel.indexOf(c) >= 0 ? '<span class="pa-uz">v karuselu</span>' : "") + "</button>";
     }).join("") || '<p class="adm-sub">V ročníku nejsou žádné fotky.</p>';
+  }
+  function kresliVyber() {
+    var n = Object.keys(vyber).length;
+    $("pa-galerie-akce").innerHTML = '<span>Vybráno <b>' + n + "</b></span>" +
+      '<button type="button" class="adm-tlacitko" id="pa-pridat"' + (n ? "" : " disabled") + ">Přidat vybrané do karuselu</button>" +
+      '<button type="button" class="adm-tlacitko-male" id="pa-vse">Vybrat vše zobrazené</button>' +
+      '<button type="button" class="adm-tlacitko-male" id="pa-zrusit"' + (n ? "" : " disabled") + ">Zrušit výběr</button>";
   }
   $("pa-galerie-obal").addEventListener("toggle", function () { if (this.open && !galerie.length) nactiGalerii(); });
   $("pa-galerie-rok").addEventListener("change", nactiGalerii);
-  $("pa-galerie-sekce").addEventListener("change", kresliGalerii);
+  $("pa-galerie-sekce").addEventListener("change", function () { kresliGalerii(); });
   $("pa-galerie").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-c]"); if (!b) return;
-    karusel.push(b.dataset.c); kresliKarusel(); hlaska("Přidáno do karuselu (" + karusel.length + "). Nezapomeň uložit.", "ok");
+    var c = b.dataset.c, seznam = zobrazene();
+    if (e.shiftKey && posledni !== null && seznam.indexOf(posledni) >= 0) {
+      var a = seznam.indexOf(posledni), z = seznam.indexOf(c);
+      seznam.slice(Math.min(a, z), Math.max(a, z) + 1).forEach(function (x) { vyber[x] = 1; });
+    } else if (vyber[c]) delete vyber[c]; else vyber[c] = 1;
+    posledni = c;
+    $("pa-galerie").querySelectorAll("button[data-c]").forEach(function (x) { x.setAttribute("aria-pressed", !!vyber[x.dataset.c]); });
+    kresliVyber();
+  });
+  $("pa-galerie-akce").addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.id === "pa-vse") zobrazene().forEach(function (c) { vyber[c] = 1; });
+    else if (t.id === "pa-zrusit") { vyber = {}; posledni = null; }
+    else if (t.id === "pa-pridat") {
+      // v pořadí galerie, bez fotek, které už v karuselu jsou
+      var nove = zobrazene().concat(Object.keys(vyber)).filter(function (c, i, a) { return vyber[c] && a.indexOf(c) === i && karusel.indexOf(c) < 0; });
+      karusel = karusel.concat(nove); vyber = {}; posledni = null; kresliKarusel();
+      hlaska("Přidáno " + nove.length + " fotek, karusel jich má " + karusel.length + ". Nezapomeň uložit.", "ok");
+    } else return;
+    kresliVyber(); kresliGalerii();
   });
 
   $("pa-nahled").addEventListener("click", function () {

@@ -75,7 +75,8 @@ eleventyExcludeFromCollections: true
         <summary>Přidat fotky z galerie</summary>
         <div class="pa-radek"><label>Ročník <select id="pa-galerie-rok"></select></label>
           <label>Sekce <select id="pa-galerie-sekce"><option value="">Vše</option><option value="start">Start</option><option value="trasa">Trasa</option><option value="cil">Cíl</option></select></label></div>
-        <p class="adm-sub">Klik na fotku ji přidá na konec karuselu.</p>
+        <p class="adm-sub">Klikáním fotky vyber (Shift+klik vybere rozsah) a přidej je tlačítkem na konec karuselu.</p>
+        <div id="pa-galerie-akce" class="pa-galerie-akce"></div>
         <div id="pa-galerie" class="pa-galerie"></div>
       </details>
     </fieldset>
@@ -114,7 +115,10 @@ eleventyExcludeFromCollections: true
 .pa-karusel .pa-ovl { display: flex; justify-content: space-between; margin-top: 2px; }
 .pa-karusel button { font: inherit; font-size: 13px; border: 1px solid #cfc4c5; background: #fff; border-radius: 4px; padding: 1px 8px; cursor: pointer; }
 .pa-galerie { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 5px; max-height: 420px; overflow: auto; }
-.pa-galerie button { padding: 0; border: 0; background: #eee; cursor: pointer; border-radius: 4px; }
+.pa-galerie button { padding: 0; border: 3px solid transparent; background: #eee; cursor: pointer; border-radius: 6px; position: relative; }
+.pa-galerie button[aria-pressed="true"] { border-color: #78212E; box-shadow: 0 0 0 2px #F6EEDC inset; }
+.pa-uz { position: absolute; left: 4px; bottom: 4px; background: #2c5c3a; color: #fff; font-size: 11px; padding: 0 5px; border-radius: 3px; }
+.pa-galerie-akce { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0; position: sticky; top: 0; background: #fff; z-index: 2; padding: 4px 0; }
 .pa-galerie img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; border-radius: 4px; }
 #pa-hlaska.chyba { color: #A3302B; font-weight: 600; } #pa-hlaska.ok { color: #2c5c3a; font-weight: 600; }
 </style>
