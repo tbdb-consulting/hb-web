@@ -511,3 +511,32 @@ body:not(.adm) :is(input:not([type=checkbox], [type=radio], [type=range]), selec
 .gal-pred { left: 10px; top: 50%; transform: translateY(-50%); }
 .gal-dalsi-f { right: 10px; top: 50%; transform: translateY(-50%); }
 @media (max-width: 480px) { .gal-roky { grid-template-columns: 1fr 1fr; gap: 10px; } .gal-rok-text { padding: 8px; font-size: .9rem; } }
+
+/* Vyskakovací okno na úvodní stránce (popup.js, 19. 10. 2026). Velikost předvolbami, na telefonu vždy přes šířku displeje. */
+.pp { border: 0; padding: 0; border-radius: 12px; background: #fff; color: var(--text); box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  width: min(var(--pp-sirka), calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; }
+.pp::backdrop { background: rgba(20, 10, 12, .6); }
+.pp-male { --pp-sirka: 420px; } .pp-stredni { --pp-sirka: 640px; } .pp-velke { --pp-sirka: 900px; } .pp-cela { --pp-sirka: 96vw; }
+.pp-cela { height: calc(100dvh - 24px); display: flex; flex-direction: column; }
+.pp-zavrit { position: absolute; top: 8px; right: 8px; z-index: 3; width: 44px; height: 44px; border-radius: 50%; border: 0;
+  background: rgba(0,0,0,.55); color: #fff; font-size: 28px; line-height: 1; cursor: pointer; }
+.pp-zavrit:focus-visible, .pp-sipka:focus-visible, .pp-zvuk:focus-visible { outline: 3px solid var(--hb); outline-offset: 2px; }
+.pp-video, .pp-obrazek, .pp-karusel { position: relative; background: #111; }
+.pp-video video { display: block; width: 100%; max-height: 70dvh; }
+.pp-obrazek img { display: block; width: 100%; max-height: 75dvh; object-fit: contain; }
+.pp-karusel img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+.pp-cela .pp-video, .pp-cela .pp-obrazek, .pp-cela .pp-karusel { flex: 1; min-height: 0; display: flex; align-items: center; }
+.pp-cela .pp-video video, .pp-cela .pp-obrazek img, .pp-cela .pp-karusel img { max-height: 100%; height: 100%; object-fit: contain; aspect-ratio: auto; }
+.pp-zvuk { position: absolute; left: 12px; bottom: 12px; border: 0; border-radius: 999px; background: var(--hb); color: #fff;
+  font: inherit; font-weight: 700; padding: 10px 16px; cursor: pointer; min-height: 44px; }
+.pp-sipka { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: rgba(0,0,0,.45); color: #fff; font-size: 28px; line-height: 1; cursor: pointer; }
+.pp-pred { left: 8px; } .pp-dal { right: 8px; }
+.pp-tecky { position: absolute; left: 0; right: 0; bottom: 8px; display: flex; justify-content: center; gap: 6px; }
+.pp-tecky button { width: 10px; height: 10px; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.55); cursor: pointer; }
+.pp-tecky button[aria-current="true"] { background: #fff; }
+.pp-text { padding: 18px 20px 20px; }
+.pp-text h2 { margin: 0 0 8px; padding-right: 40px; }
+.pp-video + .pp-text h2, .pp-obrazek + .pp-text h2, .pp-karusel + .pp-text h2 { padding-right: 0; }
+.pp-text p { margin: 0 0 10px; }
+.pp-tlacitko { margin-top: 4px; }

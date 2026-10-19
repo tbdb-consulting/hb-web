@@ -1,0 +1,120 @@
+---
+permalink: "/admin/popup/index.html"
+layout: admin.njk
+titulek: "Vyskakovací okno"
+sekce: "popup"
+skript: "admin-popup.js"
+eleventyExcludeFromCollections: true
+---
+<div class="adm-stranka pp-adm">
+  <h1>Vyskakovací okno na úvodní stránce</h1>
+  <p class="adm-sub">Okno s aktuální informací přes úvodní stránku webu. Změna platí hned po uložení, web se nesestavuje.
+    Návštěvník okno uvidí jednou; když ho zavře, znovu se mu ukáže až po změně obsahu.</p>
+  <p class="adm-sub" id="pa-stav">Načítám…</p>
+
+  <form id="pa-form" hidden>
+    <fieldset>
+      <legend>Kdy</legend>
+      <label class="pa-zaskrt"><input type="checkbox" id="pa-aktivni"> <b>Zapnuto</b> – okno se na webu ukazuje</label>
+      <div class="pa-radek">
+        <label>Od (nepovinné) <input type="datetime-local" id="pa-od"></label>
+        <label>Do (nepovinné) <input type="datetime-local" id="pa-do"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Vzhled</legend>
+      <div class="pa-radek">
+        <label>Velikost okna
+          <select id="pa-velikost">
+            <option value="male">Malé (420 px)</option>
+            <option value="stredni">Střední (640 px)</option>
+            <option value="velke">Velké (900 px)</option>
+            <option value="cela">Skoro celá obrazovka</option>
+          </select>
+        </label>
+        <label>Obsah
+          <select id="pa-typ">
+            <option value="text">Jen text</option>
+            <option value="video">Video</option>
+            <option value="obrazek">Obrázek</option>
+            <option value="karusel">Karusel fotek</option>
+          </select>
+        </label>
+      </div>
+      <p class="adm-sub">Na telefonu se okno vždy přizpůsobí šířce displeje.</p>
+    </fieldset>
+
+    <fieldset class="pa-cast" data-typ="video">
+      <legend>Video</legend>
+      <div class="pa-radek">
+        <label>Soubor MP4 nebo WebM (nejvýš 100 MB) <input type="file" id="pa-video-soubor" accept="video/mp4,video/webm"></label>
+      </div>
+      <p id="pa-video-info" class="adm-sub"></p>
+      <label class="pa-zaskrt"><input type="checkbox" id="pa-video-zvuk"> Se zvukem</label>
+      <p class="adm-sub">Prohlížeče nedovolí spustit video se zvukem samo. Když prohlížeč zvuk zakáže, video poběží ztlumené
+        a návštěvník uvidí velké tlačítko „Zapnout zvuk“.</p>
+      <label class="pa-zaskrt"><input type="checkbox" id="pa-video-smycka" checked> Přehrávat dokola</label>
+    </fieldset>
+
+    <fieldset class="pa-cast" data-typ="obrazek">
+      <legend>Obrázek</legend>
+      <label>Soubor JPG, PNG nebo WebP <input type="file" id="pa-obrazek-soubor" accept="image/jpeg,image/png,image/webp"></label>
+      <div id="pa-obrazek-nahled" class="pa-nahled"></div>
+    </fieldset>
+
+    <fieldset class="pa-cast" data-typ="karusel">
+      <legend>Karusel fotek</legend>
+      <p class="adm-sub">Pořadí změníš šipkami, × fotku z karuselu vyřadí (z galerie ani z disku se nemaže).</p>
+      <ol id="pa-karusel" class="pa-karusel"></ol>
+      <div class="pa-radek">
+        <label>Přepnout každých <input type="number" id="pa-sekund" min="2" max="30" value="5" style="width:5em"> sekund</label>
+        <label>Přidat vlastní obrázky <input type="file" id="pa-karusel-soubory" multiple accept="image/jpeg,image/png,image/webp"></label>
+      </div>
+      <details id="pa-galerie-obal">
+        <summary>Přidat fotky z galerie</summary>
+        <div class="pa-radek"><label>Ročník <select id="pa-galerie-rok"></select></label>
+          <label>Sekce <select id="pa-galerie-sekce"><option value="">Vše</option><option value="start">Start</option><option value="trasa">Trasa</option><option value="cil">Cíl</option></select></label></div>
+        <p class="adm-sub">Klik na fotku ji přidá na konec karuselu.</p>
+        <div id="pa-galerie" class="pa-galerie"></div>
+      </details>
+    </fieldset>
+
+    <fieldset>
+      <legend>Text</legend>
+      <label>Nadpis <input type="text" id="pa-nadpis" maxlength="120"></label>
+      <label>Text (prázdný řádek = nový odstavec) <textarea id="pa-text" rows="4" maxlength="1500"></textarea></label>
+      <div class="pa-radek">
+        <label>Tlačítko – popisek <input type="text" id="pa-tl-text" maxlength="60" placeholder="např. Přihlásit tým"></label>
+        <label>Tlačítko – odkaz <input type="text" id="pa-tl-url" placeholder="/registrace/ nebo https://…"></label>
+      </div>
+    </fieldset>
+
+    <div class="pa-akce">
+      <button type="button" class="adm-tlacitko-male" id="pa-nahled">Náhled</button>
+      <button type="submit" class="adm-tlacitko" id="pa-ulozit">Uložit</button>
+      <span id="pa-hlaska" role="status"></span>
+    </div>
+  </form>
+</div>
+<script src="{{ web.zaklad }}/assets/popup.js"></script>
+<style>
+.pp-adm { padding: 0 16px 32px; max-width: 900px; }
+.pp-adm fieldset { border: 1px solid #e2d9da; border-radius: 6px; margin: 14px 0; padding: 10px 14px 12px; display: grid; gap: 8px; }
+.pp-adm legend { font-weight: 700; padding: 0 4px; }
+.pp-adm label { display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; }
+.pp-adm input[type=text], .pp-adm textarea, .pp-adm select, .pp-adm input[type=datetime-local], .pp-adm input[type=number] { font: inherit; font-size: 14px; padding: 5px 8px; border: 1px solid #cfc4c5; border-radius: 5px; }
+.pa-zaskrt { flex-direction: row !important; align-items: center; gap: 8px !important; }
+.pa-radek { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: end; }
+.pa-akce { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+.pa-nahled img { max-width: 320px; border-radius: 6px; }
+.pa-karusel { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.pa-karusel li { position: relative; width: 140px; }
+.pa-karusel img { width: 140px; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 4px; display: block; }
+.pa-karusel .pa-ovl { display: flex; justify-content: space-between; margin-top: 2px; }
+.pa-karusel button { font: inherit; font-size: 13px; border: 1px solid #cfc4c5; background: #fff; border-radius: 4px; padding: 1px 8px; cursor: pointer; }
+.pa-galerie { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 5px; max-height: 420px; overflow: auto; }
+.pa-galerie button { padding: 0; border: 0; background: #eee; cursor: pointer; border-radius: 4px; }
+.pa-galerie img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; border-radius: 4px; }
+#pa-hlaska.chyba { color: #A3302B; font-weight: 600; } #pa-hlaska.ok { color: #2c5c3a; font-weight: 600; }
+</style>

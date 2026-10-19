@@ -16,6 +16,9 @@ eleventyComputed:
 
 {% if stranka.kod == "uvod" %}
   <p class="perex">{{ web.popis }}</p>
+  {# vyskakovací okno – nastavení z administrace se čte až v prohlížeči (19. 10. 2026) #}
+  <script>window.HB = window.HB || { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}" };</script>
+  <script src="{{ web.zaklad }}/assets/popup.js" data-auto="ano" defer></script>
 {% endif %}
 
 {% if stranka.text %}
