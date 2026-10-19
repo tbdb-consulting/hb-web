@@ -39,6 +39,8 @@
     karusel = (P.karusel || []).slice();
     vyplnObrazek(); vyplnVideo(); kresliKarusel(); ukazCasti();
     var ted = new Date(), platne = P.aktivni && (!P.od || new Date(P.od) <= ted) && (!P["do"] || new Date(P["do"]) > ted);
+    var prazdne = coChybi({ typ: P.typ, video: P.video, obrazek: P.obrazek, karusel: P.karusel || [], nadpis: P.nadpis, text: P.text });
+    if (P.aktivni && prazdne) { $("pa-stav").innerHTML = "<b>Okno je zapnuté, ale na webu se neukazuje.</b> " + HBA.esc(prazdne); return; }
     $("pa-stav").innerHTML = platne ? "<b>Okno se teď na webu ukazuje.</b> Verze obsahu " + P.verze + "."
       : (P.aktivni ? "Okno je zapnuté, ale teď je mimo nastavený termín." : "Okno je vypnuté, na webu se neukazuje.");
   }
@@ -161,9 +163,23 @@
     kresliVyber(); kresliGalerii();
   });
 
+  // Co by okno ukázalo – prázdné okno (jen křížek) nemá smysl ukazovat ani v náhledu (20. 10. 2026).
+  function coChybi(p) {
+    var media = (p.typ === "video" && p.video) || (p.typ === "obrazek" && p.obrazek) || (p.typ === "karusel" && p.karusel.length);
+    if (media || p.nadpis || p.text) return null;
+    var nazev = { text: "Jen text", video: "Video", obrazek: "Obrázek", karusel: "Karusel fotek" }[p.typ];
+    var t = "Okno nemá co ukázat: v Obsahu je „" + nazev + "“";
+    if (p.typ === "video") t += ", ale video není nahrané";
+    else if (p.typ === "obrazek") t += ", ale obrázek není nahraný";
+    else if (p.typ === "karusel") t += ", ale karusel je prázdný";
+    t += " a chybí nadpis i text.";
+    if (p.typ !== "karusel" && karusel.length) t += " Fotky z karuselu se ukážou, jen když v Obsahu zvolíš „Karusel fotek“.";
+    return t;
+  }
   $("pa-nahled").addEventListener("click", function () {
-    var p = sesbirej();
-    if (p.typ === "karusel" && karusel.length < 1) { hlaska("Karusel je prázdný.", "chyba"); return; }
+    var p = sesbirej(), chyba = coChybi(p);
+    if (chyba) { hlaska(chyba, "chyba"); return; }
+    hlaska("");
     window.HBPopup.ukaz(p, { nahled: true });
   });
   $("pa-form").addEventListener("submit", async function (e) {
