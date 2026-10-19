@@ -154,7 +154,9 @@
       // v pořadí galerie, bez fotek, které už v karuselu jsou
       var nove = zobrazene().concat(Object.keys(vyber)).filter(function (c, i, a) { return vyber[c] && a.indexOf(c) === i && karusel.indexOf(c) < 0; });
       karusel = karusel.concat(nove); vyber = {}; posledni = null; kresliKarusel();
-      hlaska("Přidáno " + nove.length + " fotek, karusel jich má " + karusel.length + ". Nezapomeň uložit.", "ok");
+      var fotek = function (n) { return n + (n === 1 ? " fotka" : n >= 2 && n <= 4 ? " fotky" : " fotek"); };
+      hlaska((nove.length === 1 ? "Přidána " : nove.length >= 2 && nove.length <= 4 ? "Přidány " : "Přidáno ") + fotek(nove.length) +
+        ", v karuselu " + (karusel.length >= 2 && karusel.length <= 4 ? "jsou" : "je") + " teď " + fotek(karusel.length) + ". Nezapomeň uložit.", "ok");
     } else return;
     kresliVyber(); kresliGalerii();
   });
