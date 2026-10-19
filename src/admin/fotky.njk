@@ -24,12 +24,16 @@ eleventyExcludeFromCollections: true
 
   <h2 class="fo-nadpis">Fotky ročníku na webu</h2>
   <div class="fo-radek">
-    <label>Co dělám <select id="fo-rezim"><option value="uvodni">Úvodní fotka ročníku (na dlaždici v galerii)</option><option value="trideni">Třídění na Start / Trasa / Cíl</option></select></label>
+    <label>Co dělám <select id="fo-rezim"><option value="uvodni">Úvodní fotka ročníku (na dlaždici v galerii)</option><option value="trideni">Třídění na Start / Trasa / Cíl</option><option value="kampan">Výběr do kampaně na sítě (feed 4:5, story 9:16)</option></select></label>
   </div>
   <p class="adm-sub" id="fo-napoveda">Klikni na fotku a potvrď. Na webu se změna objeví po dalším sestavení webu.</p>
   <div id="fo-uvodni" class="fo-uvodni"></div>
   <div class="fo-filtr" id="fo-filtr" hidden>
     <button type="button" data-s="" class="fo-akt">Vše</button><button type="button" data-s="start">Start</button><button type="button" data-s="trasa">Trasa</button><button type="button" data-s="cil">Cíl</button><button type="button" data-s="-">Nezařazené</button>
+  </div>
+  <div class="fo-filtr" id="fo-filtr-kampan" hidden>
+    <button type="button" data-k="" class="fo-akt">Vše</button><button type="button" data-k="feed">Kampaň feed</button><button type="button" data-k="story">Kampaň story</button>
+    <span class="fo-pocet" id="fo-kampan-pocet"></span>
   </div>
   <div id="fo-mrizka" class="fo-mrizka"></div>
 </div>
@@ -53,5 +57,9 @@ eleventyExcludeFromCollections: true
 .fo-mrizka button { padding: 0; border: 3px solid transparent; border-radius: 6px; background: #eee; cursor: pointer; display: block; position: relative; }
 .fo-mrizka button[aria-pressed="true"] { border-color: #78212E; box-shadow: 0 0 0 2px #F6EEDC inset; }
 .fo-stitek { position: absolute; left: 4px; bottom: 4px; background: rgba(0,0,0,.6); color: #fff; font-size: 11px; padding: 0 5px; border-radius: 3px; }
+.fo-filtr[hidden] { display: none; }
+.fo-pocet { align-self: center; font-size: 13px; color: #6E665B; margin-left: 6px; }
+.fo-kampan { position: absolute; right: 4px; top: 4px; display: flex; gap: 3px; }
+.fo-kampan span { background: #78212E; color: #fff; font-size: 10.5px; padding: 0 5px; border-radius: 3px; }
 .fo-mrizka img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; border-radius: 4px; }
 </style>

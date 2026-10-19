@@ -21,23 +21,39 @@
       $("fo-prehled").innerHTML =
         "<p><b>" + prehled.celkem + "</b> fotek v katalogu, <b>" + prehled.s_nahledem + "</b> má náhled, chybí <b>" + prehled.chybi.length + "</b>.</p>" +
         "<p>Na webu: " + prehled.na_webu + " · Start " + (s.start || 0) + " · Trasa " + (s.trasa || 0) + " · Cíl " + (s["cil"] || 0) + " · nezařazeno " + (s.bez || 0) + "</p>" +
+        "<p>Kampaň na sítě: feed " + ((prehled.kampan || {}).feed || 0) + " · story " + ((prehled.kampan || {}).story || 0) + "</p>" +
         (prehled.chybi.length ? '<p class="adm-sub">Chybí např.: ' + prehled.chybi.slice(0, 8).map(function (x) { return HBA.esc(x.soubor); }).join(", ") + (prehled.chybi.length > 8 ? " …" : "") + "</p>" : "");
     } catch (e) { $("fo-prehled").innerHTML = '<p class="adm-chyba">' + HBA.esc(e.message) + "</p>"; }
     vybrana = null; vyber = {}; posledni = null; kresliUvodni(); kresliMrizku();
   }
 
 
-  // Mřížka náhledů ročníku (Keksa 18. 10. 2026) má dva režimy:
+  // Mřížka náhledů ročníku (Keksa 18. 10. 2026) má tři režimy:
   // Úvodní fotka – klik vybere jednu fotku, tlačítko ji uloží (web_admin_fotka_uvodni).
   // Třídění – klik přidá fotku do výběru (Shift+klik vybere rozsah), tlačítka zařadí výběr do Start / Trasa / Cíl (web_admin_fotky_sekce).
-  var NAHLEDY = HB.url + "/storage/v1/object/public/fotky-nahledy/", vybrana = null, filtr = "", rezim = "uvodni", vyber = {}, posledni = null;
+  // Kampaň (19. 10. 2026) – stejný výběr, tlačítka přidají do feedu (4:5) nebo story (9:16) nebo odeberou z kampaně
+  // (web_admin_fotky_kampan). Značka je jen v administraci, na webu se neukazuje.
+  // Náhled v galerii = [soubor, náhled, sekce, feed, story].
+  var NAHLEDY = HB.url + "/storage/v1/object/public/fotky-nahledy/", vybrana = null, filtr = "", filtrK = "", rezim = "uvodni", vyber = {}, posledni = null;
   var SEKCE = { start: "Start", trasa: "Trasa", cil: "Cíl" };
+  var KAMPAN = { feed: "Přidat do feedu", story: "Přidat do story" };
+  function sVyberem() { return rezim === "trideni" || rezim === "kampan"; }
   function zobrazene() {
-    return ((prehled && prehled.galerie) || []).filter(function (x) { return !filtr || (filtr === "-" ? !x[2] : x[2] === filtr); });
+    return ((prehled && prehled.galerie) || []).filter(function (x) {
+      if (rezim === "kampan") return !filtrK || (filtrK === "feed" ? x[3] : x[4]);
+      return !filtr || (filtr === "-" ? !x[2] : x[2] === filtr);
+    });
   }
   function kresliUvodni() {
     var h = "";
-    if (rezim === "trideni") {
+    if (rezim === "kampan") {
+      var k = Object.keys(vyber).length;
+      h += "<span>Vybráno <b>" + k + "</b></span>" +
+        ["feed", "story"].map(function (a) { return '<button type="button" class="adm-tlacitko" data-kampan="' + a + '"' + (k ? "" : " disabled") + ">" + KAMPAN[a] + "</button>"; }).join(" ") +
+        ' <button type="button" class="adm-tlacitko-male" data-kampan="odebrat"' + (k ? "" : " disabled") + ">Odebrat z kampaně</button>" +
+        ' <button type="button" class="adm-tlacitko-male" id="fo-vse">Vybrat vše zobrazené</button>' +
+        ' <button type="button" class="adm-tlacitko-male" id="fo-zrusit"' + (k ? "" : " disabled") + ">Zrušit výběr</button>";
+    } else if (rezim === "trideni") {
       var n = Object.keys(vyber).length;
       h += "<span>Vybráno <b>" + n + "</b></span>" +
         ["start", "trasa", "cil"].map(function (s) { return '<button type="button" class="adm-tlacitko" data-zarad="' + s + '"' + (n ? "" : " disabled") + ">" + SEKCE[s] + "</button>"; }).join(" ") +
@@ -54,17 +70,23 @@
   }
   function kresliMrizku() {
     var g = (prehled && prehled.galerie) || [];
-    $("fo-filtr").hidden = !g.length;
+    $("fo-filtr").hidden = !g.length || rezim === "kampan";
+    $("fo-filtr-kampan").hidden = !g.length || rezim !== "kampan";
+    var nf = g.filter(function (x) { return x[3]; }).length, ns = g.filter(function (x) { return x[4]; }).length;
+    $("fo-kampan-pocet").textContent = "Ve feedu " + nf + " · ve story " + ns;
     $("fo-mrizka").innerHTML = zobrazene().map(function (x) {
-      var zvolena = rezim === "trideni" ? !!vyber[x[0]] : !!(vybrana && vybrana[0] === x[0]);
+      var zvolena = sVyberem() ? !!vyber[x[0]] : !!(vybrana && vybrana[0] === x[0]);
+      var znacky = rezim === "kampan" && (x[3] || x[4]) ? '<span class="fo-kampan">' + (x[3] ? "<span>feed</span>" : "") + (x[4] ? "<span>story</span>" : "") + "</span>" : "";
       return '<button type="button" data-soubor="' + HBA.esc(x[0]) + '" aria-pressed="' + zvolena + '" title="' + HBA.esc(x[0]) + '">' +
-        '<img loading="lazy" src="' + HBA.esc(NAHLEDY + x[1]) + '" alt="' + HBA.esc(x[0]) + '">' +
-        '<span class="fo-stitek">' + (SEKCE[x[2]] || "nezařazeno") + "</span></button>";
+        '<img loading="lazy" src="' + HBA.esc(NAHLEDY + x[1]) + '" alt="' + HBA.esc(x[0]) + '">' + znacky +
+        '<span class="fo-stitek">' + (rezim === "kampan" ? HBA.esc(x[0]) : (SEKCE[x[2]] || "nezařazeno")) + "</span></button>";
     }).join("") || (prehled ? '<p class="adm-sub">' + (g.length ? "Ve filtru nic není." : "Ročník zatím nemá na webu žádnou fotku s náhledem.") + "</p>" : "");
   }
   $("fo-rezim").addEventListener("change", function (e) {
     rezim = e.target.value; vybrana = null; vyber = {}; posledni = null;
-    $("fo-napoveda").textContent = rezim === "trideni"
+    $("fo-napoveda").textContent = rezim === "kampan"
+      ? "Klikáním vyber fotky (Shift+klik vybere rozsah), pak je přidej do feedu (výřez 4:5) nebo do story (výřez 9:16). Fotka může být v obou. Značka je jen tady v administraci, na webu se neukazuje."
+      : rezim === "trideni"
       ? "Klikáním vyber fotky (Shift+klik vybere rozsah), pak je zařaď tlačítkem. Na webu se změna objeví po dalším sestavení webu."
       : "Klikni na fotku a potvrď. Na webu se změna objeví po dalším sestavení webu.";
     kresliUvodni(); kresliMrizku();
@@ -72,7 +94,7 @@
   $("fo-mrizka").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-soubor]"); if (!b) return;
     var s = b.dataset.soubor;
-    if (rezim === "trideni") {
+    if (sVyberem()) {
       var seznam = zobrazene().map(function (x) { return x[0]; });
       if (e.shiftKey && posledni !== null && seznam.indexOf(posledni) >= 0) {
         var a = seznam.indexOf(posledni), z = seznam.indexOf(s);
@@ -93,8 +115,23 @@
     $("fo-filtr").querySelectorAll("button").forEach(function (x) { x.classList.toggle("fo-akt", x === b); });
     kresliMrizku();
   });
+  $("fo-filtr-kampan").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-k]"); if (!b) return;
+    filtrK = b.dataset.k;
+    $("fo-filtr-kampan").querySelectorAll("button").forEach(function (x) { x.classList.toggle("fo-akt", x === b); });
+    kresliMrizku();
+  });
   $("fo-uvodni").addEventListener("click", async function (e) {
     var t = e.target;
+    if (t.dataset && t.dataset.kampan && rezim === "kampan") {
+      var vybrane = Object.keys(vyber); if (!vybrane.length) return;
+      t.disabled = true;
+      try {
+        await HBA.rpc("web_admin_fotky_kampan", { p_rok: rokSel.value, p_soubory: vybrane, p_akce: t.dataset.kampan });
+        vyber = {}; posledni = null; await nacti();
+      } catch (err) { t.disabled = false; $("fo-uvodni").insertAdjacentHTML("beforeend", '<span class="adm-chyba">' + HBA.esc(err.message) + "</span>"); }
+      return;
+    }
     if (t.id === "fo-vse") { zobrazene().forEach(function (x) { vyber[x[0]] = 1; }); kresliUvodni(); kresliMrizku(); return; }
     if (t.id === "fo-zrusit") { vyber = {}; posledni = null; kresliUvodni(); kresliMrizku(); return; }
     if (t.dataset && t.dataset.zarad !== undefined && rezim === "trideni") {
