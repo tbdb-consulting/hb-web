@@ -32,6 +32,14 @@ export default function (eleventyConfig) {
     }).join("");
   });
 
+  // Skripty a styly webu dostanou do adresy číslo sestavení (?v=156), aby prohlížeč po nasazení hned
+  // načetl nové soubory a nedržel staré v mezipaměti (20. 10. 2026). Platí pro všechny stránky včetně administrace.
+  const verzeSouboru = process.env.GITHUB_RUN_NUMBER || String(Date.now());
+  eleventyConfig.addTransform("verze-souboru", function (obsah) {
+    if (!(this.page.outputPath || "").endsWith(".html")) return obsah;
+    return obsah.replace(/((?:src|href)=")([^"?#]*\/assets\/[^"?#]+\.(?:js|css))"/g, `$1$2?v=${verzeSouboru}"`);
+  });
+
   return {
     dir: { input: "src", output: "_site", includes: "_includes", data: "_data" },
     htmlTemplateEngine: "njk",
