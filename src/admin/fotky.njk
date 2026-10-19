@@ -32,11 +32,27 @@ eleventyExcludeFromCollections: true
     <button type="button" data-s="" class="fo-akt">Vše</button><button type="button" data-s="start">Start</button><button type="button" data-s="trasa">Trasa</button><button type="button" data-s="cil">Cíl</button><button type="button" data-s="-">Nezařazené</button>
   </div>
   <div class="fo-filtr" id="fo-filtr-kampan" hidden>
-    <button type="button" data-k="" class="fo-akt">Vše</button><button type="button" data-k="feed">Kampaň feed</button><button type="button" data-k="story">Kampaň story</button>
+    <button type="button" data-k="" class="fo-akt">Vše</button><button type="button" data-k="feed">Kampaň feed</button><button type="button" data-k="story">Kampaň story</button><button type="button" data-k="mimo">Mimo kampaň</button>
     <span class="fo-pocet" id="fo-kampan-pocet"></span>
   </div>
   <div id="fo-mrizka" class="fo-mrizka"></div>
 </div>
+<dialog id="fo-lb" class="fo-lb" aria-label="Fotka ve velkém">
+  <div class="fo-lb-hlava"><span id="fo-lb-nazev"></span><button type="button" class="fo-lb-x" data-lb="zavrit" aria-label="Zavřít">×</button></div>
+  <div class="fo-lb-stred">
+    <button type="button" class="fo-lb-sipka" id="fo-lb-pred" data-lb="pred" aria-label="Předchozí fotka">‹</button>
+    <div class="fo-lb-plocha" id="fo-lb-plocha"><img id="fo-lb-img" alt="" draggable="false">
+      <div class="fo-lb-ramec" id="fo-lb-ramec" hidden>
+        <i class="fo-lb-l fo-v1"></i><i class="fo-lb-l fo-v2"></i><i class="fo-lb-l fo-h1"></i><i class="fo-lb-l fo-h2"></i>
+        <b class="fo-lb-zona fo-hore"></b><b class="fo-lb-zona fo-dole"></b>
+        <span class="fo-lb-roh" data-roh="tl"></span><span class="fo-lb-roh" data-roh="tr"></span><span class="fo-lb-roh" data-roh="bl"></span><span class="fo-lb-roh" data-roh="br"></span>
+      </div>
+    </div>
+    <button type="button" class="fo-lb-sipka" id="fo-lb-dalsi" data-lb="dalsi" aria-label="Další fotka">›</button>
+  </div>
+  <div class="fo-lb-ovladani" id="fo-lb-ovladani"></div>
+  <p class="fo-lb-napoveda" id="fo-lb-napoveda"></p>
+</dialog>
 <style>
 .fo-stranka { padding: 0 16px 24px; max-width: 900px; }
 .fo-radek { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; margin: 14px 0; }
@@ -54,8 +70,37 @@ eleventyExcludeFromCollections: true
 .fo-filtr button { font: inherit; font-size: 13px; border: 1px solid #cfc4c5; background: #fff; border-radius: 999px; padding: 3px 12px; cursor: pointer; }
 .fo-filtr button.fo-akt { background: #78212E; color: #fff; border-color: #78212E; }
 .fo-mrizka { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; }
-.fo-mrizka button { padding: 0; border: 3px solid transparent; border-radius: 6px; background: #eee; cursor: pointer; display: block; position: relative; }
+.fo-dlazdice { position: relative; }
+.fo-mrizka button[data-soubor] { padding: 0; border: 3px solid transparent; border-radius: 6px; background: #eee; cursor: pointer; display: block; position: relative; width: 100%; }
 .fo-mrizka button[aria-pressed="true"] { border-color: #78212E; box-shadow: 0 0 0 2px #F6EEDC inset; }
+.fo-lupa { position: absolute; left: 6px; top: 6px; width: 28px; height: 28px; border: 0; border-radius: 4px; background: rgba(0,0,0,.6); color: #fff; font-size: 16px; line-height: 28px; padding: 0; cursor: zoom-in; }
+.fo-lupa:hover, .fo-lupa:focus-visible { background: #78212E; }
+.fo-lb { width: min(96vw, 1100px); max-height: 96vh; padding: 0; border: 0; border-radius: 8px; background: #1B1916; color: #EDE7DD; }
+.fo-lb::backdrop { background: rgba(0,0,0,.75); }
+.fo-lb-hlava { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; font-size: 13.5px; }
+.fo-lb-x { border: 0; background: none; color: #EDE7DD; font-size: 26px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.fo-lb-stred { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 6px; }
+.fo-lb-sipka { border: 0; background: rgba(255,255,255,.1); color: #fff; font-size: 30px; width: 40px; height: 64px; border-radius: 6px; cursor: pointer; flex: none; }
+.fo-lb-sipka:disabled { opacity: .25; cursor: default; }
+.fo-lb-plocha { position: relative; overflow: hidden; line-height: 0; user-select: none; }
+.fo-lb-plocha img { display: block; max-width: 100%; max-height: calc(96vh - 190px); }
+.fo-lb-plocha.fo-orezavam { touch-action: none; }
+.fo-lb-plocha.fo-orezavam img { filter: brightness(.35); }
+.fo-lb-ramec { position: absolute; background-repeat: no-repeat; box-shadow: inset 0 0 0 2px #fff; cursor: move; }
+.fo-lb-ramec[hidden] { display: none; }
+.fo-lb-l { position: absolute; background: rgba(255,255,255,.55); pointer-events: none; }
+.fo-v1, .fo-v2 { top: 0; bottom: 0; width: 1px; } .fo-v1 { left: 33.333%; } .fo-v2 { left: 66.667%; }
+.fo-h1, .fo-h2 { left: 0; right: 0; height: 1px; } .fo-h1 { top: 33.333%; } .fo-h2 { top: 66.667%; }
+.fo-lb-zona { position: absolute; left: 0; right: 0; pointer-events: none; display: none;
+  background: repeating-linear-gradient(45deg, rgba(222,151,161,.35) 0 6px, transparent 6px 12px); }
+.fo-lb-ramec.fo-story .fo-lb-zona { display: block; }
+.fo-hore { top: 0; height: 13%; border-bottom: 1px dashed #DE97A1; } .fo-dole { bottom: 0; height: 18%; border-top: 1px dashed #DE97A1; }
+.fo-lb-roh { position: absolute; width: 18px; height: 18px; background: #fff; border: 2px solid #78212E; border-radius: 3px; touch-action: none; }
+.fo-lb-roh[data-roh="tl"] { left: 0; top: 0; cursor: nwse-resize; } .fo-lb-roh[data-roh="br"] { right: 0; bottom: 0; cursor: nwse-resize; }
+.fo-lb-roh[data-roh="tr"] { right: 0; top: 0; cursor: nesw-resize; } .fo-lb-roh[data-roh="bl"] { left: 0; bottom: 0; cursor: nesw-resize; }
+.fo-lb-ovladani { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 10px 12px 0; font-size: 13.5px; }
+.fo-lb-napoveda { margin: 6px 16px 12px; font-size: 13px; color: #A1978A; text-align: center; line-height: 1.45; }
+.fo-lb-napoveda b { color: #E0AC4C; font-weight: 600; }
 .fo-stitek { position: absolute; left: 4px; bottom: 4px; background: rgba(0,0,0,.6); color: #fff; font-size: 11px; padding: 0 5px; border-radius: 3px; }
 .fo-filtr[hidden] { display: none; }
 .fo-pocet { align-self: center; font-size: 13px; color: #6E665B; margin-left: 6px; }
