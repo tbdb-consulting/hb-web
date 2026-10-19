@@ -7,18 +7,22 @@
   var koren = document.getElementById("vysledky-online");
   if (!koren) return;
   var CFG = window.HB || {};
+  // Angličtina (20. 10. 2026): L("česky", "anglicky") vybere text podle jazyka stránky.
+  var EN = CFG.jazyk === "en";
+  function L(cs, en) { return EN ? en : cs; }
+  var LOC = EN ? "en-GB" : "cs-CZ";
   var Q = new URLSearchParams(location.search);
   // Ukázka jen pro organizátora přihlášeného v administraci (14. 10. 2026) – veřejnost odkaz nevidí a ?ukazka=hb26 nefunguje.
   var ADMIN = false;
   try { ADMIN = !!(JSON.parse(localStorage.getItem("hb_admin_relace") || "null") || {}).refresh_token; } catch (e) {}
   var UKAZKA = ADMIN && Q.get("ukazka") === "hb26";
   var POHLEDY = [
-    { k: "poradi", n: "Pořadí" },
-    { k: "tym", n: "Můj tým" },
-    { k: "predavky", n: "Předávky" },
-    { k: "etapy", n: "Časy etap" }
+    { k: "poradi", n: L("Pořadí", "Ranking") },
+    { k: "tym", n: L("Můj tým", "My team") },
+    { k: "predavky", n: L("Předávky", "Handovers") },
+    { k: "etapy", n: L("Časy etap", "Stage times") }
   ];
-  var KAT = { "muzi-mix": "Muži + mix", "zeny": "Ženy" };
+  var KAT = { "muzi-mix": L("Muži + mix", "Men + mixed"), "zeny": L("Ženy", "Women") };
   var data = null, model = null, ted = null, chyba = null, nacteno = null;
   var st = { pohled: "poradi", etapa: null, kat: "", tym: null, etapaCasy: null, hledat: "" };
 
@@ -28,9 +32,9 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  var FMT_HM = new Intl.DateTimeFormat("cs-CZ", { timeZone: "Europe/Prague", hour: "2-digit", minute: "2-digit" });
-  var FMT_HMS = new Intl.DateTimeFormat("cs-CZ", { timeZone: "Europe/Prague", hour: "2-digit", minute: "2-digit", second: "2-digit" });
-  var FMT_DEN = new Intl.DateTimeFormat("cs-CZ", { timeZone: "Europe/Prague", weekday: "short" });
+  var FMT_HM = new Intl.DateTimeFormat(LOC, { timeZone: "Europe/Prague", hour: "2-digit", minute: "2-digit" });
+  var FMT_HMS = new Intl.DateTimeFormat(LOC, { timeZone: "Europe/Prague", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  var FMT_DEN = new Intl.DateTimeFormat(LOC, { timeZone: "Europe/Prague", weekday: "short" });
   function hm(s) { return s == null ? "" : FMT_HM.format(new Date(s * 1000)); }
   function hms(s) { return s == null ? "" : FMT_HMS.format(new Date(s * 1000)); }
   function den(s) { return FMT_DEN.format(new Date(s * 1000)); }
@@ -54,10 +58,10 @@
     return m + ":" + (x < 10 ? "0" : "") + x;
   }
   function omez(x, a, b) { return Math.max(a, Math.min(b, x)); }
-  function misto(c) { var m = (data.mista || [])[c - 1]; return m ? m[1] : "předávka " + c; }
+  function misto(c) { var m = (data.mista || [])[c - 1]; return m ? m[1] : L("předávka ", "handover ") + c; }
   // Místa se značí číslem předávky (Keksa 5. 10. 2026): P1 Dolní Lomná = start, P2 Horní Lomná … P31 Mikulov = cíl.
   // Etapa n vede z Pn na Pn+1, doběh etapy n = příchod na Pn+1.
-  function P(c) { return "P" + c + " " + misto(c) + (c === 1 ? " (start)" : c === 31 ? " (cíl)" : ""); }
+  function P(c) { return "P" + c + " " + misto(c) + (c === 1 ? " (start)" : c === 31 ? L(" (cíl)", " (finish)") : ""); }
   function km(etapa) { var m = (data.mista || [])[etapa - 1]; return m && m[2] ? Number(m[2]) : null; }
 
   function spocitej() { model = HBVysl.spocitej(data, ted); }
@@ -65,49 +69,49 @@
   // ---------- vykreslení ----------
   function zahlavi() {
     var h = "";
-    if (data.nahled) h += '<p class="upozorneni">Náhled pro organizátory – veřejnost tyto výsledky zatím nevidí (Nastavení → Online výsledky na webu).</p>';
+    if (data.nahled) h += '<p class="upozorneni">' + L("Náhled pro organizátory – veřejnost tyto výsledky zatím nevidí (Nastavení → Online výsledky na webu).", "Preview for organisers – the public can't see these results yet.") + '</p>';
     if (UKAZKA) {
       var od = model.nejdrivStart - 1800, doo = Math.max.apply(null, data.tymy.map(function (t) { var r = (t.e || [])[29]; return r && r[3] || 0; })) + 1800;
-      h += '<div class="v-ukazka"><p><strong>Ukázka:</strong> přehrání ročníku 2026 podle skutečných časů. Posuvníkem nastavíš, jaký je „teď“.</p>' +
-        '<label class="v-cas-posuvnik">Teď: <strong id="v-ted">' + den(ted) + " " + hm(ted) + '</strong>' +
+      h += '<div class="v-ukazka"><p>' + L("<strong>Ukázka:</strong> přehrání ročníku 2026 podle skutečných časů. Posuvníkem nastavíš, jaký je „teď“.", "<strong>Demo:</strong> a replay of the 2026 race using real times. Use the slider to set what “now” is.") + '</p>' +
+        '<label class="v-cas-posuvnik">' + L("Teď", "Now") + ': <strong id="v-ted">' + den(ted) + " " + hm(ted) + '</strong>' +
         '<input type="range" id="v-posuvnik" min="' + od + '" max="' + doo + '" step="300" value="' + ted + '"></label>' +
         '<p class="v-tlacitka"><button type="button" data-posun="-3600">−1 h</button> <button type="button" data-posun="-900">−15 min</button> ' +
         '<button type="button" data-posun="900">+15 min</button> <button type="button" data-posun="3600">+1 h</button></p></div>';
     }
     var stav;
-    if (!model.zacal) stav = "Závod ještě nezačal.";
-    else if (model.dobehnuto) stav = data.oficialni ? "Oficiální výsledky." : "Všechny týmy doběhly. Neoficiální výsledky – probíhá kontrola.";
-    else stav = "Průběžné výsledky.";
-    h += '<p class="v-stav">' + stav + (UKAZKA ? "" : ' <span class="v-aktualizace">Aktualizováno ' + hms(nacteno) +
-      ", obnovuje se každou minutu.</span>") + "</p>";
-    if (model.dobehnuto && data.oficialni && data.pdf) h += '<p><a class="v-pdf" href="' + esc(data.pdf) + '">Výsledková listina (PDF)</a></p>';
-    h += '<nav class="v-pohledy" aria-label="Pohledy na výsledky">' + POHLEDY.map(function (p) {
+    if (!model.zacal) stav = L("Závod ještě nezačal.", "The race hasn't started yet.");
+    else if (model.dobehnuto) stav = data.oficialni ? L("Oficiální výsledky.", "Official results.") : L("Všechny týmy doběhly. Neoficiální výsledky – probíhá kontrola.", "All teams have finished. Unofficial results – being checked.");
+    else stav = L("Průběžné výsledky.", "Live results.");
+    h += '<p class="v-stav">' + stav + (UKAZKA ? "" : ' <span class="v-aktualizace">' + L("Aktualizováno ", "Updated ") + hms(nacteno) +
+      L(", obnovuje se každou minutu.", ", refreshes every minute.") + "</span>") + "</p>";
+    if (model.dobehnuto && data.oficialni && data.pdf) h += '<p><a class="v-pdf" href="' + esc(data.pdf) + '">' + L("Výsledková listina (PDF)", "Result list (PDF, in Czech)") + '</a></p>';
+    h += '<nav class="v-pohledy" aria-label="' + L("Pohledy na výsledky", "Results views") + '">' + POHLEDY.map(function (p) {
       return '<button type="button" data-pohled="' + p.k + '"' + (st.pohled === p.k ? ' aria-current="page" class="v-aktivni"' : "") + ">" + p.n + "</button>";
     }).join("") + "</nav>";
     return h;
   }
 
   function vyberKat() {
-    return '<label>Kategorie <select id="v-kat"><option value="">Všechny</option>' +
+    return '<label>' + L("Kategorie", "Category") + ' <select id="v-kat"><option value="">' + L("Všechny", "All") + '</option>' +
       Object.keys(KAT).map(function (k) { return '<option value="' + k + '"' + (st.kat === k ? " selected" : "") + ">" + KAT[k] + "</option>"; }).join("") +
       "</select></label>";
   }
   function vyberEtapy(id, hodnota, jenProbehle) {
-    var h = '<label>Na předávce <select id="' + id + '">';
+    var h = '<label>' + L("Na předávce", "At handover") + ' <select id="' + id + '">';
     for (var e = 1; e <= 30; e++) {
       var n = model.poradi[e].length;
       if (jenProbehle && !n) continue;
-      h += '<option value="' + e + '"' + (hodnota === e ? " selected" : "") + ">" + esc(P(e + 1)) + " (" + n + " týmů)</option>";
+      h += '<option value="' + e + '"' + (hodnota === e ? " selected" : "") + ">" + esc(P(e + 1)) + " (" + n + L(" týmů)", " teams)") + "</option>";
     }
     return h + "</select></label>";
   }
   function kdeJe(t) {
-    if (t.dnf) return '<span class="v-dnf">DNF</span> odstoupil na úseku P' + t.dnf + " → P" + (t.dnf + 1);
-    if (t.cil != null) return "v cíli " + hm(t.cil);
-    if (t.s == null) return "start neurčen";
+    if (t.dnf) return '<span class="v-dnf">DNF</span> ' + L("odstoupil na úseku", "withdrew on section") + ' P' + t.dnf + " → P" + (t.dnf + 1);
+    if (t.cil != null) return L("v cíli ", "finished ") + hm(t.cil);
+    if (t.s == null) return L("start neurčen", "start not set");
     if (ted < t.s) return "start " + hm(t.s);
     var e = t.E[t.bezi - 1];
-    return "běží na " + esc(P(t.bezi + 1)) + (e && e.zpozdeni ? ' <span class="v-zpozdeni">déle, než se čekalo</span>' : "");
+    return L("běží na ", "running to ") + esc(P(t.bezi + 1)) + (e && e.zpozdeni ? ' <span class="v-zpozdeni">' + L("déle, než se čekalo", "taking longer than expected") + '</span>' : "");
   }
 
   function pohledPoradi() {
@@ -116,7 +120,7 @@
     var rada = model.poradi[e].filter(function (t) { return !st.kat || t.k === st.kat; });
     var prvni = rada.length ? rada[0].E[e - 1].casTymu : null;
     var h = '<div class="v-filtry">' + vyberEtapy("v-etapa", e, true) + vyberKat() + "</div>";
-    h += '<div class="table-responsive"><table class="v-tabulka"><thead><tr><th>Poř.</th><th>Tým</th><th>Čas týmu</th><th class="v-mimo-mobil">Ztráta</th><th class="v-mimo-mobil">Posun</th></tr></thead><tbody>';
+    h += '<div class="table-responsive"><table class="v-tabulka"><thead><tr><th>' + L("Poř.", "Pos.") + '</th><th>' + L("Tým", "Team") + '</th><th>' + L("Čas týmu", "Team time") + '</th><th class="v-mimo-mobil">' + L("Ztráta", "Gap") + '</th><th class="v-mimo-mobil">' + L("Posun", "Change") + '</th></tr></thead><tbody>';
     rada.forEach(function (t, j) {
       var x = t.E[e - 1], pred = e > 1 ? t.E[e - 2] : null;
       var por = st.kat ? x.poradiKat : x.poradi, porPred = pred ? (st.kat ? pred.poradiKat : pred.poradi) : null;
@@ -128,15 +132,15 @@
     h += "</tbody></table></div>";
     var zbyva = model.tymy.filter(function (t) { return t.E[e - 1].casTymu == null && !(t.dnf && t.dnf <= e) && (!st.kat || t.k === st.kat); });
     if (zbyva.length) {
-      h += "<h3>Na " + esc(P(e + 1)) + " zatím nedorazili (" + zbyva.length + ")</h3><ul class=\"v-zbyva\">" + zbyva.map(function (t) {
+      h += "<h3>" + L("Na ", "Not yet at ") + esc(P(e + 1)) + L(" zatím nedorazili (", " (") + zbyva.length + ")</h3><ul class=\"v-zbyva\">" + zbyva.map(function (t) {
         var x = t.E[e - 1];
         return '<li><a href="#pohled=tym&tym=' + t.id + '" data-tym="' + t.id + '">' + esc(t.n) + "</a> – " + kdeJe(t) +
-          (x.odhad ? ", na P" + (e + 1) + " " + odhadText(x.odhad) : x.dobeh == null && t.posledni > e ? ", čas na P" + (e + 1) + " chybí" : "") + "</li>";
+          (x.odhad ? L(", na P", ", at P") + (e + 1) + " " + odhadText(x.odhad) : x.dobeh == null && t.posledni > e ? L(", čas na P", ", time at P") + (e + 1) + L(" chybí", " missing") : "") + "</li>";
       }).join("") + "</ul>";
     }
     var dnf = model.odstoupili.filter(function (t) { return t.dnf <= e && (!st.kat || t.k === st.kat); });
     if (dnf.length) {
-      h += '<h3>Odstoupili (' + dnf.length + ')</h3><ul class="v-zbyva">' + dnf.map(function (t) {
+      h += '<h3>' + L("Odstoupili", "Withdrawn") + ' (' + dnf.length + ')</h3><ul class="v-zbyva">' + dnf.map(function (t) {
         return '<li><a href="#pohled=tym&tym=' + t.id + '" data-tym="' + t.id + '">' + esc(t.n) + '</a> <span class="v-cislo">' + esc(t.c) + "</span> – " + kdeJe(t) + "</li>";
       }).join("") + "</ul>";
     }
@@ -145,9 +149,9 @@
 
   function predStartem() {
     var r = model.tymy.slice().sort(function (a, b) { return (a.s || 0) - (b.s || 0) || (a.c || 0) - (b.c || 0); });
-    var h = "<p>Průběžné pořadí se objeví po prvních doběhnutých etapách." + (data.datum_zavodu ? " Start závodu: " + new Date(data.datum_zavodu + "T12:00:00").toLocaleDateString("cs-CZ") + "." : "") + "</p>";
+    var h = "<p>" + L("Průběžné pořadí se objeví po prvních doběhnutých etapách.", "The live ranking will appear after the first stages are finished.") + (data.datum_zavodu ? L(" Start závodu: ", " Race start: ") + new Date(data.datum_zavodu + "T12:00:00").toLocaleDateString(LOC, EN ? { day: "numeric", month: "long", year: "numeric" } : undefined) + "." : "") + "</p>";
     if (!r.length) return h;
-    h += '<h3>Startovní listina</h3><div class="table-responsive"><table class="v-tabulka"><thead><tr><th>Start</th><th>Tým</th><th>Kategorie</th></tr></thead><tbody>';
+    h += '<h3>' + L("Startovní listina", "Start list") + '</h3><div class="table-responsive"><table class="v-tabulka"><thead><tr><th>Start</th><th>' + L("Tým", "Team") + '</th><th>' + L("Kategorie", "Category") + '</th></tr></thead><tbody>';
     r.forEach(function (t) {
       h += "<tr><td>" + (t.s ? hm(t.s) : "–") + '</td><td><a href="#pohled=tym&tym=' + t.id + '" data-tym="' + t.id + '">' + esc(t.n) + '</a> <span class="v-cislo">' + esc(t.c) + "</span></td><td>" + esc(KAT[t.k] || "") + "</td></tr>";
     });
@@ -156,11 +160,11 @@
 
   function pohledTym() {
     var t = model.tymy.filter(function (x) { return String(x.id) === String(st.tym); })[0];
-    var h = '<div class="v-filtry"><label>Najdi tým (název nebo číslo) <input type="search" id="v-hledat" value="' + esc(st.hledat) + '"></label></div>';
+    var h = '<div class="v-filtry"><label>' + L("Najdi tým (název nebo číslo)", "Find a team (name or number)") + ' <input type="search" id="v-hledat" value="' + esc(st.hledat) + '"></label></div>';
     var q = st.hledat.trim().toLowerCase();
     if (q || !t) {
       var nal = model.tymy.filter(function (x) { return !q || String(x.c) === q || String(x.n).toLowerCase().indexOf(q) >= 0; })
-        .sort(function (a, b) { return String(a.n).localeCompare(String(b.n), "cs"); });
+        .sort(function (a, b) { return String(a.n).localeCompare(String(b.n), EN ? "en" : "cs"); });
       h += '<ul class="v-seznam-tymu">' + nal.map(function (x) {
         return '<li><a href="#pohled=tym&tym=' + x.id + '" data-tym="' + x.id + '">' + esc(x.n) + '</a> <span class="v-cislo">' + esc(x.c) + "</span></li>";
       }).join("") + "</ul>";
@@ -169,38 +173,38 @@
     var posl = t.posledni ? t.E[t.posledni - 1] : null;
     h += '<h2 class="v-tym-nazev">' + esc(t.n) + ' <span class="v-cislo">' + esc(t.c) + "</span></h2>";
     h += '<p class="v-tym-stav">' + esc(KAT[t.k] || "") + " · " + kdeJe(t) +
-      (posl && posl.poradi ? " · na " + esc(P(t.posledni + 1)) + " " + posl.poradi + ". celkově, " + posl.poradiKat + ". v kategorii" +
-        (model.poradi[t.posledni].length < model.tymy.length ? " (z " + model.poradi[t.posledni].length + " týmů, které tam už dorazily)" : "") : "") + "</p>";
-    h += '<p><button type="button" id="v-odkaz">Zkopírovat odkaz na tým</button> <span id="v-odkaz-ok" class="v-ok" hidden>Zkopírováno.</span></p>';
-    h += '<div class="table-responsive"><table class="v-tabulka v-detail"><thead><tr><th>Úsek</th><th>Běžec</th><th>Příchod na předávku</th><th>Čas etapy</th><th class="v-mimo-mobil">Proti plánu</th></tr></thead><tbody>';
+      (posl && posl.poradi ? L(" · na ", " · at ") + esc(P(t.posledni + 1)) + " " + posl.poradi + L(". celkově, ", ". overall, ") + posl.poradiKat + L(". v kategorii", ". in category") +
+        (model.poradi[t.posledni].length < model.tymy.length ? L(" (z ", " (of ") + model.poradi[t.posledni].length + L(" týmů, které tam už dorazily)", " teams that have arrived there)") : "") : "") + "</p>";
+    h += '<p><button type="button" id="v-odkaz">' + L("Zkopírovat odkaz na tým", "Copy link to team") + '</button> <span id="v-odkaz-ok" class="v-ok" hidden>' + L("Zkopírováno.", "Copied.") + '</span></p>';
+    h += '<div class="table-responsive"><table class="v-tabulka v-detail"><thead><tr><th>' + L("Úsek", "Section") + '</th><th>' + L("Běžec", "Runner") + '</th><th>' + L("Příchod na předávku", "Arrival at handover") + '</th><th>' + L("Čas etapy", "Stage time") + '</th><th class="v-mimo-mobil">' + L("Proti plánu", "Vs. plan") + '</th></tr></thead><tbody>';
     t.E.forEach(function (e) {
       var tr = e.dobeh != null ? "" : e.i === t.bezi ? ' class="v-bezi"' : e.odhad ? ' class="v-budouci"' : "";
       var naPred, casE = "", proti = "";
       if (e.dobeh != null) {
         naPred = hms(e.dobeh);
-        if (e.nelogicky || e.proveruje) casE = '<span class="v-chybi">čas se prověřuje</span>';
-        else if (e.cas != null) { casE = trvani(e.cas) + (e.pausal != null ? ' <small class="v-pausal">paušál</small>' : ""); proti = e.plan && e.pausal == null ? rozdil(e.cas - e.plan) : ""; }
-        else casE = '<span class="v-chybi">chybí čas předávky ' + e.i + "</span>";
+        if (e.nelogicky || e.proveruje) casE = '<span class="v-chybi">' + L("čas se prověřuje", "time being checked") + '</span>';
+        else if (e.cas != null) { casE = trvani(e.cas) + (e.pausal != null ? ' <small class="v-pausal">' + L("paušál", "flat rate") + '</small>' : ""); proti = e.plan && e.pausal == null ? rozdil(e.cas - e.plan) : ""; }
+        else casE = '<span class="v-chybi">' + L("chybí čas předávky ", "missing time at handover ") + e.i + "</span>";
       } else if (t.dnf && e.i >= t.dnf) {
         naPred = e.i === t.dnf ? '<span class="v-dnf">DNF</span>' : "";
       } else if (e.odhad) {
-        naPred = '<span class="v-odhad">' + odhadText(e.odhad) + "</span>" + (e.zpozdeni ? ' <span class="v-zpozdeni">déle, než se čekalo</span>' : "");
+        naPred = '<span class="v-odhad">' + odhadText(e.odhad) + "</span>" + (e.zpozdeni ? ' <span class="v-zpozdeni">' + L("déle, než se čekalo", "taking longer than expected") + '</span>' : "");
       } else if (t.posledni > e.i) {
-        naPred = '<span class="v-chybi">' + (e.proveruje ? "čas se prověřuje" : "chybí") + "</span>";
+        naPred = '<span class="v-chybi">' + (e.proveruje ? L("čas se prověřuje", "time being checked") : L("chybí", "missing")) + "</span>";
       } else naPred = "";
-      h += "<tr" + tr + "><td>P" + e.i + " → P" + (e.i + 1) + ' <small class="v-misto">' + esc(misto(e.i)) + " → " + esc(misto(e.i + 1)) + " · etapa " + e.i + "</small></td><td>" + esc(e.jm) +
-        (e.i === t.bezi ? ' <small class="v-bezi-znacka">běží</small>' : "") + "</td><td>" + naPred + "</td><td>" + casE + '</td><td class="v-mimo-mobil">' + proti + "</td></tr>";
+      h += "<tr" + tr + "><td>P" + e.i + " → P" + (e.i + 1) + ' <small class="v-misto">' + esc(misto(e.i)) + " → " + esc(misto(e.i + 1)) + L(" · etapa ", " · stage ") + e.i + "</small></td><td>" + esc(e.jm) +
+        (e.i === t.bezi ? ' <small class="v-bezi-znacka">' + L("běží", "running") + '</small>' : "") + "</td><td>" + naPred + "</td><td>" + casE + '</td><td class="v-mimo-mobil">' + proti + "</td></tr>";
     });
     return h + "</tbody></table></div>" + legenda();
   }
 
   function pohledPredavky() {
-    var h = '<p class="v-poznamka">U každé předávky: kolik týmů už prošlo a kdy se čekají další. Odhad je zaokrouhlený na 5 minut.</p><div class="v-predavky">';
+    var h = '<p class="v-poznamka">' + L("U každé předávky: kolik týmů už prošlo a kdy se čekají další. Odhad je zaokrouhlený na 5 minut.", "For each handover: how many teams have passed and when the next ones are expected. Estimates are rounded to 5 minutes.") + '</p><div class="v-predavky">';
     var hotove = 0;
     for (var m0 = 2; m0 <= 31; m0++) {
       if (model.tymy.every(function (t) { return t.E[m0 - 2].dobeh != null || t.posledni > m0 - 1 || (t.dnf && t.dnf <= m0 - 1); })) hotove = m0; else break;
     }
-    if (hotove >= 2) h += '<p class="v-predavka">' + (hotove > 2 ? "Předávkami P2–P" + hotove : "Předávkou P2") + " už prošly všechny týmy.</p>";
+    if (hotove >= 2) h += '<p class="v-predavka">' + (EN ? "All teams have passed " + (hotove > 2 ? "handovers P2–P" + hotove : "handover P2") + "." : (hotove > 2 ? "Předávkami P2–P" + hotove : "Předávkou P2") + " už prošly všechny týmy.") + "</p>";
     for (var m = Math.max(2, hotove + 1); m <= 31; m++) {
       var e = m - 1, pros = [], ceka = [], celkem = 0;
       model.tymy.forEach(function (t) {
@@ -213,11 +217,11 @@
       ceka.sort(function (a, b) { return a.p - b.p; });
       var brzy = ceka.filter(function (c) { return c.p <= ted + 1800; });
       pros.sort(function (a, b) { return a - b; });
-      var souhrn = "prošlo " + pros.length + " z " + celkem + (ceka.length ? " · další " + odhadText(ceka[0].p) : pros.length === celkem ? " · všichni prošli" : "");
+      var souhrn = L("prošlo ", "passed ") + pros.length + L(" z ", " of ") + celkem + (ceka.length ? L(" · další ", " · next ") + odhadText(ceka[0].p) : pros.length === celkem ? L(" · všichni prošli", " · all passed") : "");
       h += '<details class="v-predavka"' + (brzy.length ? " open" : "") + "><summary><strong>" + esc(P(m)) + "</strong> <span>" + souhrn + "</span></summary>";
-      h += "<p>" + (pros.length ? "První prošel " + hm(pros[0]) + ", zatím poslední " + hm(pros[pros.length - 1]) + ". " : "") +
-        (ceka.length ? "Ze zbývajících se první čeká " + odhadText(ceka[0].p) + ", poslední " + odhadText(ceka[ceka.length - 1].p) + "." : "") + "</p>";
-      if (brzy.length) h += "<p>Do 30 minut:</p><ul>" + brzy.map(function (c) {
+      h += "<p>" + (pros.length ? L("První prošel ", "First passed ") + hm(pros[0]) + L(", zatím poslední ", ", latest so far ") + hm(pros[pros.length - 1]) + ". " : "") +
+        (ceka.length ? L("Ze zbývajících se první čeká ", "Of the remaining teams, the first is expected ") + odhadText(ceka[0].p) + L(", poslední ", ", the last ") + odhadText(ceka[ceka.length - 1].p) + "." : "") + "</p>";
+      if (brzy.length) h += "<p>" + L("Do 30 minut:", "Within 30 minutes:") + "</p><ul>" + brzy.map(function (c) {
         return "<li>" + odhadText(c.p) + ' <a href="#pohled=tym&tym=' + c.t.id + '" data-tym="' + c.t.id + '">' + esc(c.t.n) + "</a> – " + esc(c.t.E[e - 1].jm) + "</li>";
       }).join("") + "</ul>";
       h += "</details>";
@@ -229,12 +233,12 @@
     var e = st.etapaCasy || model.vychozi || 1;
     var r = model.tymy.filter(function (t) { var x = t.E[e - 1]; return x.cas != null && x.pausal == null && !x.nelogicky && (!st.kat || t.k === st.kat); })
       .sort(function (a, b) { return a.E[e - 1].cas - b.E[e - 1].cas; });
-    var h = '<div class="v-filtry"><label>Úsek <select id="v-etapa-casy">';
-    for (var i = 1; i <= 30; i++) h += '<option value="' + i + '"' + (i === e ? " selected" : "") + ">P" + i + " " + esc(misto(i)) + " → P" + (i + 1) + " " + esc(misto(i + 1)) + " (etapa " + i + ")</option>";
+    var h = '<div class="v-filtry"><label>' + L("Úsek", "Section") + ' <select id="v-etapa-casy">';
+    for (var i = 1; i <= 30; i++) h += '<option value="' + i + '"' + (i === e ? " selected" : "") + ">P" + i + " " + esc(misto(i)) + " → P" + (i + 1) + " " + esc(misto(i + 1)) + L(" (etapa ", " (stage ") + i + ")</option>";
     h += "</select></label>" + vyberKat() + "</div>";
-    if (!r.length) return h + "<p>Na tomto úseku zatím nejsou změřené časy.</p>";
-    h += '<p class="v-poznamka">' + (km(e) ? km(e) + " km · " : "") + "změřeno " + r.length + " běžců.</p>";
-    h += '<div class="table-responsive"><table class="v-tabulka"><thead><tr><th>Poř.</th><th>Běžec</th><th>Tým</th><th>Čas</th><th class="v-mimo-mobil">Tempo</th><th class="v-mimo-mobil">Proti plánu</th></tr></thead><tbody>';
+    if (!r.length) return h + "<p>" + L("Na tomto úseku zatím nejsou změřené časy.", "No times have been recorded on this section yet.") + "</p>";
+    h += '<p class="v-poznamka">' + (km(e) ? km(e) + " km · " : "") + L("změřeno ", "") + r.length + L(" běžců.", " runners timed.") + "</p>";
+    h += '<div class="table-responsive"><table class="v-tabulka"><thead><tr><th>' + L("Poř.", "Pos.") + '</th><th>' + L("Běžec", "Runner") + '</th><th>' + L("Tým", "Team") + '</th><th>' + L("Čas", "Time") + '</th><th class="v-mimo-mobil">' + L("Tempo", "Pace") + '</th><th class="v-mimo-mobil">' + L("Proti plánu", "Vs. plan") + '</th></tr></thead><tbody>';
     r.forEach(function (t, j) {
       var x = t.E[e - 1];
       h += "<tr><td>" + (j + 1) + ".</td><td>" + esc(x.jm) + '</td><td><a href="#pohled=tym&tym=' + t.id + '" data-tym="' + t.id + '">' + esc(t.n) + "</a></td><td>" + trvani(x.cas) +
@@ -244,15 +248,16 @@
   }
 
   function legenda() {
-    return '<p class="v-legenda">14:32:10 = změřený čas · <span class="v-odhad">≈ 14:35</span> = odhad podle dosavadního tempa (zaokrouhlený na 5 min) · <span class="v-chybi">chybí</span> = čas nebyl zapsán · <span class="v-dnf">DNF</span> = tým odstoupil.</p>';
+    return '<p class="v-legenda">' + L('14:32:10 = změřený čas · <span class="v-odhad">≈ 14:35</span> = odhad podle dosavadního tempa (zaokrouhlený na 5 min) · <span class="v-chybi">chybí</span> = čas nebyl zapsán · <span class="v-dnf">DNF</span> = tým odstoupil.',
+      '14:32:10 = recorded time · <span class="v-odhad">≈ 14:35</span> = estimate based on the pace so far (rounded to 5 min) · <span class="v-chybi">missing</span> = time not recorded · <span class="v-dnf">DNF</span> = team withdrew.') + '</p>';
   }
 
   function vykresli() {
     if (chyba) { koren.innerHTML = '<p class="upozorneni">' + esc(chyba) + "</p>"; return; }
-    if (!data) { koren.innerHTML = "<p>Načítám výsledky…</p>"; return; }
+    if (!data) { koren.innerHTML = "<p>" + L("Načítám výsledky…", "Loading results…") + "</p>"; return; }
     if (!data.zobrazit) {
-      koren.innerHTML = "<p>Průběžné výsledky ročníku se tu objeví během závodu" +
-        (data.datum_zavodu ? " (" + new Date(data.datum_zavodu + "T12:00:00").toLocaleDateString("cs-CZ") + ")" : "") + ".</p>" +
+      koren.innerHTML = "<p>" + L("Průběžné výsledky ročníku se tu objeví během závodu", "Live results will appear here during the race") +
+        (data.datum_zavodu ? " (" + new Date(data.datum_zavodu + "T12:00:00").toLocaleDateString(LOC, EN ? { day: "numeric", month: "long", year: "numeric" } : undefined) + ")" : "") + ".</p>" +
         (ADMIN ? '<p><a href="?ukazka=hb26">Vyzkoušej ukázku na ročníku 2026</a> <span class="v-aktualizace">(vidí jen přihlášený organizátor)</span></p>' : "");
       return;
     }
@@ -286,7 +291,7 @@
       var url = location.origin + location.pathname + (UKAZKA ? "?ukazka=hb26" : "") + "#pohled=tym&tym=" + st.tym;
       (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () {
         var ok = document.getElementById("v-odkaz-ok"); if (ok) ok.hidden = false;
-      }).catch(function () { prompt("Zkopíruj odkaz:", url); });
+      }).catch(function () { prompt(L("Zkopíruj odkaz:", "Copy the link:"), url); });
     }
   });
   koren.addEventListener("change", function (ev) {
@@ -337,7 +342,7 @@
       nacteno = Math.floor(Date.now() / 1000);
       chyba = null;
     } catch (e) {
-      if (!data) chyba = "Výsledky se nepodařilo načíst. Zkus stránku obnovit za chvíli.";
+      if (!data) chyba = L("Výsledky se nepodařilo načíst. Zkus stránku obnovit za chvíli.", "The results couldn't be loaded. Please try refreshing the page in a moment.");
     }
     vykresli();
   }

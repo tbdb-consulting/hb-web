@@ -1,38 +1,46 @@
 ---
 pagination:
-  data: trasa.etapy
+  data: trasa.strankyEtap
   size: 1
-  alias: e
-permalink: "{{ e.adresa }}index.html"
+  alias: st
+permalink: "{{ st.adresa }}index.html"
 layout: zaklad.njk
 eleventyComputed:
-  titulek: "Etapa {{ e.cislo }}: {{ e.nazev }}"
-  metaPopis: "Etapa {{ e.cislo }} závodu Hory Bory: {{ e.nazev }}, {{ e.delkaKm | cz }} km, převýšení {{ e.prevyseni }} m."
-  adresa: "/trasa/"
+  titulek: "{% if st.jazyk == 'en' %}Stage {{ st.e.cislo }}: {{ st.e.nazev }}{% else %}Etapa {{ st.e.cislo }}: {{ st.e.nazev }}{% endif %}"
+  metaPopis: "{% if st.jazyk == 'en' %}Stage {{ st.e.cislo }} of the Hory Bory race: {{ st.e.nazev }}, {{ st.e.delkaKm }} km, {{ st.e.prevyseni }} m of climbing.{% else %}Etapa {{ st.e.cislo }} závodu Hory Bory: {{ st.e.nazev }}, {{ st.e.delkaKm | cz }} km, převýšení {{ st.e.prevyseni }} m.{% endif %}"
+  adresa: "{{ '/en/route/' if st.jazyk == 'en' else '/trasa/' }}"
+  jazyk: "{{ st.jazyk }}"
+  altCs: "{{ st.e.adresa }}"
+  altEn: "{{ st.e.adresaEn }}"
 ---
+{#- Stránka etapy v obou jazycích (20. 10. 2026). Tištěná karta dole zůstává česky – je to oficiální karta závodu. -#}
+{%- set e = st.e -%}
+{%- set jaz = st.jazyk -%}
+{%- set en = jaz == "en" -%}
+{%- set km = (e.delkaKm if en else (e.delkaKm | cz)) -%}
 <meta name="hb-rok" content="{{ trasa.rokCislo }}">
 
 
-<nav class="etapa-drobky" aria-label="Kde jsi">
-  <a href="{{ web.zaklad }}/trasa/">Trasa a etapy</a> <span aria-hidden="true">›</span> Etapa {{ e.cislo }}
+<nav class="etapa-drobky" aria-label="{{ 'Kde jsi' | t(jaz) }}">
+  <a href="{{ web.zaklad }}{{ '/en/route/' if en else '/trasa/' }}">{{ "Trasa a etapy" | t(jaz) }}</a> <span aria-hidden="true">›</span> {{ "Etapa" | t(jaz) }} {{ e.cislo }}
 </nav>
 
 <h1 class="etapa-nadpis"><span class="etapa-cislo">{{ e.cislo }}</span> {{ e.nazev }}</h1>
 
 <ul class="etapa-cisla">
-  <li><strong>{{ e.delkaKm | cz }}&nbsp;km</strong><span>délka</span></li>
-  <li><strong>{{ e.prevyseni }} m</strong><span>stoupání</span></li>
-  <li><strong>{{ e.klesani }} m</strong><span>klesání</span></li>
-  {% if e.penalizace %}<li><strong>{{ e.penalizace }}</strong><span>penalizace</span></li>{% endif %}
+  <li><strong>{{ km }}&nbsp;km</strong><span>{{ "délka" | t(jaz) }}</span></li>
+  <li><strong>{{ e.prevyseni }} m</strong><span>{{ "stoupání" | t(jaz) }}</span></li>
+  <li><strong>{{ e.klesani }} m</strong><span>{{ "klesání" | t(jaz) }}</span></li>
+  {% if e.penalizace %}<li><strong>{{ e.penalizace }}</strong><span>{{ "penalizace" | t(jaz) }}</span></li>{% endif %}
 </ul>
 
-{% if e.povrch %}<p class="etapa-povrch">Povrch: {{ e.povrch }}</p>{% endif %}
+{% if e.povrch %}<p class="etapa-povrch">{{ "Povrch:" | t(jaz) }} {{ e.povrchEn if en else e.povrch }}</p>{% endif %}
 
 <section class="etapa-blok">
-  <h2>Výškový profil</h2>
+  <h2>{{ "Výškový profil" | t(jaz) }}</h2>
   <figure class="profil">
     <svg viewBox="0 0 {{ e.svg.S }} {{ e.svg.V }}" preserveAspectRatio="none" role="img"
-         aria-label="Výškový profil etapy {{ e.cislo }}: začíná v {{ e.profil.min }} m n. m., nejvýše {{ e.profil.max }} m n. m.">
+         aria-label="{% if en %}Elevation profile of stage {{ e.cislo }}: starts at {{ e.profil.min }} m a.s.l., highest point {{ e.profil.max }} m a.s.l.{% else %}Výškový profil etapy {{ e.cislo }}: začíná v {{ e.profil.min }} m n. m., nejvýše {{ e.profil.max }} m n. m.{% endif %}">
       <path class="profil-plocha" d="{{ e.svg.plocha }}"></path>
       <path class="profil-cara" d="{{ e.svg.cara }}"></path>
     </svg>
@@ -42,9 +50,9 @@ eleventyComputed:
       {% endfor %}
     </div>
     <figcaption>
-      <span>{{ e.start.kod }} {{ e.start.nazev }} · {{ e.profil.startV }} m n. m.</span>
-      <span class="profil-vrchol">nejvýše {{ e.profil.max }} m n. m.</span>
-      <span>{{ e.cil.kod }} {{ e.cil.nazev }} · {{ e.profil.cilV }} m n. m.</span>
+      <span>{{ e.start.kod | t(jaz) }} {{ e.start.nazev }} · {{ e.profil.startV }} {{ "m n. m." | t(jaz) }}</span>
+      <span class="profil-vrchol">{{ "nejvýše" | t(jaz) }} {{ e.profil.max }} {{ "m n. m." | t(jaz) }}</span>
+      <span>{{ e.cil.kod | t(jaz) }} {{ e.cil.nazev }} · {{ e.profil.cilV }} {{ "m n. m." | t(jaz) }}</span>
     </figcaption>
   </figure>
 </section>
@@ -52,81 +60,81 @@ eleventyComputed:
 <section class="etapa-blok etapa-body">
   <div class="etapa-bod">
     <h2>Start</h2>
-    <p class="etapa-misto"><span class="etapa-kod">{{ e.start.kod }}</span> {{ e.start.nazev }}</p>
+    <p class="etapa-misto"><span class="etapa-kod">{{ e.start.kod | t(jaz) }}</span> {{ e.start.nazev }}</p>
     {% if e.start.detail %}<p class="etapa-gps">{{ e.start.detail }}</p>{% endif %}
   </div>
   <div class="etapa-bod">
-    <h2>Cíl</h2>
-    <p class="etapa-misto"><span class="etapa-kod">{{ e.cil.kod }}</span> {{ e.cil.nazev }}</p>
+    <h2>{{ "Cíl" | t(jaz) }}</h2>
+    <p class="etapa-misto"><span class="etapa-kod">{{ e.cil.kod | t(jaz) }}</span> {{ e.cil.nazev }}</p>
     {% if e.cil.detail %}<p class="etapa-gps">{{ e.cil.detail }}</p>{% endif %}
   </div>
 </section>
 
-
-{% if e.popis %}
+{% set popis = e.popisEn if en else e.popis %}
+{% if popis %}
 <section class="etapa-blok">
-  <h2>Trasa běžce</h2>
-  <div class="text etapa-popis">{{ e.popis | safe }}</div>
+  <h2>{{ "Trasa běžce" | t(jaz) }}</h2>
+  <div class="text etapa-popis">{{ popis | safe }}</div>
 </section>
 {% endif %}
 
 
 <section class="etapa-blok etapa-mapa">
-  <h2>Mapa trasy</h2>
-  <img src="{{ web.zaklad }}{{ e.obrazky.mapa }}" alt="Mapa trasy etapy {{ e.cislo }}" loading="lazy" width="900" height="1100">
+  <h2>{{ "Mapa trasy" | t(jaz) }}</h2>
+  <img src="{{ web.zaklad }}{{ e.obrazky.mapa }}" alt="{{ 'Mapa trasy etapy' | t(jaz) }} {{ e.cislo }}" loading="lazy" width="900" height="1100">
   {% if e.mapaUrl %}
   <div class="etapa-qr">
-    <a href="{{ e.mapaUrl }}" rel="noopener"><img src="{{ web.zaklad }}{{ e.obrazky.qr }}" alt="QR kód na trasu etapy {{ e.cislo }} v mapách" width="120" height="120"></a>
-    <p>Trasa v mapě<br><a href="{{ e.mapaUrl }}" rel="noopener">otevřít na mapy.com</a></p>
+    <a href="{{ e.mapaUrl }}" rel="noopener"><img src="{{ web.zaklad }}{{ e.obrazky.qr }}" alt="{{ 'QR kód na trasu etapy v mapách' | t(jaz) }} {{ e.cislo }}" width="120" height="120"></a>
+    <p>{{ "Trasa v mapě" | t(jaz) }}<br><a href="{{ e.mapaUrl }}" rel="noopener">{{ "otevřít na mapy.com" | t(jaz) }}</a></p>
   </div>
   {% endif %}
 </section>
 
 <section class="etapa-blok etapa-parkovani">
-  <h2>Parkování v cíli</h2>
-  <img src="{{ web.zaklad }}{{ e.obrazky.parkoviste }}" alt="Letecký snímek parkoviště u cíle etapy {{ e.cislo }}" loading="lazy" width="700" height="450">
+  <h2>{{ "Parkování v cíli" | t(jaz) }}</h2>
+  <img src="{{ web.zaklad }}{{ e.obrazky.parkoviste }}" alt="{{ 'Letecký snímek parkoviště u cíle etapy' | t(jaz) }} {{ e.cislo }}" loading="lazy" width="700" height="450">
   {% if e.autoKm %}
-  <p class="etapa-auto">Autem z předchozí předávky {{ e.autoKm | cz }}&nbsp;km, přibližně {{ e.autoMin }} minut.</p>
+  <p class="etapa-auto">{% if en %}By car from the previous handover {{ e.autoKm }}&nbsp;km, about {{ e.autoMin }} minutes.{% else %}Autem z předchozí předávky {{ e.autoKm | cz }}&nbsp;km, přibližně {{ e.autoMin }} minut.{% endif %}</p>
   {% endif %}
 </section>
 
 {% if e.useky.length %}
 <section class="etapa-blok etapa-useky-blok">
-  <h2>Úseky etapy</h2>
+  <h2>{{ "Úseky etapy" | t(jaz) }}</h2>
   <div class="table-responsive">
   <table class="etapa-useky">
     <thead>
-      <tr><th>Od&nbsp;km</th><th>Do&nbsp;km</th><th>Délka</th><th>Ráz</th><th>Povrch</th><th>Sklon</th><th>Auto</th></tr>
+      <tr><th>{{ "Od km" | t(jaz) }}</th><th>{{ "Do km" | t(jaz) }}</th><th>{{ "Délka" | t(jaz) }}</th><th>{{ "Ráz" | t(jaz) }}</th><th>{{ "Povrch" | t(jaz) }}</th><th>{{ "Sklon" | t(jaz) }}</th><th>{{ "Auto" | t(jaz) }}</th></tr>
     </thead>
     <tbody>
       {% for u in e.useky %}
       <tr>
-        <td>{{ (u.od_m / 1000) | round(1) | cz }}</td>
-        <td>{{ (u.do_m / 1000) | round(1) | cz }}</td>
-        <td>{% if u.delka_m < 1000 %}{{ u.delka_m }}&nbsp;m{% else %}{{ (u.delka_m / 1000) | round(1) | cz }}&nbsp;km{% endif %}</td>
-        <td>{{ u.raz }}</td>
-        <td>{{ u.povrch }}</td>
-        <td>{{ u.sklon_pct | cz }}&nbsp;%</td>
-        <td>{% if u.auto %}ano{% else %}ne{% endif %}</td>
+        <td>{{ (u.od_m / 1000) | round(1) if en else ((u.od_m / 1000) | round(1) | cz) }}</td>
+        <td>{{ (u.do_m / 1000) | round(1) if en else ((u.do_m / 1000) | round(1) | cz) }}</td>
+        <td>{% if u.delka_m < 1000 %}{{ u.delka_m }}&nbsp;m{% else %}{{ (u.delka_m / 1000) | round(1) if en else ((u.delka_m / 1000) | round(1) | cz) }}&nbsp;km{% endif %}</td>
+        <td>{{ u.raz | t(jaz) }}</td>
+        <td>{{ u.povrch | t(jaz) }}</td>
+        <td>{{ u.sklon_pct if en else (u.sklon_pct | cz) }}&nbsp;%</td>
+        <td>{% if u.auto %}{{ "ano" | t(jaz) }}{% else %}{{ "ne" | t(jaz) }}{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   </div>
-  <p class="etapa-vysvetlivka">Sloupec „Auto“ říká, jestli se dá úsek objet autem — doprovod podle něj pozná, kde běžce uvidí.</p>
+  <p class="etapa-vysvetlivka">{{ "Sloupec „Auto“ říká, jestli se dá úsek objet autem — doprovod podle něj pozná, kde běžce uvidí." | t(jaz) }}</p>
 </section>
 {% endif %}
 
-<nav class="etapa-sousedi" aria-label="Další etapy">
-  {% if e.predchozi %}<a class="etapa-zpet" href="{{ web.zaklad }}{{ e.predchozi.adresa }}">‹ {{ e.predchozi.cislo }}. {{ e.predchozi.nazev }}</a>{% endif %}
-  {% if e.dalsi %}<a class="etapa-vpred" href="{{ web.zaklad }}{{ e.dalsi.adresa }}">{{ e.dalsi.cislo }}. {{ e.dalsi.nazev }} ›</a>{% endif %}
+<nav class="etapa-sousedi" aria-label="{{ 'Další etapy' | t(jaz) }}">
+  {% if e.predchozi %}<a class="etapa-zpet" href="{{ web.zaklad }}{{ e.predchozi.adresaEn if en else e.predchozi.adresa }}">‹ {{ e.predchozi.cislo }}. {{ e.predchozi.nazev }}</a>{% endif %}
+  {% if e.dalsi %}<a class="etapa-vpred" href="{{ web.zaklad }}{{ e.dalsi.adresaEn if en else e.dalsi.adresa }}">{{ e.dalsi.cislo }}. {{ e.dalsi.nazev }} ›</a>{% endif %}
 </nav>
 
 <p class="etapa-tisk">
-  {% if e.pdf %}<a class="c-btn" href="{{ web.zaklad }}{{ e.pdf }}">Stáhnout kartu etapy (PDF)</a>{% endif %}
-  {% if e.gpx %}<a class="c-btn c-btn-vedlejsi" href="{{ web.zaklad }}{{ e.gpx }}" download>Stáhnout GPX</a>{% endif %}
+  {% if e.pdf %}<a class="c-btn" href="{{ web.zaklad }}{{ e.pdf }}">{{ "Stáhnout kartu etapy (PDF)" | t(jaz) }}</a>{% endif %}
+  {% if e.gpx %}<a class="c-btn c-btn-vedlejsi" href="{{ web.zaklad }}{{ e.gpx }}" download>{{ "Stáhnout GPX" | t(jaz) }}</a>{% endif %}
 </p>
-<p class="etapa-tisk-pozn">Kartu je nejlepší vytisknout ze staženého PDF — má hotovou tiskovou podobu na dvě strany A4.</p>
+<p class="etapa-tisk-pozn">{{ "Kartu je nejlepší vytisknout ze staženého PDF — má hotovou tiskovou podobu na dvě strany A4." | t(jaz) }}</p>
 
 {#  Tištěná karta etapy. Na obrazovce se nezobrazuje, v tisku naopak nahrazuje
     celou stránku. Je to samostatná struktura — dva listy A4, každý s vlastní

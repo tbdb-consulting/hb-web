@@ -1,6 +1,6 @@
 ---
 pagination:
-  data: obsah.stranky
+  data: obsah.vsechnyStranky
   size: 1
   alias: stranka
 permalink: "{{ stranka.adresa }}index.html"
@@ -11,12 +11,21 @@ eleventyComputed:
   stav: "{{ stranka.stav }}"
   upozorneni: "{{ stranka.upozorneni }}"
   adresa: "{{ stranka.adresa }}"
+  jazyk: "{{ stranka.jazyk }}"
+  altCs: "{{ stranka.alt.cs }}"
+  altEn: "{{ stranka.alt.en }}"
 ---
+{#- Obsahové stránky z databáze v obou jazycích (čeština na /, angličtina na /en/, 20. 10. 2026). -#}
+{%- set jaz = stranka.jazyk -%}
+{%- set en = jaz == "en" -%}
+{%- set otazky = obsah.otazkyEn if en else obsah.otazky -%}
 <h1>{{ stranka.titulek }}</h1>
 
 {% if stranka.kod == "uvod" %}
-  <p class="perex">{{ web.popis }}</p>
-  {# vyskakovací okno – nastavení z administrace se čte až v prohlížeči (19. 10. 2026) #}
+  <p class="perex">{{ web.popis | t(jaz) }}</p>
+  {% endif %}
+  {% if stranka.kod == "uvod" and not en %}
+  {# vyskakovací okno (obsah je jen česky, proto jen na české úvodní stránce) – nastavení z administrace se čte až v prohlížeči (19. 10. 2026) #}
   <script>window.HB = window.HB || { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}" };</script>
   <script src="{{ web.zaklad }}/assets/popup.js" data-auto="ano" defer></script>
 {% endif %}
@@ -34,23 +43,28 @@ eleventyComputed:
 
 {% if stranka.kod == "trasa" and trasa.etapy.length %}
   <p class="trasa-souhrn">
+    {% if en %}
+    {{ trasa.celkem.etap }} stages, {{ trasa.celkem.km }}&nbsp;km, {{ trasa.celkem.prevyseni }}&nbsp;m of climbing in total.
+    Every stage has its own page with an elevation profile, map and route description.
+    {% else %}
     {{ trasa.celkem.etap }} etap, {{ trasa.celkem.km | cz }}&nbsp;km, celkem {{ trasa.celkem.prevyseni }} m stoupání.
     Každá etapa má vlastní stránku s profilem, mapou a popisem trasy.
+    {% endif %}
   </p>
   <div class="table-responsive">
   <table class="trasa-tabulka">
     <thead>
-      <tr><th>Č.</th><th>Etapa</th><th>Délka</th><th>Stoupání</th><th>Klesání</th><th>Povrch</th><th>Karta</th></tr>
+      <tr><th>{{ "Č." | t(jaz) }}</th><th>{{ "Etapa" | t(jaz) }}</th><th>{{ "Délka" | t(jaz) }}</th><th>{{ "Stoupání" | t(jaz) }}</th><th>{{ "Klesání" | t(jaz) }}</th><th>{{ "Povrch" | t(jaz) }}</th><th>{{ "Karta" | t(jaz) }}</th></tr>
     </thead>
     <tbody>
       {% for e in trasa.etapy %}
       <tr>
         <td class="trasa-cislo">{{ e.cislo }}</td>
-        <td><a href="{{ web.zaklad }}{{ e.adresa }}">{{ e.nazev }}</a></td>
-        <td>{{ e.delkaKm | cz }}&nbsp;km</td>
+        <td><a href="{{ web.zaklad }}{{ e.adresaEn if en else e.adresa }}">{{ e.nazev }}</a></td>
+        <td>{{ e.delkaKm if en else (e.delkaKm | cz) }}&nbsp;km</td>
         <td>{{ e.prevyseni }}&nbsp;m</td>
         <td>{{ e.klesani }}&nbsp;m</td>
-        <td class="trasa-povrch">{{ e.povrch }}</td>
+        <td class="trasa-povrch">{{ e.povrchEn if en else e.povrch }}</td>
         <td>{% if e.pdf %}<a href="{{ web.zaklad }}{{ e.pdf }}">PDF</a>{% endif %}</td>
       </tr>
       {% endfor %}
@@ -61,28 +75,28 @@ eleventyComputed:
 
 {% if stranka.kod == "casto-se-ptate" %}
   <div class="faq">
-  {% for o in obsah.otazky %}
+  {% for o in otazky %}
     <details class="otazka">
       <summary>{{ o.otazka | striptags | trim }}</summary>
       <div class="text">{{ o.odpoved | nezalom | safe }}</div>
     </details>
   {% endfor %}
   </div>
-  <p class="pocet">Otázek celkem: {{ obsah.otazky.length }}.</p>
+  <p class="pocet">{{ "Otázek celkem:" | t(jaz) }} {{ otazky.length }}.</p>
 {% endif %}
 
 {% if stranka.kod == "vysledky" %}
   <div id="vysledky-online" class="vysledky-online"></div>
-  <script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}" };</script>
+  <script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}", jazyk: "{{ jaz }}" };</script>
   <script src="{{ web.zaklad }}/assets/vysledky-model.js" defer></script>
   <script src="{{ web.zaklad }}/assets/vysledky.js" defer></script>
   {% if obsah.archiv and obsah.archiv.length %}
   <section class="vitezove">
-    <h2>Vítězové ročníků</h2>
+    <h2>{{ "Vítězové ročníků" | t(jaz) }}</h2>
     <div class="vit-mrizka">
     {% for r in obsah.archiv %}
       <article class="vit">
-        {% if r.fotoCelkem %}<img src="{{ r.fotoCelkem }}" alt="Vítězný tým Hory Bory {{ r.letopocet }} – {{ r.vitez.tym }}" loading="lazy" width="768" height="512">{% endif %}
+        {% if r.fotoCelkem %}<img src="{{ r.fotoCelkem }}" alt="{{ 'Vítězný tým Hory Bory' | t(jaz) }} {{ r.letopocet }} – {{ r.vitez.tym }}" loading="lazy" width="768" height="512">{% endif %}
         <div class="vit-text">
           <p class="vit-rok">Hory Bory {{ r.letopocet }}</p>
           <p class="vit-jmeno">{{ r.vitez.tym }}</p>
@@ -90,11 +104,11 @@ eleventyComputed:
           <ol start="2">{% for d in r.dalsi %}<li>{{ d.tym }} <span class="vit-cas">{{ d.cas }}</span></li>{% endfor %}</ol>
           {% if r.zeny %}
           <div class="vit-zeny">
-            {% if r.fotoZeny %}<img src="{{ r.fotoZeny }}" alt="Vítězky ženské kategorie Hory Bory {{ r.letopocet }} – {{ r.zeny.tym }}" loading="lazy" width="768" height="512">{% endif %}
-            Ženy: <strong>{{ r.zeny.tym }}</strong> <span class="vit-cas">{{ r.zeny.cas }}</span>
+            {% if r.fotoZeny %}<img src="{{ r.fotoZeny }}" alt="{{ 'Vítězky ženské kategorie Hory Bory' | t(jaz) }} {{ r.letopocet }} – {{ r.zeny.tym }}" loading="lazy" width="768" height="512">{% endif %}
+            {{ "Ženy:" | t(jaz) }} <strong>{{ r.zeny.tym }}</strong> <span class="vit-cas">{{ r.zeny.cas }}</span>
           </div>
           {% endif %}
-          <a href="{{ web.zaklad }}{{ r.adresa }}">Celé výsledky {{ r.letopocet }}</a>
+          <a href="{{ web.zaklad }}{{ ('/en/results/' + r.letopocet + '/') if en else r.adresa }}">{{ "Celé výsledky" | t(jaz) }} {{ r.letopocet }}</a>
         </div>
       </article>
     {% endfor %}
@@ -105,22 +119,22 @@ eleventyComputed:
 
 {% if stranka.kod == "seznamka" %}
   <link rel="stylesheet" href="{{ web.zaklad }}/assets/seznamka.css">
-  <div id="seznamka" class="seznamka"><p class="prazdno">Načítám inzeráty…</p></div>
-  <script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}" };</script>
+  <div id="seznamka" class="seznamka"><p class="prazdno">{{ "Načítám inzeráty…" | t(jaz) }}</p></div>
+  <script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}", jazyk: "{{ jaz }}" };</script>
   <script src="{{ web.zaklad }}/assets/seznamka.js" defer></script>
 {% endif %}
 
 {% if stranka.kod == "fotky" and obsah.galerie and obsah.galerie.length %}
   <div class="gal-roky">
   {% for g in obsah.galerie %}
-    <a class="gal-rok" href="{{ web.zaklad }}{{ g.adresa }}">
+    <a class="gal-rok" href="{{ web.zaklad }}{{ ('/en/photos/' + g.letopocet + '/') if en else g.adresa }}">
       <img src="{{ g.obal }}" alt="Hory Bory {{ g.letopocet }}" loading="lazy" width="768" height="512">
-      <span class="gal-rok-text"><strong>Hory Bory {{ g.letopocet }}</strong> {{ g.pocet }} fotek</span>
+      <span class="gal-rok-text"><strong>Hory Bory {{ g.letopocet }}</strong> {{ g.pocet }} {{ "fotek" | t(jaz) }}</span>
     </a>
   {% endfor %}
   </div>
 {% endif %}
 
 {% if not stranka.text and stranka.bloky.length == 0 and stranka.kod != "casto-se-ptate" and stranka.kod != "vysledky" and stranka.kod != "seznamka" and not (stranka.kod == "fotky" and obsah.galerie and obsah.galerie.length) %}
-  <p class="prazdno">Obsah téhle stránky se teprve připravuje.</p>
+  <p class="prazdno">{{ "Obsah téhle stránky se teprve připravuje." | t(jaz) }}</p>
 {% endif %}

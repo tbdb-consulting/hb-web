@@ -540,3 +540,10 @@ body:not(.adm) :is(input:not([type=checkbox], [type=radio], [type=range]), selec
 .pp-video + .pp-text h2, .pp-obrazek + .pp-text h2, .pp-karusel + .pp-text h2 { padding-right: 0; }
 .pp-text p { margin: 0 0 10px; }
 .pp-tlacitko { margin-top: 4px; }
+
+/* Přepínač jazyka CS / EN v hlavičce (20. 10. 2026). Na telefonu mezi značkou a tlačítkem Menu, na počítači vpravo v řádku se značkou. */
+.hlavicka .jazyky { display: flex; gap: 2px; margin-left: auto; padding: 0; }
+.hlavicka .jazyky a { color: #fff; text-decoration: none; font-size: .85rem; font-weight: 700; letter-spacing: .04em; padding: 6px 8px; border-radius: 4px; opacity: .7; min-height: 32px; }
+.hlavicka .jazyky a:hover, .hlavicka .jazyky a:focus-visible { opacity: 1; text-decoration: underline; }
+.hlavicka .jazyky a[aria-current="true"] { opacity: 1; background: rgba(255,255,255,.18); }
+.hlavicka .jazyky + .menu-tlacitko { margin-left: 8px; }

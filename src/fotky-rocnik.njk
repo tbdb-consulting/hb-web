@@ -1,27 +1,33 @@
 ---
 pagination:
-  data: obsah.galerie
+  data: obsah.galerieStranky
   size: 1
-  alias: g
-permalink: "/fotky/{{ g.letopocet }}/index.html"
+  alias: st
+permalink: "{{ st.adresa }}index.html"
 layout: zaklad.njk
 eleventyComputed:
-  titulek: "Fotky Hory Bory {{ g.letopocet }}"
-  metaPopis: "Fotky ze štafetového běhu Hory Bory {{ g.letopocet }} – start, trasa a cíl."
-  adresa: "/fotky/{{ g.letopocet }}/"
+  titulek: "{{ 'Hory Bory photos' if st.jazyk == 'en' else 'Fotky Hory Bory' }} {{ st.g.letopocet }}"
+  metaPopis: "{% if st.jazyk == 'en' %}Photos from the Hory Bory relay run {{ st.g.letopocet }} – start, route and finish.{% else %}Fotky ze štafetového běhu Hory Bory {{ st.g.letopocet }} – start, trasa a cíl.{% endif %}"
+  adresa: "{{ st.adresa }}"
+  jazyk: "{{ st.jazyk }}"
+  altCs: "{{ st.altCs }}"
+  altEn: "{{ st.altEn }}"
 ---
-{# Galerie jednoho ročníku z tabulky fotky (funkce web_galerie). Záložky Start/Trasa/Cíl se ukážou jen tam, kde jsou fotky zařazené. Keksa 12. 10. 2026. #}
-<p class="drobecky"><a href="{{ web.zaklad }}/fotky/">Fotky ze závodu</a> › {{ g.letopocet }}</p>
-<h1>Fotky Hory Bory {{ g.letopocet }}</h1>
+{# Galerie jednoho ročníku z tabulky fotky (funkce web_galerie). Záložky Start/Trasa/Cíl se ukážou jen tam, kde jsou fotky zařazené. Keksa 12. 10. 2026, angličtina 20. 10. 2026. #}
+{%- set g = st.g -%}
+{%- set jaz = st.jazyk -%}
+{%- set en = jaz == "en" -%}
+<p class="drobecky"><a href="{{ web.zaklad }}{{ '/en/photos/' if en else '/fotky/' }}">{{ "Fotky ze závodu" | t(jaz) }}</a> › {{ g.letopocet }}</p>
+<h1>{{ "Fotky Hory Bory" | t(jaz) }} {{ g.letopocet }}</h1>
 {% if g.sekce.length %}
 <div class="gal-zalozky" role="tablist">
-  <button type="button" class="gal-zalozka gal-aktivni" data-sekce="">Vše <span>{{ g.pocet }}</span></button>
-  {% set nazvy = { "start": "Start", "trasa": "Trasa", "cil": "Cíl" } %}
+  <button type="button" class="gal-zalozka gal-aktivni" data-sekce="">{{ "Vše" | t(jaz) }} <span>{{ g.pocet }}</span></button>
+  {% set nazvy = { "start": "Start", "trasa": "Trasa" | t(jaz), "cil": "Cíl" | t(jaz) } %}
   {% for k in g.sekce %}<button type="button" class="gal-zalozka" data-sekce="{{ k }}">{{ nazvy[k] }}</button>{% endfor %}
 </div>
 {% endif %}
 <div class="gal-mrizka" id="gal-mrizka">
-{% for f in g.fotky %}<a href="{{ f.u }}" data-s="{{ f.s }}"{% if f.a %} data-a="{{ f.a }}"{% endif %}><img src="{{ f.u }}" alt="Hory Bory {{ g.letopocet }}, fotka {{ loop.index }}" loading="lazy" width="768" height="512"></a>{% endfor %}
+{% for f in g.fotky %}<a href="{{ f.u }}" data-s="{{ f.s }}"{% if f.a %} data-a="{{ f.a }}"{% endif %}><img src="{{ f.u }}" alt="Hory Bory {{ g.letopocet }}, {{ 'fotka' | t(jaz) }} {{ loop.index }}" loading="lazy" width="768" height="512"></a>{% endfor %}
 </div>
-<p class="gal-dalsi">Další ročníky: {% for x in obsah.galerie %}{% if x.rok != g.rok %}<a href="{{ web.zaklad }}{{ x.adresa }}">{{ x.letopocet }}</a>{% if not loop.last %} · {% endif %}{% endif %}{% endfor %}</p>
+<p class="gal-dalsi">{{ "Další ročníky:" | t(jaz) }} {% for x in obsah.galerie %}{% if x.rok != g.rok %}<a href="{{ web.zaklad }}{{ ('/en/photos/' + x.letopocet + '/') if en else x.adresa }}">{{ x.letopocet }}</a>{% if not loop.last %} · {% endif %}{% endif %}{% endfor %}</p>
 <script src="{{ web.zaklad }}/assets/galerie.js" defer></script>

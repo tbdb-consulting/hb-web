@@ -38,7 +38,8 @@
     function jdi(k) { i = (k + fotky.length) % fotky.length; img.src = fotky[i]; [].forEach.call(tecky.children, function (t, n) { t.setAttribute("aria-current", n === i); }); }
     function spust() { clearInterval(casovac); if (!klidne && fotky.length > 1) casovac = setInterval(function () { jdi(i + 1); }, (p.karusel_sekund || 5) * 1000); }
     var pred = el("button", "pp-sipka pp-pred", "‹"), dal = el("button", "pp-sipka pp-dal", "›");
-    pred.type = dal.type = "button"; pred.setAttribute("aria-label", "Předchozí fotka"); dal.setAttribute("aria-label", "Další fotka");
+    pred.type = dal.type = "button"; var EN = document.documentElement.lang === "en";
+    pred.setAttribute("aria-label", EN ? "Previous photo" : "Předchozí fotka"); dal.setAttribute("aria-label", EN ? "Next photo" : "Další fotka");
     pred.addEventListener("click", function () { jdi(i - 1); spust(); }); dal.addEventListener("click", function () { jdi(i + 1); spust(); });
     obal.addEventListener("mouseenter", function () { clearInterval(casovac); }); obal.addEventListener("mouseleave", spust);
     obal.appendChild(pred); obal.appendChild(dal); obal.appendChild(tecky);
@@ -52,7 +53,7 @@
     var stary = document.getElementById("pp-okno"); if (stary) stary.remove();
     var d = document.createElement("dialog"); d.id = "pp-okno"; d.className = "pp pp-" + (p.velikost || "stredni");
     if (p.nadpis) d.setAttribute("aria-label", p.nadpis);
-    var zavrit = el("button", "pp-zavrit", "×"); zavrit.type = "button"; zavrit.setAttribute("aria-label", "Zavřít");
+    var zavrit = el("button", "pp-zavrit", "×"); zavrit.type = "button"; zavrit.setAttribute("aria-label", document.documentElement.lang === "en" ? "Close" : "Zavřít");
     d.appendChild(zavrit);
     var media = null;
     if (p.typ === "video" && p.video) media = video(p);

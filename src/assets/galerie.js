@@ -16,10 +16,11 @@
   // Prohlížeč
   var box = document.createElement("div");
   box.className = "gal-box"; box.hidden = true;
-  box.innerHTML = '<button type="button" class="gal-zavrit" aria-label="Zavřít">×</button>' +
-    '<button type="button" class="gal-pred" aria-label="Předchozí">‹</button>' +
+  var EN = document.documentElement.lang === "en";  // angličtina 20. 10. 2026
+  box.innerHTML = '<button type="button" class="gal-zavrit" aria-label="' + (EN ? "Close" : "Zavřít") + '">×</button>' +
+    '<button type="button" class="gal-pred" aria-label="' + (EN ? "Previous" : "Předchozí") + '">‹</button>' +
     '<figure><img alt=""><figcaption></figcaption></figure>' +
-    '<button type="button" class="gal-dalsi-f" aria-label="Další">›</button>';
+    '<button type="button" class="gal-dalsi-f" aria-label="' + (EN ? "Next" : "Další") + '">›</button>';
   document.body.appendChild(box);
   var img = box.querySelector("img"), popis = box.querySelector("figcaption"), i = 0;
   function viditelne() { return odkazy.filter(function (a) { return !a.hidden; }); }

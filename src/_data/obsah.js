@@ -98,7 +98,10 @@ async function galerie() {
 
 export default async function () {
   if (zeSouboru) {
-    return JSON.parse(await readFile(zeSouboru, "utf8"));
+    const o = JSON.parse(await readFile(zeSouboru, "utf8"));
+    // zkušební data jsou jen česky
+    o.stranky.forEach((s) => { s.jazyk = "cs"; s.alt = { cs: s.adresa }; });
+    return { strankyEn: [], otazkyEn: [], adresy: {}, enNaWebu: false, ...o, vsechnyStranky: o.stranky };
   }
   const [stranky, preklady, texty, textyPreklady, faq, faqPreklady, jazyky] = await Promise.all([
     tabulka("web_stranky?select=*&order=poradi"),
@@ -111,47 +114,70 @@ export default async function () {
   ]);
   const [archiv, fotogalerie] = await Promise.all([archivVysledku(), galerie()]);
 
-  const jazyk = web.jazyk;
-  const textPodleKodu = {};
-  for (const t of texty) {
-    const p = textyPreklady.find((x) => x.text_id === t.id && x.jazyk === jazyk);
-    if (p) textPodleKodu[t.kod] = { titulek: p.titulek, obsah: sZakladem(p.obsah), popis: t.popis };
+  // Dva jazyky (20. 10. 2026): čeština na /, angličtina na /en/. Anglická stránka vznikne jen tam, kde je překlad.
+  // Angličtina se sestaví vždy (kvůli kontrole), ale dokud nemá v web_jazyky na_webu, nemá přepínač a neindexuje se.
+  const predpona = { cs: "", en: "/en" };
+  function strankyJazyka(jazyk) {
+    const textPodleKodu = {};
+    for (const t of texty) {
+      const p = textyPreklady.find((x) => x.text_id === t.id && x.jazyk === jazyk);
+      if (p) textPodleKodu[t.kod] = { titulek: p.titulek, obsah: sZakladem(p.obsah), popis: t.popis };
+    }
+    return stranky
+      .filter((s) => s.aktivni && s.sekce === "verejna")
+      .map((s) => {
+        const p = preklady.find((x) => x.stranka_id === s.id && x.jazyk === jazyk);
+        if (!p) return null;
+        return {
+          jazyk,
+          kod: s.kod,
+          stav: s.stav,
+          upozorneni: jazyk === "cs" ? s.upozorneni : null,
+          poradi: s.poradi,
+          titulek: p.titulek,
+          slug: p.slug,
+          adresa: predpona[jazyk] + (p.slug === "" ? "/" : `/${p.slug}/`),
+          text: sZakladem(p.text),
+          metaPopis: p.meta_popis,
+          bloky: (blokyStranek[s.kod] || []).map((kod) => textPodleKodu[kod]).filter(Boolean),
+        };
+      })
+      .filter(Boolean);
   }
-
-  const seznamStranek = stranky
-    .filter((s) => s.aktivni && s.sekce === "verejna")
-    .map((s) => {
-      const p = preklady.find((x) => x.stranka_id === s.id && x.jazyk === jazyk);
-      if (!p) return null;
-      return {
-        kod: s.kod,
-        stav: s.stav,
-        upozorneni: s.upozorneni,
-        poradi: s.poradi,
-        titulek: p.titulek,
-        slug: p.slug,
-        adresa: p.slug === "" ? "/" : `/${p.slug}/`,
-        text: sZakladem(p.text),
-        metaPopis: p.meta_popis,
-        bloky: (blokyStranek[s.kod] || []).map((kod) => textPodleKodu[kod]).filter(Boolean),
-      };
-    })
-    .filter(Boolean);
-
-  const otazky = faq
-    .filter((f) => f.aktivni)
-    .map((f) => {
-      const p = faqPreklady.find((x) => x.faq_id === f.id && x.jazyk === jazyk);
-      return p ? { poradi: f.poradi, otazka: cistyText(p.otazka), odpoved: sZakladem(p.odpoved) } : null;
-    })
-    .filter(Boolean);
+  function otazkyJazyka(jazyk) {
+    return faq
+      .filter((f) => f.aktivni)
+      .map((f) => {
+        const p = faqPreklady.find((x) => x.faq_id === f.id && x.jazyk === jazyk);
+        return p ? { poradi: f.poradi, otazka: cistyText(p.otazka), odpoved: sZakladem(p.odpoved) } : null;
+      })
+      .filter(Boolean);
+  }
+  const seznamStranek = strankyJazyka("cs");
+  const strankyEn = strankyJazyka("en");
+  // adresy stránek podle kódu v obou jazycích – pro přepínač jazyka a odkazy v šablonách
+  const adresy = {};
+  for (const s of seznamStranek.concat(strankyEn)) (adresy[s.kod] = adresy[s.kod] || {})[s.jazyk] = s.adresa;
+  for (const s of seznamStranek.concat(strankyEn)) s.alt = adresy[s.kod];
 
   return {
     stranky: seznamStranek,
-    otazky,
+    strankyEn,
+    vsechnyStranky: seznamStranek.concat(strankyEn),
+    adresy,
+    otazky: otazkyJazyka("cs"),
+    otazkyEn: otazkyJazyka("en"),
     jazyky: jazyky.filter((j) => j.aktivni),
+    enNaWebu: !!(jazyky.find((j) => j.kod === "en") || {}).na_webu,
     archiv,
     galerie: fotogalerie,
+    // stránky ročníků (archiv výsledků, galerie) v obou jazycích
+    archivStranky: archiv.flatMap((r) => [
+      { jazyk: "cs", r, adresa: r.adresa, altCs: r.adresa, altEn: `/en/results/${r.letopocet}/` },
+      { jazyk: "en", r, adresa: `/en/results/${r.letopocet}/`, altCs: r.adresa, altEn: `/en/results/${r.letopocet}/` }]),
+    galerieStranky: fotogalerie.flatMap((g) => [
+      { jazyk: "cs", g, adresa: g.adresa, altCs: g.adresa, altEn: `/en/photos/${g.letopocet}/` },
+      { jazyk: "en", g, adresa: `/en/photos/${g.letopocet}/`, altCs: g.adresa, altEn: `/en/photos/${g.letopocet}/` }]),
     staženo: new Date().toISOString(),
   };
 }

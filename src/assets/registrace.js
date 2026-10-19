@@ -6,6 +6,9 @@
 (function () {
   "use strict";
   var C = window.HB_REG || {};
+  // Angličtina (20. 10. 2026): texty se překládají slovníkem window.HB_T (klíčem je český text), data česky z databáze taky.
+  var EN = C.jazyk === "en";
+  function t(s) { var T = window.HB_T; return (T && T[s]) || s; }
   function el(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
@@ -21,19 +24,20 @@
     return fetch(C.url + "/rest/v1/rpc/" + fce, { method: "POST", headers: hlavicky(true), body: JSON.stringify(data || {}) })
       .then(function (r) {
         return r.json().then(function (j) {
-          if (!r.ok) throw new Error((j && (j.message || j.hint)) || ("Chyba " + r.status));
+          if (!r.ok) throw new Error((j && (j.message || j.hint)) || (t("Chyba") + " " + r.status));
           return j;
         });
       });
   }
   function cist(cesta) {
     return fetch(C.url + "/rest/v1/" + cesta, { headers: hlavicky(false) }).then(function (r) {
-      if (!r.ok) throw new Error("Nepodařilo se načíst číselník.");
+      if (!r.ok) throw new Error(t("Nepodařilo se načíst číselník."));
       return r.json();
     });
   }
   function ukaz(id, ano) { el(id).classList.toggle("rg-skryte", !ano); }
   function kdy(d) {
+    if (EN) return d.toLocaleString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
     var dny = ["neděle", "pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota"];
     return dny[d.getDay()] + " " + d.getDate() + ". " + (d.getMonth() + 1) + ". " + d.getFullYear() +
       " v " + d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
@@ -57,13 +61,13 @@
     stav();
     casovac = setInterval(stav, 1000);
   }).catch(function () {
-    el("rg-nacitam").textContent = "Termín registrace se nepodařilo načíst. Zkus stránku obnovit, případně napiš na info@horybory.cz.";
+    el("rg-nacitam").textContent = t("Termín registrace se nepodařilo načíst. Zkus stránku obnovit, případně napiš na info@horybory.cz.");
   });
 
   function stav() {
     var ted = new Date();
     if (!OD || !DO) {
-      el("rg-od").textContent = "brzy – termín ještě oznámíme";
+      el("rg-od").textContent = t("brzy – termín ještě oznámíme");
       el("rg-odpocet").textContent = "";
       ukaz("rg-pred", true); ukaz("rg-form", false); ukaz("rg-po", false);
       return;
@@ -72,7 +76,7 @@
       el("rg-od").textContent = kdy(OD);
       var s = Math.floor((OD - ted) / 1000);
       var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
-      el("rg-odpocet").textContent = (d ? d + " " + sklon(d, "den", "dny", "dní") + " " : "") +
+      el("rg-odpocet").textContent = (d ? d + " " + (EN ? (d === 1 ? "day" : "days") : sklon(d, "den", "dny", "dní")) + " " : "") +
         String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(x).padStart(2, "0");
       ukaz("rg-pred", true); ukaz("rg-form", false); ukaz("rg-po", false);
     } else if (ted > DO) {
@@ -92,26 +96,26 @@
   function ciselniky() {
     cist("web_kraj?select=kod,nazev,zeme&aktivni=eq.true&order=poradi").then(function (r) {
       var sel = el("rg-kraj"), zeme = null, cil = sel;
-      sel.innerHTML = '<option value="">— vyber —</option>';
+      sel.innerHTML = '<option value="">' + t("— vyber —") + '</option>';
       r.forEach(function (k) {
-        if (k.zeme !== zeme) { zeme = k.zeme; cil = document.createElement("optgroup"); cil.label = ZEME[zeme] || zeme; sel.appendChild(cil); }
+        if (k.zeme !== zeme) { zeme = k.zeme; cil = document.createElement("optgroup"); cil.label = t(ZEME[zeme] || zeme); sel.appendChild(cil); }
         var o = document.createElement("option"); o.value = k.kod; o.textContent = k.nazev; cil.appendChild(o);
       });
-    }).catch(function () { el("rg-kraj").innerHTML = '<option value="">Číselník se nenačetl – obnov stránku</option>'; });
+    }).catch(function () { el("rg-kraj").innerHTML = '<option value="">' + t("Číselník se nenačetl – obnov stránku") + '</option>'; });
     cist("web_kategorie?select=kod,nazev,popis&aktivni=eq.true&order=poradi").then(function (r) {
       var sel = el("rg-kategorie");
-      sel.innerHTML = '<option value="">— vyber —</option>';
+      sel.innerHTML = '<option value="">' + t("— vyber —") + '</option>';
       r.forEach(function (k) {
-        POPIS[k.kod] = k.popis || "";
-        var o = document.createElement("option"); o.value = k.kod; o.textContent = k.nazev; sel.appendChild(o);
+        POPIS[k.kod] = t(k.popis || "");
+        var o = document.createElement("option"); o.value = k.kod; o.textContent = t(k.nazev); sel.appendChild(o);
       });
-    }).catch(function () { el("rg-kategorie").innerHTML = '<option value="">Číselník se nenačetl – obnov stránku</option>'; });
+    }).catch(function () { el("rg-kategorie").innerHTML = '<option value="">' + t("Číselník se nenačetl – obnov stránku") + '</option>'; });
     cist("web_zdroj_registrace?select=kod,nazev,volny_text&aktivni=eq.true&order=poradi").then(function (r) {
       el("rg-zdroj").innerHTML = r.map(function (z) {
         if (z.volny_text) VOLNY[z.kod] = true;
-        return '<label class="rg-volba"><input type="radio" name="zdroj" value="' + esc(z.kod) + '" required><span>' + esc(z.nazev) + "</span></label>";
+        return '<label class="rg-volba"><input type="radio" name="zdroj" value="' + esc(z.kod) + '" required><span>' + esc(t(z.nazev)) + "</span></label>";
       }).join("");
-    }).catch(function () { el("rg-zdroj").innerHTML = '<p class="rg-pozn">Možnosti se nenačetly – obnov stránku.</p>'; });
+    }).catch(function () { el("rg-zdroj").innerHTML = '<p class="rg-pozn">' + t("Možnosti se nenačetly – obnov stránku.") + '</p>'; });
   }
   var VOLNY = {};
   function zdroj() { var z = form.querySelector("input[name=zdroj]:checked"); return z ? z.value : ""; }
@@ -143,10 +147,19 @@
       p_utm_source: utm("utm_source"), p_utm_campaign: utm("utm_campaign")
     };
     el("rg-odeslat").disabled = true;
-    el("rg-odeslat").textContent = "Odesílám…";
+    el("rg-odeslat").textContent = t("Odesílám…");
     rpc("web_registrace", data).then(function (v) {
       var nahradnik = v.stav === "nahradnik";
-      el("rg-vysledek").innerHTML =
+      el("rg-vysledek").innerHTML = EN ?
+        "<h2>The registration of team " + esc(v.tym) + " has arrived</h2>" +
+        (nahradnik
+          ? "<p>The race is already full, so we have put your team on the <strong>waiting list</strong>. Don't pay the entry fee yet.</p>"
+          : (v.ceka_na_schvaleni
+            ? "<p>You'll receive an e-mail at <strong>" + esc(v.email) + "</strong> right away confirming that your registration has arrived. We'll send the registration confirmation and entry fee payment instructions within 24 hours.</p>"
+            : "<p>We're sending the registration confirmation and entry fee payment instructions to <strong>" + esc(v.email) + "</strong> right now.</p>")) +
+        "<p>The e-mails and the <a href=\"" + C.zaklad + "/kapitan/prihlaseni/\">captain's section</a> are in Czech for now; you log in to the captain's section with the e-mail from your registration.</p>" +
+        "<p>If the e-mail doesn't arrive, check your spam folder too, or write to <a href=\"mailto:info@horybory.cz\">info@horybory.cz</a>.</p>"
+        :
         "<h2>Přihláška týmu " + esc(v.tym) + " dorazila</h2>" +
         (nahradnik
           ? "<p>Kapacita závodu je už naplněná, proto jsme tvůj tým zapsali mezi <strong>náhradníky</strong>. Startovné zatím neplať.</p>"
@@ -164,7 +177,7 @@
       el("rg-chyba").scrollIntoView({ behavior: "smooth", block: "center" });
     }).then(function () {
       el("rg-odeslat").disabled = false;
-      el("rg-odeslat").textContent = "Odeslat přihlášku";
+      el("rg-odeslat").textContent = t("Odeslat přihlášku");
     });
   });
 })();

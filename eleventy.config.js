@@ -3,7 +3,22 @@
 // do hotových HTML souborů. Důvod je v rozhodnutí z 20. 9. 2026 — vyhledávače
 // a hlavně náhledy odkazů na sítích a v mailech potřebují text přímo ve stránce.
 
+import ANGLICTINA from "./src/_data/anglictina.js";
+
 export default function (eleventyConfig) {
+  // Pevné texty šablon v angličtině (20. 10. 2026): {{ "Trasa a etapy" | t(jazyk) }}. Klíčem je český text,
+  // slovník je v src/_data/anglictina.js. Chybějící překlad se vypíše česky a nahlásí na konci sestavení.
+  const chybi = new Set();
+  eleventyConfig.addFilter("t", (s, jazyk) => {
+    if (jazyk !== "en" || s == null || /^P\d+$/.test(s)) return s;  // kódy předávek P1…P30 se nepřekládají
+    if (ANGLICTINA[s] !== undefined) return ANGLICTINA[s];
+    chybi.add(s);
+    return s;
+  });
+  eleventyConfig.on("eleventy.after", () => {
+    if (chybi.size) console.warn(`[anglictina] Chybí překlad pro ${chybi.size} textů:\n  ` + [...chybi].join("\n  "));
+  });
+
   eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
 
   // Datum ve tvaru, na který jsou lidi zvyklí: 5. 9. 2026

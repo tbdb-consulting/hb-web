@@ -1,92 +1,111 @@
 ---
-permalink: "/registrace/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/registration/' if jazyk == 'en' else '/registrace/' }}index.html"
 layout: zaklad.njk
-titulek: "Registrace týmu"
-metaPopis: "Registrace týmu na štafetový běh Hory Bory."
+eleventyComputed:
+  titulek: "{{ 'Team registration' if jazyk == 'en' else 'Registrace týmu' }}"
+  metaPopis: "{{ 'Team registration for the Hory Bory relay run.' if jazyk == 'en' else 'Registrace týmu na štafetový běh Hory Bory.' }}"
+  altCs: "/registrace/"
+  altEn: "/en/registration/"
 eleventyExcludeFromCollections: true
 ---
 {# Veřejná registrace týmu (Keksa 13. 10. 2026). Formulář volá web_registrace; do otevření ukazuje jen termín a odpočet.
    Termín, ročník a číselníky se čtou až v prohlížeči, ať se po změně v Nastavení nemusí přestavovat web.
    Odkud tým přišel (marketing 18. 10. 2026): povinná otázka z číselníku web_zdroj_registrace a utm_source/utm_campaign
    z adresy stránky, přečtené až při odeslání – žádné cookies ani úložiště v prohlížeči. #}
+{%- set jaz = jazyk -%}
+{%- set en = jaz == "en" -%}
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/registrace.css">
-<h1>Registrace týmu</h1>
+<h1>{{ "Registrace týmu" | t(jaz) }}</h1>
 
-<div id="rg-nacitam" class="rg-info">Načítám termín registrace…</div>
+<div id="rg-nacitam" class="rg-info">{{ "Načítám termín registrace…" | t(jaz) }}</div>
 
 <div id="rg-pred" class="rg-info rg-skryte">
-  <p><strong>Registrace se otevře <span id="rg-od"></span>.</strong></p>
+  <p><strong>{{ "Registrace se otevře" | t(jaz) }} <span id="rg-od"></span>.</strong></p>
   <p class="rg-odpocet" id="rg-odpocet"></p>
 </div>
 
 <div id="rg-po" class="rg-info rg-skryte">
+  {% if en %}
+  <p><strong>Registration for <span id="rg-rok-po"></span> is closed.</strong> Write to us at <a href="mailto:info@horybory.cz">info@horybory.cz</a>.</p>
+  {% else %}
   <p><strong>Registrace ročníku <span id="rg-rok-po"></span> je uzavřená.</strong> Napiš nám na <a href="mailto:info@horybory.cz">info@horybory.cz</a>.</p>
+  {% endif %}
 </div>
 
 <form id="rg-form" class="rg-form rg-skryte" novalidate>
+  {% if en %}<p class="rg-pozn">The registration e-mails and the captain's section are in Czech for now. If anything is unclear, write to <a href="mailto:info@horybory.cz">info@horybory.cz</a> – we're happy to help in English.</p>{% endif %}
   <fieldset>
-    <legend>Tým a kapitán</legend>
+    <legend>{{ "Tým a kapitán" | t(jaz) }}</legend>
     <div class="rg-radek">
-      <label class="rg-pole rg-cela">Název týmu *<input name="nazev" required maxlength="80"></label>
-      <label class="rg-pole">Jméno kapitána *<input name="jmeno" required autocomplete="given-name"></label>
-      <label class="rg-pole">Příjmení *<input name="prijmeni" required autocomplete="family-name"></label>
-      <label class="rg-pole">E-mail *<input name="email" type="email" required autocomplete="email"></label>
-      <label class="rg-pole">Telefon<input name="telefon" type="tel" autocomplete="tel" placeholder="777 123 456"></label>
-      <label class="rg-volba rg-cela"><input type="checkbox" name="bezim" checked><span>Poběžím také – zapiš mě rovnou na soupisku (pak je telefon povinný)</span></label>
-      <label class="rg-pole">Kraj *<select name="kraj" id="rg-kraj" required><option value="">Načítám…</option></select></label>
-      <label class="rg-pole">Kategorie týmu *<select name="kategorie" id="rg-kategorie" required><option value="">Načítám…</option></select></label>
+      <label class="rg-pole rg-cela">{{ "Název týmu *" | t(jaz) }}<input name="nazev" required maxlength="80"></label>
+      <label class="rg-pole">{{ "Jméno kapitána *" | t(jaz) }}<input name="jmeno" required autocomplete="given-name"></label>
+      <label class="rg-pole">{{ "Příjmení *" | t(jaz) }}<input name="prijmeni" required autocomplete="family-name"></label>
+      <label class="rg-pole">{{ "E-mail *" | t(jaz) }}<input name="email" type="email" required autocomplete="email"></label>
+      <label class="rg-pole">{{ "Telefon" | t(jaz) }}<input name="telefon" type="tel" autocomplete="tel" placeholder="{{ '+420 777 123 456' if en else '777 123 456' }}"></label>
+      <label class="rg-volba rg-cela"><input type="checkbox" name="bezim" checked><span>{{ "Poběžím také – zapiš mě rovnou na soupisku (pak je telefon povinný)" | t(jaz) }}</span></label>
+      <label class="rg-pole">{{ "Kraj *" | t(jaz) }}<select name="kraj" id="rg-kraj" required><option value="">{{ "Načítám…" | t(jaz) }}</option></select></label>
+      <label class="rg-pole">{{ "Kategorie týmu *" | t(jaz) }}<select name="kategorie" id="rg-kategorie" required><option value="">{{ "Načítám…" | t(jaz) }}</option></select></label>
     </div>
     <p class="rg-pozn" id="rg-popis-kategorie"></p>
   </fieldset>
 
   <fieldset>
-    <legend>Zástupce kapitána</legend>
-    <p class="rg-pozn">Druhá kontaktní osoba týmu. Musí mít jiný e-mail než kapitán.</p>
+    <legend>{{ "Zástupce kapitána" | t(jaz) }}</legend>
+    <p class="rg-pozn">{{ "Druhá kontaktní osoba týmu. Musí mít jiný e-mail než kapitán." | t(jaz) }}</p>
     <div class="rg-radek">
-      <label class="rg-pole">Jméno *<input name="zastupce_jmeno" required></label>
-      <label class="rg-pole">Příjmení *<input name="zastupce_prijmeni" required></label>
-      <label class="rg-pole">E-mail *<input name="zastupce_email" type="email" required></label>
-      <label class="rg-pole">Telefon *<input name="zastupce_telefon" type="tel" required placeholder="777 123 456"></label>
+      <label class="rg-pole">{{ "Jméno *" | t(jaz) }}<input name="zastupce_jmeno" required></label>
+      <label class="rg-pole">{{ "Příjmení *" | t(jaz) }}<input name="zastupce_prijmeni" required></label>
+      <label class="rg-pole">{{ "E-mail *" | t(jaz) }}<input name="zastupce_email" type="email" required></label>
+      <label class="rg-pole">{{ "Telefon *" | t(jaz) }}<input name="zastupce_telefon" type="tel" required placeholder="{{ '+420 777 123 456' if en else '777 123 456' }}"></label>
     </div>
   </fieldset>
 
   <fieldset>
-    <legend>Faktura za startovné</legend>
-    <label class="rg-volba"><input type="radio" name="faktura" value="ne" checked><span>Ne, fakturu nepotřebujeme</span></label>
-    <label class="rg-volba"><input type="radio" name="faktura" value="ano"><span>Ano, startovné platí firma nebo organizace a potřebuje fakturu</span></label>
+    <legend>{{ "Faktura za startovné" | t(jaz) }}</legend>
+    <label class="rg-volba"><input type="radio" name="faktura" value="ne" checked><span>{{ "Ne, fakturu nepotřebujeme" | t(jaz) }}</span></label>
+    <label class="rg-volba"><input type="radio" name="faktura" value="ano"><span>{{ "Ano, startovné platí firma nebo organizace a potřebuje fakturu" | t(jaz) }}</span></label>
     <div id="rg-faktura" class="rg-odsaz rg-skryte">
       <div class="rg-radek">
-        <label class="rg-pole">Název odběratele *<input name="odberatel_nazev"></label>
-        <label class="rg-pole">IČ *<input name="odberatel_ic"></label>
-        <label class="rg-pole">DIČ<input name="odberatel_dic"></label>
-        <label class="rg-pole">Adresa *<input name="odberatel_adresa"></label>
+        <label class="rg-pole">{{ "Název odběratele *" | t(jaz) }}<input name="odberatel_nazev"></label>
+        <label class="rg-pole">{{ "IČ *" | t(jaz) }}<input name="odberatel_ic"></label>
+        <label class="rg-pole">{{ "DIČ" | t(jaz) }}<input name="odberatel_dic"></label>
+        <label class="rg-pole">{{ "Adresa *" | t(jaz) }}<input name="odberatel_adresa"></label>
       </div>
-      <p class="rg-otazka">Datum uskutečnění zdanitelného plnění *</p>
-      <label class="rg-volba"><input type="radio" name="duzp" value="2027" checked><span>v roce 2027</span></label>
-      <p class="rg-pozn">Preferujeme plnění v roce 2027.</p>
-      <label class="rg-volba"><input type="radio" name="duzp" value="2026"><span>v roce 2026</span></label>
+      <p class="rg-otazka">{{ "Datum uskutečnění zdanitelného plnění *" | t(jaz) }}</p>
+      <label class="rg-volba"><input type="radio" name="duzp" value="2027" checked><span>{{ "v roce 2027" | t(jaz) }}</span></label>
+      <p class="rg-pozn">{{ "Preferujeme plnění v roce 2027." | t(jaz) }}</p>
+      <label class="rg-volba"><input type="radio" name="duzp" value="2026"><span>{{ "v roce 2026" | t(jaz) }}</span></label>
     </div>
   </fieldset>
 
   <fieldset>
-    <legend>Odkud znáš Hory Bory? *</legend>
-    <div id="rg-zdroj"><p class="rg-pozn">Načítám…</p></div>
-    <label class="rg-pole rg-odsaz rg-skryte" id="rg-zdroj-jinak">Napiš krátce odkud *<input name="zdroj_jinak" maxlength="200"></label>
+    <legend>{{ "Odkud znáš Hory Bory? *" | t(jaz) }}</legend>
+    <div id="rg-zdroj"><p class="rg-pozn">{{ "Načítám…" | t(jaz) }}</p></div>
+    <label class="rg-pole rg-odsaz rg-skryte" id="rg-zdroj-jinak">{{ "Napiš krátce odkud *" | t(jaz) }}<input name="zdroj_jinak" maxlength="200"></label>
   </fieldset>
 
   <fieldset>
-    <legend>Poznámka pro pořadatele</legend>
-    <label class="rg-pole">Nepovinné<textarea name="poznamka" rows="3" maxlength="1000"></textarea></label>
+    <legend>{{ "Poznámka pro pořadatele" | t(jaz) }}</legend>
+    <label class="rg-pole">{{ "Nepovinné" | t(jaz) }}<textarea name="poznamka" rows="3" maxlength="1000"></textarea></label>
   </fieldset>
 
+  {% if en %}
+  <p class="rg-pozn rg-souhlas">By submitting the registration you agree to the <a href="{{ web.zaklad }}/en/rules/">race rules</a>. You can find out how we handle personal data in our <a href="{{ web.zaklad }}/en/privacy/">privacy policy</a>.</p>
+  {% else %}
   <p class="rg-pozn rg-souhlas">Odesláním přihlášky souhlasíš s <a href="{{ web.zaklad }}/pravidla/">pravidly závodu</a>. Jak zacházíme s osobními údaji, najdeš v <a href="{{ web.zaklad }}/gdpr/">zásadách zpracování osobních údajů</a>.</p>
-  <button class="rg-tlacitko" type="submit" id="rg-odeslat">Odeslat přihlášku</button>
+  {% endif %}
+  <button class="rg-tlacitko" type="submit" id="rg-odeslat">{{ "Odeslat přihlášku" | t(jaz) }}</button>
 </form>
 
 <div id="rg-chyba" class="rg-chyba rg-skryte" role="alert"></div>
 <div id="rg-vysledek" class="rg-vysledek rg-skryte" role="status"></div>
 
 <script>
-  window.HB_REG = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}" };
+  window.HB_REG = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}", jazyk: "{{ jaz }}" };
 </script>
 <script src="{{ web.zaklad }}/assets/registrace.js" defer></script>

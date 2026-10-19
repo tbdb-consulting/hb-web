@@ -1,60 +1,74 @@
+{%- set jaz = jazyk or "cs" -%}
+{%- set menuStranky = obsah.strankyEn if jaz == "en" else obsah.stranky -%}
+{%- set popisWebu = web.popis | t(jaz) -%}
 <!doctype html>
-<html lang="{{ web.jazyk }}">
+<html lang="{{ jaz }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% if titulek and titulek != web.nazev %}{{ titulek }} – {{ web.nazev }}{% else %}{{ web.nazev }}{% endif %}</title>
-<meta name="description" content="{{ metaPopis or web.popis }}">
+<meta name="description" content="{{ metaPopis or popisWebu }}">
 <meta property="og:title" content="{% if titulek and titulek != web.nazev %}{{ titulek }} – {{ web.nazev }}{% else %}{{ web.nazev }}{% endif %}">
-<meta property="og:description" content="{{ metaPopis or web.popis }}">
+<meta property="og:description" content="{{ metaPopis or popisWebu }}">
 <meta property="og:type" content="website">
-<meta property="og:locale" content="cs_CZ">
+<meta property="og:locale" content="{{ 'en_GB' if jaz == 'en' else 'cs_CZ' }}">
+{%- if jaz == "en" and not obsah.enNaWebu %}
+<meta name="robots" content="noindex">{# angličtina se teprve kontroluje (20. 10. 2026) #}
+{%- endif %}
+{%- if obsah.enNaWebu and altCs and altEn %}
+<link rel="alternate" hreflang="cs" href="{{ web.zaklad }}{{ altCs }}">
+<link rel="alternate" hreflang="en" href="{{ web.zaklad }}{{ altEn }}">
+{%- endif %}
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/styl.css">
+{%- if jaz == "en" %}
+<script>window.HB_T = {{ anglictina | dump | safe }};</script>{# slovník pro skripty stránky (výsledky, galerie, seznamka, registrace) #}
+{%- endif %}
 </head>
 <body>
 
-<a class="preskocit" href="#obsah">Přeskočit na obsah</a>
+<a class="preskocit" href="#obsah">{{ "Přeskočit na obsah" | t(jaz) }}</a>
 
 <header class="hlavicka">
   <div class="obal hlavicka-obal">
-    <a class="znacka" href="{{ web.zaklad }}/">Hory&nbsp;Bory</a>
+    <a class="znacka" href="{{ web.zaklad }}{{ '/en/' if jaz == 'en' else '/' }}">Hory&nbsp;Bory</a>
+    {#- Přepínač jazyka (20. 10. 2026): vede na stejnou stránku v druhém jazyce, když existuje, jinak na úvod.
+        Na českých stránkách se ukáže až po zveřejnění angličtiny (web_jazyky.na_webu). #}
+    {%- if jaz == "en" or obsah.enNaWebu %}
+    <nav class="jazyky" aria-label="{{ 'Jazyk' | t(jaz) }}">
+      <a href="{{ web.zaklad }}{{ altCs or '/' }}" lang="cs" hreflang="cs"{% if jaz == 'cs' %} aria-current="true"{% endif %}>CS</a>
+      <a href="{{ web.zaklad }}{{ altEn or '/en/' }}" lang="en" hreflang="en"{% if jaz == 'en' %} aria-current="true"{% endif %}>EN</a>
+    </nav>
+    {%- endif %}
     <button class="menu-tlacitko" aria-expanded="false" aria-controls="menu">Menu</button>
-    <nav id="menu" class="menu" aria-label="Hlavní nabídka">
+    <nav id="menu" class="menu" aria-label="{{ 'Hlavní nabídka' | t(jaz) }}">
       <ul>
-        {% for s in obsah.stranky %}
+        {% for s in menuStranky %}
           {% if s.kod != "uvod" and s.kod != "gdpr" %}
           <li><a href="{{ web.zaklad }}{{ s.adresa }}"{% if s.adresa == adresa %} aria-current="page"{% endif %}>{{ s.titulek }}</a></li>
           {% endif %}
         {% endfor %}
-        <li><a href="{{ web.zaklad }}/kapitan/"{% if page.url and page.url.indexOf("/kapitan/") == 0 %} aria-current="page"{% endif %}>Pro kapitány</a></li>
+        <li><a href="{{ web.zaklad }}/kapitan/"{% if page.url and page.url.indexOf("/kapitan/") == 0 %} aria-current="page"{% endif %}>{{ "Pro kapitány" | t(jaz) }}</a></li>
       </ul>
-      {% if false and obsah.jazyky.length > 1 %}{# přepínač jazyků až s anglickou verzí (UX revize 5. 10. 2026) #}
-      <div class="jazyky" aria-label="Jazyk">
-        {% for j in obsah.jazyky %}
-          <span class="jazyk{% if j.kod == web.jazyk %} jazyk-aktivni{% endif %}">{{ j.kod | upper }}</span>
-        {% endfor %}
-      </div>
-      {% endif %}
     </nav>
   </div>
 </header>
 
 <main id="obsah" class="obal">
   {% if stav == "rozpracovana" %}
-  <p class="upozorneni">{{ upozorneni or "Na této stránce se pracuje. Obsah zatím nemusí být úplný ani aktuální." }}</p>
+  <p class="upozorneni">{{ upozorneni or ("Na této stránce se pracuje. Obsah zatím nemusí být úplný ani aktuální." | t(jaz)) }}</p>
   {% endif %}
   {{ content | safe }}
 </main>
 
 <footer class="paticka">
   <div class="obal">
-    <p><strong>Hory Bory</strong> — štafetový běh z Beskyd na Pálavu.</p>
+    <p><strong>Hory Bory</strong> — {{ "štafetový běh z Beskyd na Pálavu." | t(jaz) }}</p>
     <p>
       <a href="mailto:info@horybory.cz">info@horybory.cz</a> ·
-      <a href="{{ web.zaklad }}/kapitan/prihlaseni/" id="paticka-kapitan">Přihlášení do kapitánské sekce</a> ·
-      {% for s in obsah.stranky %}{% if s.kod == "gdpr" %}<a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a>{% endif %}{% endfor %}
+      <a href="{{ web.zaklad }}/kapitan/prihlaseni/" id="paticka-kapitan">{{ "Přihlášení do kapitánské sekce" | t(jaz) }}</a> ·
+      {% for s in menuStranky %}{% if s.kod == "gdpr" %}<a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a>{% endif %}{% endfor %}
     </p>
-    <p class="verze" title="{{ web.commit }}">verze {{ web.verze }} · {{ web.sestaveno }}</p>
+    <p class="verze" title="{{ web.commit }}">{{ "verze" | t(jaz) }} {{ web.verze }} · {{ web.sestaveno }}</p>
   </div>
 </footer>
 
@@ -75,7 +89,7 @@
       for (var i = 0; i < localStorage.length; i++) {
         var k = localStorage.key(i);
         if (/^sb-.*-auth-token$/.test(k) && localStorage.getItem(k)) {
-          a.textContent = 'Kapitánská sekce'; a.href = '{{ web.zaklad }}/kapitan/'; return;
+          a.textContent = '{{ "Kapitánská sekce" | t(jaz) }}'; a.href = '{{ web.zaklad }}/kapitan/'; return;
         }
       }
     } catch (e) {}

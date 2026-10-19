@@ -17,6 +17,13 @@ async function pohled(cesta) {
   return odpoved.json();
 }
 
+// Povrch etapy anglicky: „70% asfalt, 30% lesní cesta“ → „70% asphalt, 30% forest track“.
+const POVRCH_EN = [["lesní a polní cesta", "forest and field tracks"], ["lesní cesta", "forest track"], ["polní cesta", "field track"], ["asfalt", "asphalt"]];
+function povrchAnglicky(t) {
+  if (!t) return t;
+  return POVRCH_EN.reduce((s, [cs, en]) => s.split(cs).join(en), String(t));
+}
+
 const cislo = (x) => (x === null || x === undefined || x === "" ? null : Number(x));
 
 // Z času 01:52:00 udělá „1:52 h“.
@@ -103,12 +110,13 @@ export default async function () {
   if (zeSouboru) {
     data = JSON.parse(await readFile(zeSouboru, "utf8"));
   } else {
-    const [rocniky, etapy, useky] = await Promise.all([
+    const [rocniky, etapy, useky, preklady] = await Promise.all([
       pohled("web_v_rocnik?select=*"),
       pohled("web_v_trasa?select=*&order=cislo"),
       pohled("web_v_trasa_useky?select=*&order=cislo,poradi"),
+      pohled("web_trasa_preklady?select=rok,cislo,jazyk,popis"),
     ]);
-    data = { rocnik: rocniky[0], etapy, useky };
+    data = { rocnik: rocniky[0], etapy, useky, preklady };
   }
 
   const rok = data.rocnik ? data.rocnik.rok : null;
@@ -130,6 +138,7 @@ export default async function () {
         cislo: e.cislo,
         poradi,
         adresa: `/trasa/etapa-${poradi}/`,
+        adresaEn: `/en/route/stage-${poradi}/`,
         nazev: e.nazev,
         start: {
           nazev: e.start_nazev, kod: kod(e.cislo),
@@ -154,6 +163,9 @@ export default async function () {
         // na druhé straně karty přímo v mapě a na stránce jako odkaz.
         qrAuto: e.qr_auto,
         popis: e.popis_trasy,
+        // anglický popis trasy z web_trasa_preklady, povrch se překládá slovníkem (20. 10. 2026)
+        popisEn: ((data.preklady || []).find((x) => x.rok === e.rok && x.cislo === e.cislo && x.jazyk === "en") || {}).popis || null,
+        povrchEn: povrchAnglicky(e.povrch),
         video: e.video,
         useky: moje,
         profil: p,
@@ -175,11 +187,16 @@ export default async function () {
     e.dalsi = i < etapy.length - 1 ? etapy[i + 1] : null;
   });
 
+  // každá etapa dvakrát – česky a anglicky (pro šablonu etapa.njk)
+  const strankyEtap = [];
+  for (const e of etapy) for (const jazyk of ["cs", "en"]) strankyEtap.push({ jazyk, e, adresa: jazyk === "en" ? e.adresaEn : e.adresa });
+
   const soucet = (klic) => etapy.reduce((s, e) => s + (e[klic] || 0), 0);
   return {
     rocnik: data.rocnik,
     rokCislo,
     etapy,
+    strankyEtap,
     celkem: {
       etap: etapy.length,
       km: Math.round(soucet("delkaKm") * 10) / 10,
