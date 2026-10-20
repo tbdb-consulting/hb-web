@@ -78,3 +78,12 @@ nastroje/               pomocné skripty (tisk karet etap)
 
 Krátká česká zpráva bez diakritiky ve tvaru `Oblast: co se změnilo`, např.
 `Fotky: galerie po rocnicich (/fotky/ a /fotky/RRRR/)`.
+
+## Pravidla zakázky TBDB (od 20. 10. 2026)
+
+Repozitář patří organizaci `tbdb-consulting`; Hory Bory je zakázka TBDB.
+
+- **Zdrojová grafika** (PSD, AI, velké obrázky) patří na Disk do složky Hory Bory,
+  sem jen hotové exporty pro web. GitHub odmítá soubory nad 100 MB a každá verze
+  zůstává v historii navždy.
+- **Osobní údaje běžců nikdy do repozitáře** — web je veřejný, a to i v historii a v komentářích.
