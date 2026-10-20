@@ -12,7 +12,7 @@ a v mailech potřebují text přímo ve stránce.
 
 | Kde | Adresa | K čemu |
 |---|---|---|
-| Testovací | https://keksa77.github.io/hb-web/ | tady se vyvíjí a zkouší |
+| Testovací | https://tbdb-consulting.github.io/hb-web/ | tady se vyvíjí a zkouší |
 | Ostrý | https://www.horybory.cz/ | až po přepnutí, prosinec 2026 |
 
 Nasazení na Wedos přes FTP zatím **není** ve workflow schválně — aby se

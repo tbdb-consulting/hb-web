@@ -13,7 +13,7 @@ Komunikuj česky a srozumitelně, bez zbytečného žargonu.
 
 | Co | Kde |
 |---|---|
-| Testovací web | https://keksa77.github.io/hb-web/ (podsložka `/hb-web/`) |
+| Testovací web | https://tbdb-consulting.github.io/hb-web/ (podsložka `/hb-web/`) |
 | Ostrý web | https://www.horybory.cz/ — přepnutí plánované na prosinec 2026, zatím starý web na Wedosu |
 | Databáze | Supabase, projekt **`hory-bory`** (ref `rjuxqlyckikuxfaeaozf`, eu-central-1) |
 

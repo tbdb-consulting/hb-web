@@ -1,7 +1,7 @@
 # Sestavení webu Hory Bory a vystavení na testovací adresu.
 #
 # Co to dělá: stáhne obsah ze Supabase, vygeneruje hotové HTML a vystaví ho
-# na https://keksa77.github.io/hb-web/. Ostrý web na Wedosu tenhle soubor
+# na https://tbdb-consulting.github.io/hb-web/. Ostrý web na Wedosu tenhle soubor
 # ZATÍM NEOBSLUHUJE — nasazení přes FTP se doplní až před přepnutím domény,
 # aby se omylem nepřepsal živý horybory.cz.
 #
