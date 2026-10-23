@@ -2,6 +2,7 @@
 // týmu (web_k_nabidka_bezcu), nebo „Nový běžec“. Vybraný člověk se předá na stránku Údaje běžce (Keksa 4. 10. 2026).
 (function () {
   var e = HBK.esc;
+  var t = HBK.t, tf = HBK.tf;
   var NABIDKA = [];
 
   function vykresli(P, soupiska) {
@@ -14,26 +15,26 @@
       videno[k] = 1; return true;
     });
     var h = [], k = HBK.konceptNacti(HBK.konceptKlic(P.tym_id, null));
-    if (k) h.push('<p class="k-koncept">Máš rozepsaného běžce' + (k.jmeno ? " <b>" + e(k.jmeno) + "</b>" : "") + ", zatím není na soupisce. " +
-      '<a href="' + HB.zaklad + '/kapitan/bezec/udaje/?novy=1">Pokračovat v údajích →</a></p>');
+    if (k) h.push('<p class="k-koncept">' + t("Máš rozepsaného běžce") + (k.jmeno ? " <b>" + e(k.jmeno) + "</b>" : "") + ", " + t("zatím není na soupisce.") + " " +
+      '<a href="' + HB.zaklad + HBK.adresa("/kapitan/bezec/udaje/?novy=1") + '">' + t("Pokračovat v údajích") + " →</a></p>");
     if (NABIDKA.length) {
-      h.push('<p class="k-uvod">Tyhle lidi z minulých ročníků tvého týmu databáze zná. Vyber, koho chceš přidat, údaje se vyplní samy a jen je zkontroluješ. ' +
-        "Když na seznamu není, přidej nového běžce.</p>");
-      if (NABIDKA.length > 8) h.push('<label class="k-pole k-hledat" for="k-hledat">Hledat jméno<input id="k-hledat" type="search" autocomplete="off" placeholder="např. Nováková"></label>');
+      h.push('<p class="k-uvod">' + t("Tyhle lidi z minulých ročníků tvého týmu databáze zná. Vyber, koho chceš přidat, údaje se vyplní samy a jen je zkontroluješ.") + " " +
+        t("Když na seznamu není, přidej nového běžce.") + "</p>");
+      if (NABIDKA.length > 8) h.push('<label class="k-pole k-hledat" for="k-hledat">' + t("Hledat jméno") + '<input id="k-hledat" type="search" autocomplete="off" placeholder="' + t("např. Nováková") + '"></label>');
       h.push('<ul class="k-vyber">' + NABIDKA.map(function (x, i) {
         return '<li data-jmeno="' + e(String(x.jmeno || "").toLowerCase()) + '"><button type="button" class="k-vyber-polozka" data-vybrat="' + i + '">' +
           "<b>" + e(x.jmeno) + "</b><span>" + e(x.rocniky || x.rocnik) + (x.mesto ? " · " + e(x.mesto) : "") + "</span>" +
           (x.roky && x.roky.length
-            ? '<span class="k-roky"><span class="k-roky-titulek">Výkonnost na 10 km:</span>' + HBK.rokyVykonnosti(x.roky).map(function (t) { return "<span>" + t + "</span>"; }).join("") + "</span>"
-            : x.vykonnost_10km ? "<span>hlášená výkonnost " + e(HBK.vykonnost(x.vykonnost_10km)) + " na 10 km</span>" : "") +
-          "<small>Vybrat a zkontrolovat údaje →</small></button></li>";
+            ? '<span class="k-roky"><span class="k-roky-titulek">' + t("Výkonnost na 10 km:") + "</span>" + HBK.rokyVykonnosti(x.roky).map(function (r) { return "<span>" + r + "</span>"; }).join("") + "</span>"
+            : x.vykonnost_10km ? "<span>" + e(tf("hlášená výkonnost {0} na 10 km", HBK.vykonnost(x.vykonnost_10km))) + "</span>" : "") +
+          "<small>" + t("Vybrat a zkontrolovat údaje") + " →</small></button></li>";
       }).join("") + "</ul>");
     } else {
-      h.push('<p class="k-uvod">Z minulých ročníků tvého týmu nikoho dalšího neznáme. Přidej nového běžce a vyplň jeho údaje.</p>');
+      h.push('<p class="k-uvod">' + t("Z minulých ročníků tvého týmu nikoho dalšího neznáme. Přidej nového běžce a vyplň jeho údaje.") + "</p>");
     }
     h.push('<div class="k-akce k-akce-hlavni"><a class="' + (NABIDKA.length ? "k-vedlejsi k-tlacitko-s-napovedou" : "k-tlacitko k-tlacitko-s-napovedou") +
-      '" href="' + HB.zaklad + '/kapitan/bezec/udaje/?novy=1">Nový běžec' + (NABIDKA.length ? " – není v seznamu" : "") +
-      "<small>Všechny údaje vyplníš ručně.</small></a></div>");
+      '" href="' + HB.zaklad + HBK.adresa("/kapitan/bezec/udaje/?novy=1") + '">' + (NABIDKA.length ? t("Nový běžec – není v seznamu") : t("Nový běžec")) +
+      "<small>" + t("Všechny údaje vyplníš ručně.") + "</small></a></div>");
     document.getElementById("k-obsah").innerHTML = h.join("");
   }
 
@@ -46,17 +47,17 @@
   document.addEventListener("click", function (ev) {
     var b = ev.target && ev.target.closest && ev.target.closest("[data-vybrat]"); if (!b) return;
     try { sessionStorage.setItem("hb_k_vybrany", JSON.stringify(NABIDKA[Number(b.dataset.vybrat)])); } catch (err) {}
-    location.href = HB.zaklad + "/kapitan/bezec/udaje/?z=historie";
+    location.href = HB.zaklad + HBK.adresa("/kapitan/bezec/udaje/?z=historie");
   });
 
   document.addEventListener("DOMContentLoaded", async function () {
     var P = await HBK.vyzadovat(); if (!P) return;
-    HBK.navigace(P, { zpet: { n: "Soupiska", url: "/kapitan/soupiska/", hint: "Bez přidání běžce." } });
+    HBK.navigace(P, { zpet: { n: t("Soupiska"), url: "/kapitan/soupiska/", hint: t("Bez přidání běžce.") } });
     if (P.role === "bezec" || !P.soupiska_otevrena || P.pocet_potvrzen || P.bezcu >= P.max_bezcu) {
-      document.getElementById("k-obsah").innerHTML = '<p class="k-pozn">' + (P.role === "bezec" ? "Běžce přidává kapitán nebo zástupce týmu."
-        : !P.soupiska_otevrena ? "Soupiska je uzavřená. Změny řeší pořadatel na info@horybory.cz."
-        : P.pocet_potvrzen ? "Konečný počet máš potvrzený. Když chceš přidat běžce, nejdřív ho změň v kroku Konečný počet."
-        : "Soupiska je plná.") + "</p>";
+      document.getElementById("k-obsah").innerHTML = '<p class="k-pozn">' + (P.role === "bezec" ? t("Běžce přidává kapitán nebo zástupce týmu.")
+        : !P.soupiska_otevrena ? t("Soupiska je uzavřená. Změny řeší pořadatel na info@horybory.cz.")
+        : P.pocet_potvrzen ? t("Konečný počet máš potvrzený. Když chceš přidat běžce, nejdřív ho změň v kroku Konečný počet.")
+        : t("Soupiska je plná.")) + "</p>";
       return;
     }
     try {

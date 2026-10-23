@@ -10,8 +10,8 @@ krok: "pocet"
 skript: "kapitan-pocet.js"
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Konečný počet běžců' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Konečný počet běžců' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/pocet/"
   altEn: "/en/captain/team-size/"
 ---

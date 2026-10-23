@@ -11,8 +11,8 @@ skript: "kapitan-seznamka.js"
 vlastniNavigace: true
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Hledáme běžce' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Hledáme běžce' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/seznamka/"
   altEn: "/en/captain/runner-search/"
 ---

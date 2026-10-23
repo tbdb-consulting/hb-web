@@ -2,7 +2,10 @@
 // Šablony: {{ "Trasa a etapy" | t(jazyk) }}. Skripty dostanou celý slovník jako window.HB_T (jen na anglických stránkách).
 // Co ve slovníku chybí, zůstane česky a sestavení to vypíše. Texty z databáze (stránky, bloky, FAQ, popisy tras)
 // mají vlastní překlady v tabulkách *_preklady, sem nepatří.
+import kapitan from "./anglictinaKapitan.js";
+
 export default {
+  ...kapitan, // kapitánská sekce, můj inzerát, hlášky z databáze (23. 10. 2026); co je níž, má přednost
   // společná kostra
   "Štafetový běh z Beskyd na Pálavu. 30 etap, nepřetržitě dnem i nocí.": "A relay run from the Beskydy Mountains to Pálava. 30 stages, non-stop day and night.",
   "Přeskočit na obsah": "Skip to content",
@@ -11,8 +14,8 @@ export default {
   "Pro kapitány": "For captains",
   "Na této stránce se pracuje. Obsah zatím nemusí být úplný ani aktuální.": "This page is a work in progress. The content may not yet be complete or up to date.",
   "štafetový běh z Beskyd na Pálavu.": "a relay run from the Beskydy Mountains to Pálava.",
-  "Přihlášení do kapitánské sekce": "Captain's section login (in Czech)",
-  "Kapitánská sekce": "Captain's section (in Czech)",
+  "Přihlášení do kapitánské sekce": "Captain's section login",
+  "Kapitánská sekce": "Captain's section",
   "verze": "version",
 
   // trasa a etapy

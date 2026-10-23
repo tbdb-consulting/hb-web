@@ -8,32 +8,34 @@ permalink: "{{ '/en/captain/login/' if jazyk == 'en' else '/kapitan/prihlaseni/'
 layout: zaklad.njk
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Přihlášení do kapitánské sekce' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory – přihlášení odkazem z e-mailu.' | t(jazyk) }}"
+  titulek: "{{ 'Přihlášení do kapitánské sekce' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory – přihlášení odkazem z e-mailu.' | t(jazyk) | safe }}"
   altCs: "/kapitan/prihlaseni/"
   altEn: "/en/captain/login/"
 ---
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/kapitan.css">
-<h1>Kapitánská sekce</h1>
+<h1>{{ "Kapitánská sekce" | t(jazyk) }}</h1>
 <div class="k-karta k-uzka" id="k-prihlaseni">
-  <p>Zadej e-mail z registrace týmu (nebo e-mail, pod kterým jsi na soupisce týmu). Pošleme ti na něj odkaz, kterým se přihlásíš. Heslo není potřeba.</p>
+  <p>{{ "Zadej e-mail z registrace týmu (nebo e-mail, pod kterým jsi na soupisce týmu). Pošleme ti na něj odkaz, kterým se přihlásíš. Heslo není potřeba." | t(jazyk) }}</p>
   <form id="k-form" novalidate>
-    <label class="k-pole" for="k-email">E-mail
+    <label class="k-pole" for="k-email">{{ "E-mail" | t(jazyk) }}
       <input id="k-email" name="email" type="email" autocomplete="email" required>
     </label>
-    <button type="submit" class="k-tlacitko" id="k-poslat">Poslat přihlašovací odkaz</button>
+    <button type="submit" class="k-tlacitko" id="k-poslat">{{ "Poslat přihlašovací odkaz" | t(jazyk) }}</button>
   </form>
   <p id="k-stav" class="k-hlaska" role="status"></p>
 </div>
 <script>
-  window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}" };
+  window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}",
+                jazyk: "{{ jazyk }}", adresy: {{ kapitanAdresy | dump | safe }} };
 </script>
 <script src="{{ web.zaklad }}/assets/kapitan.js"></script>
 <script>
 (async function () {
+  var t = HBK.t, tf = HBK.tf;
   var stav = document.getElementById("k-stav");
   var zpet = new URLSearchParams(location.search).get("zpet");
-  var cil = zpet && zpet.indexOf(HB.zaklad + "/kapitan/") === 0 ? zpet : HB.zaklad + "/kapitan/";
+  var cil = zpet && (zpet.indexOf(HB.zaklad + "/kapitan/") === 0 || zpet.indexOf(HB.zaklad + "/en/captain/") === 0) ? zpet : HB.zaklad + HBK.adresa("/kapitan/");
   try { if (zpet) sessionStorage.setItem("hb_kapitan_zpet", cil); else cil = sessionStorage.getItem("hb_kapitan_zpet") || cil; } catch (e) {}
   var o = HBK.prevezmiZOdkazu();
   if (o && o.chyba) HBK.hlaska(stav, o.chyba, true);
@@ -41,16 +43,16 @@ eleventyComputed:
   document.getElementById("k-form").addEventListener("submit", async function (e) {
     e.preventDefault();
     var email = document.getElementById("k-email").value.trim();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { HBK.hlaska(stav, "Zadej e-mail ve tvaru jmeno@domena.cz.", true); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { HBK.hlaska(stav, t("Zadej e-mail ve tvaru jmeno@domena.cz."), true); return; }
     var b = document.getElementById("k-poslat"); b.disabled = true;
     try {
       await HBK.poslatOdkaz(email);
-      HBK.hlaska(stav, "Odkaz jsme poslali na " + email + ". Klepni na něj v e-mailu, přihlásí tě. Platí hodinu. Když nepřijde do pár minut, podívej se do spamu.");
+      HBK.hlaska(stav, tf("Odkaz jsme poslali na {0}. Klepni na něj v e-mailu, přihlásí tě. Platí hodinu. Když nepřijde do pár minut, podívej se do spamu.", email));
       // další odkaz jde poslat až za minutu (omezení počtu e-mailů), tlačítko odpočítává
       var zbyva = 60;
       (function tik() {
-        if (zbyva <= 0) { b.disabled = false; b.textContent = "Poslat odkaz znovu"; return; }
-        b.textContent = "Poslat znovu za " + zbyva + " s"; zbyva--; setTimeout(tik, 1000);
+        if (zbyva <= 0) { b.disabled = false; b.textContent = t("Poslat odkaz znovu"); return; }
+        b.textContent = tf("Poslat znovu za {0} s", zbyva); zbyva--; setTimeout(tik, 1000);
       })();
       return;
     } catch (err) { HBK.hlaska(stav, err.message, true); }

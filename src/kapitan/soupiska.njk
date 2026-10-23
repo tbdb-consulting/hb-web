@@ -10,8 +10,8 @@ krok: "soupiska"
 skript: "kapitan-soupiska.js"
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Soupiska' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Soupiska' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/soupiska/"
   altEn: "/en/captain/team-list/"
 ---

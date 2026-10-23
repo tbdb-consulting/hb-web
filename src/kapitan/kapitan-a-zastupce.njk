@@ -11,8 +11,8 @@ skript: "kapitan-vedeni.js"
 vlastniNavigace: true
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Kapitán a zástupce' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Kapitán a zástupce' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/kapitan-a-zastupce/"
   altEn: "/en/captain/captain-and-deputy/"
 ---

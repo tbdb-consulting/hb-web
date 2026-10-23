@@ -10,8 +10,8 @@ krok: "prehled"
 skript: "kapitan-prehled.js"
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Přehled a startovné' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Přehled a startovné' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/"
   altEn: "/en/captain/"
 ---

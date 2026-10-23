@@ -11,8 +11,8 @@ skript: "kapitan-oprava.js"
 vlastniNavigace: true
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Oprava času' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Oprava času' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/oprava-casu/"
   altEn: "/en/captain/time-correction/"
 ---

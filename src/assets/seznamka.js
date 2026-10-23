@@ -7,11 +7,26 @@
   // Angličtina (20. 10. 2026): L("česky", "anglicky") podle jazyka stránky.
   var EN = C && C.jazyk === "en";
   function L(cs, en) { return EN ? en : cs; }
+  // hlášky z databáze jsou česky; slovník window.HB_T je má i s % na místě hodnot (23. 10. 2026, jako kapitan.js)
+  var vzory = null;
+  function prelozHlasku(s) {
+    var T = window.HB_T; s = String(s == null ? "" : s);
+    if (!EN || !T) return s;
+    if (T[s]) return T[s];
+    if (!vzory) vzory = Object.keys(T).filter(function (k) { return k.indexOf("%") >= 0; }).map(function (k) {
+      return { re: new RegExp("^" + k.split("%").map(function (c) { return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("(.+?)") + "$"), en: T[k] };
+    });
+    for (var i = 0; i < vzory.length; i++) {
+      var m = s.match(vzory[i].re);
+      if (m) { var n = 0; return vzory[i].en.replace(/%/g, function () { n++; return m[n] == null ? "" : m[n]; }); }
+    }
+    return s;
+  }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   async function rpc(f, d) {
     var r = await fetch(C.url + "/rest/v1/rpc/" + f, { method: "POST", headers: { apikey: C.klic, Authorization: "Bearer " + C.klic, "Content-Type": "application/json" }, body: JSON.stringify(d || {}) });
     var j = await r.json().catch(function () { return null; });
-    if (!r.ok) throw new Error((j && (j.message || j.hint)) || L("Chyba ", "Error ") + r.status);
+    if (!r.ok) throw new Error(prelozHlasku((j && (j.message || j.hint)) || L("Chyba ", "Error ") + r.status));
     return j;
   }
   window.HBS = { rpc: rpc, esc: esc, kraje: async function () {
@@ -43,10 +58,10 @@
     var h = '<p class="sz-pozn">' + L("Hledáš tým, nebo běžce do týmu? Napiš inzerát. Na webu se ukáže jen křestní jméno a první písmeno příjmení, " +
       "e-mail nikde. Kdo ti chce napsat, použije formulář a zprávu ti pošleme e-mailem. Inzeráty zmizí po skončení závodu.",
       "Looking for a team, or for runners for your team? Post a listing. Only your first name and the initial of your surname appear on the website, " +
-      "your e-mail never does. Anyone who wants to write to you uses the form and we send you the message by e-mail. Listings disappear after the race. Our e-mails are in Czech.") + "</p>";
+      "your e-mail never does. Anyone who wants to write to you uses the form and we send you the message by e-mail. Listings disappear after the race.") + "</p>";
     h += '<div class="sz-sloupce"><section><h2>' + L("Týmy hledají běžce", "Teams looking for runners") + '</h2>' + (tymy.length ? tymy.map(inzerat).join("") : '<p class="sz-prazdno">' + L("Zatím žádná poptávka.", "No requests yet.") + '</p>') +
       '<p class="sz-pozn">' + L('Kapitán nebo zástupce zadá poptávku za tým v <a href="' + C.zaklad + '/kapitan/seznamka/">kapitánské sekci</a>.',
-        'The captain or deputy posts a request for their team in the <a href="' + C.zaklad + '/kapitan/seznamka/">captain\'s section</a> (in Czech).') + '</p></section>' +
+        'The captain or deputy posts a request for their team in the <a href="' + C.zaklad + '/en/captain/runner-search/">captain\'s section</a>.') + '</p></section>' +
       "<section><h2>" + L("Běžci hledají tým", "Runners looking for a team") + "</h2>" + (bezci.length ? bezci.map(inzerat).join("") : '<p class="sz-prazdno">' + L("Zatím žádný inzerát.", "No listings yet.") + '</p>') + "</section></div>";
     if (D.otevreno) h += '<div id="sz-pridat-misto"><button type="button" class="sz-tlacitko" id="sz-pridat">' + L("Přidat inzerát – hledám tým", "Post a listing – I'm looking for a team") + '</button></div>';
     else h += '<p class="sz-prazdno">' + L("Seznamka letos skončila.", "The team finder is closed for this year.") + '</p>';
@@ -63,7 +78,7 @@
   function formPridat() {
     return '<form class="sz-form" id="sz-form-pridat" novalidate><h2>' + L("Hledám tým", "I'm looking for a team") + '</h2>' +
       '<div class="sz-radek"><label>' + L("Jméno *", "First name *") + '<input name="jmeno" autocomplete="given-name"></label><label>' + L("Příjmení *", "Surname *") + '<input name="prijmeni" autocomplete="family-name"><small>' + L("Na webu jen první písmeno.", "Only the initial appears on the website.") + '</small></label></div>' +
-      '<label>E-mail *<input name="email" type="email" autocomplete="email"><small>' + L("Nikde se neukáže. Přijde na něj odkaz, kterým inzerát zveřejníš, upravíš nebo stáhneš.", "It is never shown. You'll receive a link to publish, edit or remove your listing (the e-mail is in Czech).") + '</small></label>' +
+      '<label>E-mail *<input name="email" type="email" autocomplete="email"><small>' + L("Nikde se neukáže. Přijde na něj odkaz, kterým inzerát zveřejníš, upravíš nebo stáhneš.", "It is never shown. You'll receive a link to publish, edit or remove your listing.") + '</small></label>' +
       '<div class="sz-radek"><label>' + L("Kraj", "Region") + HBS.krajSelect("sz-kraj") + '</label><label>' + L("Výkonnost na 10 km", "10 km time") + '<input name="vykonnost" inputmode="numeric" placeholder="52:30"></label>' +
       '<label>' + L("Kolik etap zvládneš", "How many stages can you run") + '<input name="etap" type="number" min="1" max="30" inputmode="numeric"></label></div>' +
       '<label>' + L("O mně *", "About me *") + '<textarea name="text" rows="4" maxlength="1000" placeholder="' + L("Jak běháš, odkud jsi, jestli máš auto…", "How you run, where you're from, whether you have a car…") + '"></textarea></label>' +
@@ -101,8 +116,8 @@
       if (!v("text")) return hlaska(f, L("Napiš pár slov o sobě.", "Please write a few words about yourself."), true);
       b.disabled = true;
       try { await rpc("web_seznamka_pridat", { p_jmeno: v("jmeno"), p_prijmeni: v("prijmeni"), p_email: v("email"), p_kraj: document.getElementById("sz-kraj").value || null,
-          p_vykonnost: v("vykonnost") || null, p_etap: v("etap") ? Number(v("etap")) : null, p_text: v("text") });
-        document.getElementById("sz-pridat-misto").innerHTML = '<p class="sz-pozn">' + L("<b>Skoro hotovo.</b> Poslali jsme ti e-mail s odkazem. Inzerát se zveřejní, až na odkaz klikneš.", "<b>Almost done.</b> We've sent you an e-mail (in Czech) with a link. Your listing will be published once you click it.") + '</p>'; }
+          p_vykonnost: v("vykonnost") || null, p_etap: v("etap") ? Number(v("etap")) : null, p_text: v("text"), p_jazyk: EN ? "en" : "cs" });
+        document.getElementById("sz-pridat-misto").innerHTML = '<p class="sz-pozn">' + L("<b>Skoro hotovo.</b> Poslali jsme ti e-mail s odkazem. Inzerát se zveřejní, až na odkaz klikneš.", "<b>Almost done.</b> We've sent you an e-mail with a link. Your listing will be published once you click it.") + '</p>'; }
       catch (e) { hlaska(f, e.message, true); b.disabled = false; }
     }
   });

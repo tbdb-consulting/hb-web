@@ -11,8 +11,8 @@ skript: "kapitan-prevzeti.js"
 vlastniNavigace: true
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Převzetí týmu' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Převzetí týmu' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/prevzeti/"
   altEn: "/en/captain/takeover/"
 ---

@@ -9,6 +9,21 @@
   // Angličtina (20. 10. 2026): texty se překládají slovníkem window.HB_T (klíčem je český text), data česky z databáze taky.
   var EN = C.jazyk === "en";
   function t(s) { var T = window.HB_T; return (T && T[s]) || s; }
+  // Hlášky z databáze (raise exception) jsou česky; ve slovníku jsou i s % na místě hodnot (23. 10. 2026, stejně jako kapitan.js).
+  var vzory = null;
+  function prelozHlasku(s) {
+    var T = window.HB_T; s = String(s == null ? "" : s);
+    if (!EN || !T) return s;
+    if (T[s]) return T[s];
+    if (!vzory) vzory = Object.keys(T).filter(function (k) { return k.indexOf("%") >= 0; }).map(function (k) {
+      return { re: new RegExp("^" + k.split("%").map(function (c) { return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("(.+?)") + "$"), en: T[k] };
+    });
+    for (var i = 0; i < vzory.length; i++) {
+      var m = s.match(vzory[i].re);
+      if (m) { var n = 0; return vzory[i].en.replace(/%/g, function () { n++; return m[n] == null ? "" : m[n]; }); }
+    }
+    return s;
+  }
   function el(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
@@ -24,7 +39,7 @@
     return fetch(C.url + "/rest/v1/rpc/" + fce, { method: "POST", headers: hlavicky(true), body: JSON.stringify(data || {}) })
       .then(function (r) {
         return r.json().then(function (j) {
-          if (!r.ok) throw new Error((j && (j.message || j.hint)) || (t("Chyba") + " " + r.status));
+          if (!r.ok) throw new Error(prelozHlasku((j && (j.message || j.hint)) || (t("Chyba") + " " + r.status)));
           return j;
         });
       });
@@ -144,7 +159,8 @@
       p_duzp_rok: ano ? parseInt(f.duzp.value, 10) : null,
       p_poznamka: f.poznamka.value, p_bezim: f.bezim.checked,
       p_zdroj: zdroj() || null, p_zdroj_jinak: VOLNY[zdroj()] ? f.zdroj_jinak.value : null,
-      p_utm_source: utm("utm_source"), p_utm_campaign: utm("utm_campaign")
+      p_utm_source: utm("utm_source"), p_utm_campaign: utm("utm_campaign"),
+      p_jazyk: EN ? "en" : "cs" // jazyk mailů týmu (23. 10. 2026)
     };
     el("rg-odeslat").disabled = true;
     el("rg-odeslat").textContent = t("Odesílám…");
@@ -157,7 +173,7 @@
           : (v.ceka_na_schvaleni
             ? "<p>You'll receive an e-mail at <strong>" + esc(v.email) + "</strong> right away confirming that your registration has arrived. We'll send the registration confirmation and entry fee payment instructions within 24 hours.</p>"
             : "<p>We're sending the registration confirmation and entry fee payment instructions to <strong>" + esc(v.email) + "</strong> right now.</p>")) +
-        "<p>The e-mails and the <a href=\"" + C.zaklad + "/kapitan/prihlaseni/\">captain's section</a> are in Czech for now; you log in to the captain's section with the e-mail from your registration.</p>" +
+        "<p>You log in to the <a href=\"" + C.zaklad + "/en/captain/login/\">captain's section</a> with the e-mail from your registration.</p>" +
         "<p>If the e-mail doesn't arrive, check your spam folder too, or write to <a href=\"mailto:info@horybory.cz\">info@horybory.cz</a>.</p>"
         :
         "<h2>Přihláška týmu " + esc(v.tym) + " dorazila</h2>" +

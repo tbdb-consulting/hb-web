@@ -10,8 +10,8 @@ krok: "etapy"
 skript: "kapitan-etapy.js"
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Rozdělení etap' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Rozdělení etap' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/etapy/"
   altEn: "/en/captain/stages/"
 ---

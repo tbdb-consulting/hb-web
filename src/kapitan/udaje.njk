@@ -11,8 +11,8 @@ skript: "kapitan-udaje.js"
 vlastniNavigace: true
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Údaje běžce' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Údaje běžce' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/bezec/udaje/"
   altEn: "/en/captain/runner/details/"
 ---

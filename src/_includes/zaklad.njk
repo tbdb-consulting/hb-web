@@ -47,7 +47,7 @@
           <li><a href="{{ web.zaklad }}{{ s.adresa }}"{% if s.adresa == adresa %} aria-current="page"{% endif %}>{{ s.titulek }}</a></li>
           {% endif %}
         {% endfor %}
-        <li><a href="{{ web.zaklad }}/kapitan/"{% if page.url and page.url.indexOf("/kapitan/") == 0 %} aria-current="page"{% endif %}>{{ "Pro kapitány" | t(jaz) }}</a></li>
+        <li><a href="{{ web.zaklad }}{{ kapitanAdresy["/kapitan/"] if jaz == "en" else "/kapitan/" }}"{% if page.url and (page.url.indexOf("/kapitan/") == 0 or page.url.indexOf("/en/captain/") == 0) %} aria-current="page"{% endif %}>{{ "Pro kapitány" | t(jaz) }}</a></li>
       </ul>
     </nav>
   </div>
@@ -65,7 +65,7 @@
     <p><strong>Hory Bory</strong> — {{ "štafetový běh z Beskyd na Pálavu." | t(jaz) }}</p>
     <p>
       <a href="mailto:info@horybory.cz">info@horybory.cz</a> ·
-      <a href="{{ web.zaklad }}/kapitan/prihlaseni/" id="paticka-kapitan">{{ "Přihlášení do kapitánské sekce" | t(jaz) }}</a> ·
+      <a href="{{ web.zaklad }}{{ kapitanAdresy["/kapitan/prihlaseni/"] if jaz == "en" else "/kapitan/prihlaseni/" }}" id="paticka-kapitan">{{ "Přihlášení do kapitánské sekce" | t(jaz) }}</a> ·
       {% for s in menuStranky %}{% if s.kod == "gdpr" %}<a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a>{% endif %}{% endfor %}
     </p>
     <p class="verze" title="{{ web.commit }}">{{ "verze" | t(jaz) }} {{ web.verze }} · {{ web.sestaveno }}</p>
@@ -89,7 +89,7 @@
       for (var i = 0; i < localStorage.length; i++) {
         var k = localStorage.key(i);
         if (/^sb-.*-auth-token$/.test(k) && localStorage.getItem(k)) {
-          a.textContent = '{{ "Kapitánská sekce" | t(jaz) }}'; a.href = '{{ web.zaklad }}/kapitan/'; return;
+          a.textContent = '{{ "Kapitánská sekce" | t(jaz) }}'; a.href = '{{ web.zaklad }}{{ kapitanAdresy["/kapitan/"] if jaz == "en" else "/kapitan/" }}'; return;
         }
       }
     } catch (e) {}

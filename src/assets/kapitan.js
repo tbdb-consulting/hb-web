@@ -10,7 +10,7 @@
   function t(s) { var T = window.HB_T; return (EN && T && T[s]) || s; }
   // t() s doplněním hodnot: tf("Krok {0} z {1}", 3, 5)
   function tf(s) { var a = arguments; return t(s).replace(/\{(\d)\}/g, function (_, i) { return a[Number(i) + 1]; }); }
-  // Česká adresa sekce → adresa v jazyce stránky (/kapitan/soupiska/?id=5 → /en/captain/roster/?id=5).
+  // Česká adresa sekce → adresa v jazyce stránky (/kapitan/soupiska/?id=5 → /en/captain/team-list/?id=5).
   function adresa(u) {
     if (!EN || !u) return u;
     var m = String(u).match(/^([^?#]*)(.*)$/), cesta = m[1], adresy = (window.HB && HB.adresy) || {};
@@ -100,10 +100,10 @@
   }
 
   async function odhlasit() {
-    var t = await platnyToken();
-    if (t) {
+    var tok = await platnyToken();
+    if (tok) {
       fetch(HB.url + "/auth/v1/logout", { method: "POST",
-        headers: { apikey: HB.klic, Authorization: "Bearer " + t } }).catch(function () {});
+        headers: { apikey: HB.klic, Authorization: "Bearer " + tok } }).catch(function () {});
     }
     ulozRelaci(null);
     try { sessionStorage.removeItem("hb_kapitan_dokonceno"); } catch (e) {}
@@ -112,9 +112,9 @@
 
   async function db(cesta, volby) {
     volby = volby || {};
-    var t = await platnyToken();
+    var tok = await platnyToken();
     var hlavicky = { apikey: HB.klic, "Content-Type": "application/json" };
-    if (t) hlavicky.Authorization = "Bearer " + t;
+    if (tok) hlavicky.Authorization = "Bearer " + tok;
     var r = await fetch(HB.url + "/rest/v1/" + cesta, {
       method: volby.metoda || "GET", headers: hlavicky,
       body: volby.telo ? JSON.stringify(volby.telo) : undefined
@@ -260,6 +260,11 @@
     try { p = await rpc("web_k_prehled"); } catch (e) {
       if (obsah) obsah.innerHTML = '<p class="k-chyba">' + esc(e.message) + "</p>"; return null;
     }
+    // upozornění skládá databáze česky (web_k_upozorneni); na anglické stránce je přeloží slovník vzorů
+    // (u neúplných běžců je v textu „(chybí rok narození, kraj)“ – názvy polí přeloží slovník po jednom)
+    if (p && EN) (p.upozorneni || []).forEach(function (x) {
+      x.text = prelozHlasku(x.text).replace(/\(chybí ([^)]*)\)/g, function (_, s) { return "(" + t("chybí") + " " + s.split(", ").map(t).join(", ") + ")"; });
+    });
     var lista = document.getElementById("k-lista");
     if (!p) {
       if (lista) lista.hidden = false;
@@ -280,7 +285,7 @@
     vykresliKroky(p);
     if (!(window.HB && HB.vlastniNavigace)) navigace(p);
     // krátké potvrzení z předchozí stránky (třeba „Rozdělení je uložené.“ po přechodu z etap)
-    try { var t = sessionStorage.getItem("hb_k_toast"); if (t) { sessionStorage.removeItem("hb_k_toast"); setTimeout(function () { toast(t); }, 300); } } catch (e) {}
+    try { var tt = sessionStorage.getItem("hb_k_toast"); if (tt) { sessionStorage.removeItem("hb_k_toast"); setTimeout(function () { toast(tt); }, 300); } } catch (e) {}
     return p;
   }
 

@@ -10,8 +10,8 @@ krok: "potvrzeni"
 skript: "kapitan-potvrzeni.js"
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  titulek: "{{ 'Kontrola a potvrzení' | t(jazyk) }}"
-  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  titulek: "{{ 'Kontrola a potvrzení' | t(jazyk) | safe }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) | safe }}"
   altCs: "/kapitan/potvrzeni/"
   altEn: "/en/captain/confirmation/"
 ---

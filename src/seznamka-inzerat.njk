@@ -1,14 +1,24 @@
 ---
-permalink: "/seznamka/inzerat/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/team-finder/my-listing/' if jazyk == 'en' else '/seznamka/inzerat/' }}index.html"
 layout: zaklad.njk
-titulek: "Můj inzerát v seznamce"
-metaPopis: "Správa inzerátu v seznamce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Můj inzerát v seznamce' | t(jazyk) }}"
+  metaPopis: "{{ 'Správa inzerátu v seznamce Hory Bory.' | t(jazyk) }}"
+  altCs: "/seznamka/inzerat/"
+  altEn: "/en/team-finder/my-listing/"
 ---
+{#- Správa vlastního inzerátu odkazem z e-mailu; angličtina (23. 10. 2026) pod /en/team-finder/my-listing/. -#}
+{%- set jaz = jazyk -%}
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/seznamka.css">
-<h1>Můj inzerát v seznamce</h1>
-<div id="seznamka-muj"><p class="prazdno">Načítám…</p></div>
-<script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}" };</script>
+<h1>{{ "Můj inzerát v seznamce" | t(jaz) }}</h1>
+<div id="seznamka-muj"><p class="prazdno">{{ "Načítám…" | t(jaz) }}</p></div>
+<script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}", jazyk: "{{ jaz }}" };</script>
 <script src="{{ web.zaklad }}/assets/seznamka.js"></script>
 <script src="{{ web.zaklad }}/assets/seznamka-muj.js"></script>
