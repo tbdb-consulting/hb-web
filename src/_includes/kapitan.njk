@@ -2,19 +2,22 @@
 layout: zaklad.njk
 ---
 {# Kapitánská sekce: jméno týmu a odhlášení, ukazatel kroků, obsah stránky a dole tlačítka Zpět / Dál.
-   Na stránce je jen jedna věc, dál se jde tlačítkem „Dál“ (Keksa 4. 10. 2026). Stránky se neindexují. #}
+   Na stránce je jen jedna věc, dál se jde tlačítkem „Dál“ (Keksa 4. 10. 2026). Stránky se neindexují.
+   Angličtina (23. 10. 2026): stejné stránky pod /en/captain/, texty skriptů přes HBK.t() a slovník window.HB_T. #}
+{%- set jaz = jazyk or "cs" -%}
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/kapitan.css">
 <div class="k-lista" id="k-lista" hidden>
   <span class="k-tym" id="k-tym"></span>
-  <button type="button" class="k-odkaz" id="k-odhlasit">Odhlásit</button>
+  <button type="button" class="k-odkaz" id="k-odhlasit">{{ "Odhlásit" | t(jaz) }}</button>
 </div>
-<nav aria-label="Kroky kapitánské sekce"><ol class="k-kroky" id="k-kroky" hidden></ol></nav>
+<nav aria-label="{{ 'Kroky kapitánské sekce' | t(jaz) }}"><ol class="k-kroky" id="k-kroky" hidden></ol></nav>
 <h1>{{ titulek }}</h1>
-<div id="k-obsah"><p class="prazdno">Načítám…</p></div>
-<nav class="k-navigace" id="k-navigace" aria-label="Další a předchozí krok" hidden></nav>
+<div id="k-obsah"><p class="prazdno">{{ "Načítám…" | t(jaz) }}</p></div>
+<nav class="k-navigace" id="k-navigace" aria-label="{{ 'Další a předchozí krok' | t(jaz) }}" hidden></nav>
 <script>
   window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}",
-                krok: "{{ krok }}", vlastniNavigace: {{ "true" if vlastniNavigace else "false" }} };
+                krok: "{{ krok }}", vlastniNavigace: {{ "true" if vlastniNavigace else "false" }},
+                jazyk: "{{ jaz }}", adresy: {{ kapitanAdresy | dump | safe }} };
 </script>
 <script src="{{ web.zaklad }}/assets/kapitan.js"></script>
 {% if skript %}<script src="{{ web.zaklad }}/assets/{{ skript }}"></script>{% endif %}

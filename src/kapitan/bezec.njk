@@ -1,10 +1,18 @@
 ---
-permalink: "/kapitan/bezec/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/runner/' if jazyk == 'en' else '/kapitan/bezec/' }}index.html"
 layout: kapitan.njk
-titulek: "Kdo poběží?"
 krok: "soupiska"
 skript: "kapitan-bezec.js"
 vlastniNavigace: true
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Kdo poběží?' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/bezec/"
+  altEn: "/en/captain/runner/"
 ---

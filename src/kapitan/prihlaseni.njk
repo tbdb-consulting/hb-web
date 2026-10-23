@@ -1,9 +1,17 @@
 ---
-permalink: "/kapitan/prihlaseni/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/login/' if jazyk == 'en' else '/kapitan/prihlaseni/' }}index.html"
 layout: zaklad.njk
-titulek: "Přihlášení do kapitánské sekce"
-metaPopis: "Kapitánská sekce Hory Bory – přihlášení odkazem z e-mailu."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Přihlášení do kapitánské sekce' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory – přihlášení odkazem z e-mailu.' | t(jazyk) }}"
+  altCs: "/kapitan/prihlaseni/"
+  altEn: "/en/captain/login/"
 ---
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/kapitan.css">
 <h1>Kapitánská sekce</h1>

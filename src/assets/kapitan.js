@@ -4,6 +4,39 @@
 (function () {
   var KLIC_RELACE = "hb_kapitan_relace";
 
+  // Angličtina (23. 10. 2026): stránky sekce i pod /en/captain/. Texty se překládají slovníkem window.HB_T
+  // (src/_data/anglictina.js, klíčem je český text); co ve slovníku chybí, zůstane česky.
+  var EN = !!(window.HB && HB.jazyk === "en");
+  function t(s) { var T = window.HB_T; return (EN && T && T[s]) || s; }
+  // t() s doplněním hodnot: tf("Krok {0} z {1}", 3, 5)
+  function tf(s) { var a = arguments; return t(s).replace(/\{(\d)\}/g, function (_, i) { return a[Number(i) + 1]; }); }
+  // Česká adresa sekce → adresa v jazyce stránky (/kapitan/soupiska/?id=5 → /en/captain/roster/?id=5).
+  function adresa(u) {
+    if (!EN || !u) return u;
+    var m = String(u).match(/^([^?#]*)(.*)$/), cesta = m[1], adresy = (window.HB && HB.adresy) || {};
+    if (cesta && cesta.charAt(cesta.length - 1) !== "/" && cesta.indexOf(".") < 0) cesta += "/";
+    return (adresy[cesta] || cesta.replace(/^\/kapitan\//, "/en/captain/")) + m[2];
+  }
+  // Hlášky z databáze (raise exception) jsou česky; ve slovníku jsou i s % na místě hodnot.
+  var vzoryHlasek = null;
+  function prelozHlasku(s) {
+    s = String(s == null ? "" : s);
+    var T = window.HB_T;
+    if (!EN || !T) return s;
+    if (T[s]) return T[s];
+    if (!vzoryHlasek) {
+      vzoryHlasek = Object.keys(T).filter(function (k) { return k.indexOf("%") >= 0; }).map(function (k) {
+        var re = k.split("%").map(function (c) { return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("(.+?)");
+        return { re: new RegExp("^" + re + "$"), en: T[k] };
+      });
+    }
+    for (var i = 0; i < vzoryHlasek.length; i++) {
+      var m = s.match(vzoryHlasek[i].re);
+      if (m) { var n = 0; return vzoryHlasek[i].en.replace(/%/g, function () { n++; return m[n] == null ? "" : m[n]; }); }
+    }
+    return s;
+  }
+
   function nactiRelaci() {
     try { return JSON.parse(localStorage.getItem(KLIC_RELACE) || "null"); } catch (e) { return null; }
   }
@@ -26,8 +59,8 @@
     });
     var j = await r.json().catch(function () { return {}; });
     if (!r.ok) {
-      var zprava = j.error_description || j.msg || j.message || ("Chyba " + r.status);
-      if (/rate limit|security purposes/i.test(zprava)) zprava = "Odkaz jsme posílali před chvílí. Zkus to prosím za minutu znovu.";
+      var zprava = j.error_description || j.msg || j.message || (t("Chyba") + " " + r.status);
+      if (/rate limit|security purposes/i.test(zprava)) zprava = t("Odkaz jsme posílali před chvílí. Zkus to prosím za minutu znovu.");
       throw new Error(zprava);
     }
     return j;
@@ -35,7 +68,7 @@
 
   // Pošle na e-mail přihlašovací odkaz. Odkaz vede zpět na stránku přihlášení.
   async function poslatOdkaz(email) {
-    var zpet = location.origin + HB.zaklad + "/kapitan/prihlaseni/";
+    var zpet = location.origin + HB.zaklad + adresa("/kapitan/prihlaseni/");
     await auth("otp?redirect_to=" + encodeURIComponent(zpet), { email: String(email || "").trim(), create_user: true });
   }
 
@@ -46,7 +79,7 @@
     if (p.get("error_description") || p.get("error")) {
       history.replaceState(null, "", location.pathname + location.search);
       var chyba = p.get("error_description") || p.get("error");
-      if (/expired|invalid/i.test(chyba)) chyba = "Odkaz už neplatí. Nech si poslat nový.";
+      if (/expired|invalid/i.test(chyba)) chyba = t("Odkaz už neplatí. Nech si poslat nový.");
       return { chyba: chyba };
     }
     if (!p.get("access_token")) return null;
@@ -74,7 +107,7 @@
     }
     ulozRelaci(null);
     try { sessionStorage.removeItem("hb_kapitan_dokonceno"); } catch (e) {}
-    location.href = HB.zaklad + "/kapitan/prihlaseni/";
+    location.href = HB.zaklad + adresa("/kapitan/prihlaseni/");
   }
 
   async function db(cesta, volby) {
@@ -88,7 +121,7 @@
     });
     var text = await r.text();
     var j = text ? JSON.parse(text) : null;
-    if (!r.ok) throw new Error((j && (j.message || j.hint)) || ("Chyba " + r.status));
+    if (!r.ok) throw new Error(prelozHlasku((j && (j.message || j.hint)) || (t("Chyba") + " " + r.status)));
     return j;
   }
   function rpc(fce, data) { return db("rpc/" + fce, { metoda: "POST", telo: data || {} }); }
@@ -101,6 +134,7 @@
   function datum(d) {
     if (!d) return "–";
     var x = new Date(String(d).length === 10 ? d + "T12:00:00" : d);
+    if (EN) return x.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
     return x.getDate() + ". " + (x.getMonth() + 1) + ". " + x.getFullYear();
   }
   function cas(d) {
@@ -108,7 +142,7 @@
     var x = new Date(d);
     return datum(d) + " " + String(x.getHours()).padStart(2, "0") + ":" + String(x.getMinutes()).padStart(2, "0");
   }
-  function kc(n) { return n == null ? "–" : Number(n).toLocaleString("cs-CZ") + " Kč"; }
+  function kc(n) { return n == null ? "–" : EN ? "CZK " + Number(n).toLocaleString("en-GB") : Number(n).toLocaleString("cs-CZ") + " Kč"; }
   // interval z databáze („00:52:30“) → „52:30“, „1:05:00“
   function vykonnost(v) {
     if (!v) return "";
@@ -157,9 +191,10 @@
   function bezStartovneho(p) { return !!p.zaplaceno || p.role === "bezec" || p.stav === "nahradnik" || p.stav === "zruseno"; }
   function viditelneKroky(p) {
     return KROKY.filter(function (x) { return !x.vede || p.role !== "bezec"; }).map(function (x) {
-      if (x.k === "prehled" && bezStartovneho(p)) return Object.assign({}, x, { n: "Přehled týmu", hint: "Tvůj tým a stav registrace." });
+      if (x.k === "prehled" && bezStartovneho(p)) x = Object.assign({}, x, { n: "Přehled týmu", hint: "Tvůj tým a stav registrace." });
       // běžec soupisku jen prohlíží a upravuje své údaje (UX revize 5. 10. 2026)
-      return p.role === "bezec" && x.k === "soupiska" ? Object.assign({}, x, { hint: "Tvoje údaje a tým na soupisce." }) : x;
+      else if (p.role === "bezec" && x.k === "soupiska") x = Object.assign({}, x, { hint: "Tvoje údaje a tým na soupisce." });
+      return Object.assign({}, x, { n: t(x.n), hint: t(x.hint) });
     });
   }
   function vykresliKroky(p) {
@@ -167,23 +202,23 @@
     var ted = (window.HB && HB.krok) || "";
     ol.innerHTML = viditelneKroky(p).map(function (x, i) {
       var h = hotovo(x.k, p), aktualni = x.k === ted;
-      return '<li class="' + (aktualni ? "k-krok-ted" : "") + (h ? " k-krok-hotovo" : "") + '"><a href="' + HB.zaklad + x.url + '"' +
+      return '<li class="' + (aktualni ? "k-krok-ted" : "") + (h ? " k-krok-hotovo" : "") + '"><a href="' + HB.zaklad + adresa(x.url) + '"' +
         (aktualni ? ' aria-current="step"' : "") + '><span class="k-krok-cislo" aria-hidden="true">' + (h ? "✓" : i + 1) + "</span>" +
-        '<span class="k-krok-nazev">' + esc(x.n) + "</span>" + (h ? '<span class="k-skryte"> (hotovo)</span>' : "") + "</a></li>";
+        '<span class="k-krok-nazev">' + esc(x.n) + "</span>" + (h ? '<span class="k-skryte"> (' + t("hotovo") + ")</span>" : "") + "</a></li>";
     }).join("");
     ol.hidden = false;
     // na mobilu se místo pěti rámečků ukáže „Krok 3 z 5: Konečný počet“ a pod tím tečky
     var kroky = viditelneKroky(p), i = kroky.map(function (x) { return x.k; }).indexOf(ted);
     var m = document.getElementById("k-krok-mobil");
     if (!m) { m = document.createElement("p"); m.id = "k-krok-mobil"; m.className = "k-krok-mobil"; m.setAttribute("aria-hidden", "true"); ol.parentNode.insertBefore(m, ol); }
-    m.textContent = i >= 0 ? "Krok " + (i + 1) + " z " + kroky.length + ": " + kroky[i].n : "";
+    m.textContent = i >= 0 ? tf("Krok {0} z {1}: {2}", i + 1, kroky.length, kroky[i].n) : "";
     m.hidden = i < 0;
   }
   // Tlačítko kroku: šipka, název kroku a nápověda pod ním. Volby: { zpet: {...}, dal: {...} }, kde položka má n, url, hint.
   function tlacitkoKroku(x, smer) {
     if (!x) return "<span></span>";
-    return '<a class="k-nav-' + smer + '" href="' + (x.url.indexOf("http") === 0 ? x.url : HB.zaklad + x.url) + '">' +
-      '<span class="k-nav-sipka">' + (smer === "dal" ? (x.popisek || "Dál") + " →" : "← " + (x.popisek || "Zpět")) + "</span>" +
+    return '<a class="k-nav-' + smer + '" href="' + (x.url.indexOf("http") === 0 ? x.url : HB.zaklad + adresa(x.url)) + '">' +
+      '<span class="k-nav-sipka">' + (smer === "dal" ? (x.popisek || t("Dál")) + " →" : "← " + (x.popisek || t("Zpět"))) + "</span>" +
       "<b>" + esc(x.n) + "</b><small>" + esc(x.hint || "") + "</small></a>";
   }
   function navigace(p, vlastni) {
@@ -210,11 +245,11 @@
   async function vyzadovat() {
     var obsah = document.getElementById("k-obsah");
     if (!(await platnyToken())) {
-      location.href = HB.zaklad + "/kapitan/prihlaseni/?zpet=" + encodeURIComponent(location.pathname);
+      location.href = HB.zaklad + adresa("/kapitan/prihlaseni/") + "?zpet=" + encodeURIComponent(location.pathname);
       return null;
     }
     // rozpracované převzetí týmu odkazem z e-mailu (11. 10. 2026): po přihlášení se vrátí na stránku Převzetí týmu
-    try { if (localStorage.getItem("hb_prevzeti_token") && HB.krok !== "prevzeti") { location.href = HB.zaklad + "/kapitan/prevzeti/"; return null; } } catch (e) {}
+    try { if (localStorage.getItem("hb_prevzeti_token") && HB.krok !== "prevzeti") { location.href = HB.zaklad + adresa("/kapitan/prevzeti/"); return null; } } catch (e) {}
     var hotovo = false;
     try { hotovo = sessionStorage.getItem("hb_kapitan_dokonceno") === "1"; } catch (e) {}
     if (!hotovo) {
@@ -228,19 +263,19 @@
     var lista = document.getElementById("k-lista");
     if (!p) {
       if (lista) lista.hidden = false;
-      if (obsah) obsah.innerHTML = '<div class="k-karta"><h2>Tým jsme nenašli</h2><p>K tomuhle e-mailu nemáme v letošním ročníku tým ani místo na soupisce. ' +
-        'Kapitán tě na soupisku přidá pod e-mailem, na který ti pak přijde i odkaz. Když si myslíš, že jde o chybu, napiš na ' +
-        '<a href="mailto:info@horybory.cz">info@horybory.cz</a>.</p></div>';
+      if (obsah) obsah.innerHTML = '<div class="k-karta"><h2>' + t("Tým jsme nenašli") + "</h2><p>" +
+        t("K tomuhle e-mailu nemáme v letošním ročníku tým ani místo na soupisce. Kapitán tě na soupisku přidá pod e-mailem, na který ti pak přijde i odkaz. Když si myslíš, že jde o chybu, napiš na") +
+        ' <a href="mailto:info@horybory.cz">info@horybory.cz</a>.</p></div>';
       return null;
     }
     if (lista) {
       lista.hidden = false;
-      var role = { kapitan: "kapitán", zastupce: "zástupce kapitána", bezec: "běžec" }[p.role] || p.role;
+      var role = t({ kapitan: "kapitán", zastupce: "zástupce kapitána", bezec: "běžec" }[p.role] || p.role);
       document.getElementById("k-tym").textContent = (p.cislo ? p.cislo + " · " : "") + p.nazev + " · " + role;
     }
     if (HB.krok === "prehled" && bezStartovneho(p)) {
-      var h1 = document.querySelector("h1"); if (h1) h1.textContent = "Přehled týmu";
-      document.title = document.title.replace("Přehled a startovné", "Přehled týmu");
+      var h1 = document.querySelector("h1"); if (h1) h1.textContent = t("Přehled týmu");
+      document.title = document.title.replace(t("Přehled a startovné"), t("Přehled týmu"));
     }
     vykresliKroky(p);
     if (!(window.HB && HB.vlastniNavigace)) navigace(p);
@@ -281,8 +316,8 @@
   // Výkonnost běžce po ročnících z historie: „HB26: hlášená výkonnost 51:00 · skutečná výkonnost 49:40“ (Keksa 5. 10. 2026).
   function rokyVykonnosti(roky) {
     return (roky || []).map(function (r) {
-      return esc(r.rocnik) + ": hlášená výkonnost " + (r.hlaseno ? esc(vykonnost(r.hlaseno)) : "—") +
-        " · skutečná výkonnost " + (r.skutecne ? esc(vykonnost(r.skutecne)) : "neznámá");
+      return esc(r.rocnik) + ": " + t("hlášená výkonnost") + " " + (r.hlaseno ? esc(vykonnost(r.hlaseno)) : "—") +
+        " · " + t("skutečná výkonnost") + " " + (r.skutecne ? esc(vykonnost(r.skutecne)) : t("neznámá"));
     });
   }
 
@@ -290,5 +325,6 @@
                  odhlasit: odhlasit, db: db, rpc: rpc, esc: esc, datum: datum, cas: cas, kc: kc,
                  vykonnost: vykonnost, hlaska: hlaska, toast: toast, vyzadovat: vyzadovat,
                  kroky: vykresliKroky, navigace: navigace, bezStartovneho: bezStartovneho, krok: krok, hotovo: hotovo, hlaskaDal: hlaskaDal, prevezmiHlasku: prevezmiHlasku,
-                 konceptKlic: konceptKlic, konceptNacti: konceptNacti, konceptUloz: konceptUloz, konceptZahod: konceptZahod, koncepty: koncepty, rokyVykonnosti: rokyVykonnosti };
+                 konceptKlic: konceptKlic, konceptNacti: konceptNacti, konceptUloz: konceptUloz, konceptZahod: konceptZahod, koncepty: koncepty, rokyVykonnosti: rokyVykonnosti,
+                 en: EN, t: t, tf: tf, adresa: adresa, prelozHlasku: prelozHlasku };
 })();

@@ -1,9 +1,17 @@
 ---
-permalink: "/kapitan/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/' if jazyk == 'en' else '/kapitan/' }}index.html"
 layout: kapitan.njk
-titulek: "Přehled a startovné"
 krok: "prehled"
 skript: "kapitan-prehled.js"
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Přehled a startovné' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/"
+  altEn: "/en/captain/"
 ---

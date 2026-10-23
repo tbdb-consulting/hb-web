@@ -1,10 +1,18 @@
 ---
-permalink: "/kapitan/startovni-cas/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/start-time/' if jazyk == 'en' else '/kapitan/startovni-cas/' }}index.html"
 layout: kapitan.njk
-titulek: "Startovní čas"
 krok: "harmonogram"
 skript: "kapitan-harmonogram.js"
 vlastniNavigace: true
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Startovní čas' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/startovni-cas/"
+  altEn: "/en/captain/start-time/"
 ---

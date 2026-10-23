@@ -1,9 +1,17 @@
 ---
-permalink: "/kapitan/etapy/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/stages/' if jazyk == 'en' else '/kapitan/etapy/' }}index.html"
 layout: kapitan.njk
-titulek: "Rozdělení etap"
 krok: "etapy"
 skript: "kapitan-etapy.js"
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Rozdělení etap' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/etapy/"
+  altEn: "/en/captain/stages/"
 ---

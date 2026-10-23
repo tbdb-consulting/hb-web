@@ -1,9 +1,17 @@
 ---
-permalink: "/kapitan/soupiska/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/team-list/' if jazyk == 'en' else '/kapitan/soupiska/' }}index.html"
 layout: kapitan.njk
-titulek: "Soupiska"
 krok: "soupiska"
 skript: "kapitan-soupiska.js"
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Soupiska' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/soupiska/"
+  altEn: "/en/captain/team-list/"
 ---

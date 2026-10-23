@@ -1,10 +1,18 @@
 ---
-permalink: "/kapitan/prevzeti/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/takeover/' if jazyk == 'en' else '/kapitan/prevzeti/' }}index.html"
 layout: kapitan.njk
-titulek: "Převzetí týmu"
 krok: "prevzeti"
 skript: "kapitan-prevzeti.js"
 vlastniNavigace: true
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Převzetí týmu' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/prevzeti/"
+  altEn: "/en/captain/takeover/"
 ---

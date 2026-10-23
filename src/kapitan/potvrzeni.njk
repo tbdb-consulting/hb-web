@@ -1,9 +1,17 @@
 ---
-permalink: "/kapitan/potvrzeni/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/confirmation/' if jazyk == 'en' else '/kapitan/potvrzeni/' }}index.html"
 layout: kapitan.njk
-titulek: "Kontrola a potvrzení"
 krok: "potvrzeni"
 skript: "kapitan-potvrzeni.js"
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Kontrola a potvrzení' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/potvrzeni/"
+  altEn: "/en/captain/confirmation/"
 ---

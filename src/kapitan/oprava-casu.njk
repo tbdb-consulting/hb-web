@@ -1,10 +1,18 @@
 ---
-permalink: "/kapitan/oprava-casu/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/time-correction/' if jazyk == 'en' else '/kapitan/oprava-casu/' }}index.html"
 layout: kapitan.njk
-titulek: "Oprava času"
 krok: "oprava"
 skript: "kapitan-oprava.js"
 vlastniNavigace: true
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Oprava času' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/oprava-casu/"
+  altEn: "/en/captain/time-correction/"
 ---

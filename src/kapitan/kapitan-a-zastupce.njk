@@ -1,10 +1,18 @@
 ---
-permalink: "/kapitan/kapitan-a-zastupce/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/captain-and-deputy/' if jazyk == 'en' else '/kapitan/kapitan-a-zastupce/' }}index.html"
 layout: kapitan.njk
-titulek: "Kapitán a zástupce"
 krok: "vedeni"
 skript: "kapitan-vedeni.js"
 vlastniNavigace: true
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Kapitán a zástupce' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/kapitan-a-zastupce/"
+  altEn: "/en/captain/captain-and-deputy/"
 ---

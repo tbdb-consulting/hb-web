@@ -1,10 +1,18 @@
 ---
-permalink: "/kapitan/seznamka/index.html"
+jazykyStranky: ["cs", "en"]
+pagination:
+  data: jazykyStranky
+  size: 1
+  alias: jazyk
+permalink: "{{ '/en/captain/runner-search/' if jazyk == 'en' else '/kapitan/seznamka/' }}index.html"
 layout: kapitan.njk
-titulek: "Hledáme běžce"
 krok: "seznamka"
 skript: "kapitan-seznamka.js"
 vlastniNavigace: true
-metaPopis: "Kapitánská sekce Hory Bory."
 eleventyExcludeFromCollections: true
+eleventyComputed:
+  titulek: "{{ 'Hledáme běžce' | t(jazyk) }}"
+  metaPopis: "{{ 'Kapitánská sekce Hory Bory.' | t(jazyk) }}"
+  altCs: "/kapitan/seznamka/"
+  altEn: "/en/captain/runner-search/"
 ---
