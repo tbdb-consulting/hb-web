@@ -8,7 +8,7 @@
   // (src/_data/anglictina.js, klíčem je český text); co ve slovníku chybí, zůstane česky.
   var EN = !!(window.HB && HB.jazyk === "en");
   function t(s) { var T = window.HB_T; return (EN && T && T[s]) || s; }
-  // t() s doplněním hodnot: tf("Krok {0} z {1}", 3, 5)
+  // t() s doplněním hodnot: tf("Krok {0} z {1}: {2}", 3, 5, "Etapy")
   function tf(s) { var a = arguments; return t(s).replace(/\{(\d)\}/g, function (_, i) { return a[Number(i) + 1]; }); }
   // Česká adresa sekce → adresa v jazyce stránky (/kapitan/soupiska/?id=5 → /en/captain/team-list/?id=5).
   function adresa(u) {
