@@ -211,7 +211,7 @@
         ' <button type="button" class="adm-tlacitko-male" data-lb="zpet">Zrušit</button>';
       nap = "Rámeček posuň tažením, roh ho zvětší nebo zmenší (poměr stran drží sám). Hlavní postavu, předávku nebo obličej dej na průsečík " +
         "bílých čar třetin, nech kus místa nad hlavou a ve směru běhu a neuřízni ruce ani nohy v kloubech." +
-        (lb.orez === "story" ? " <b>Šrafované pruhy nahoře a dole</b> u story přibližně zakryje Instagram (jméno účtu, pole na odpověď) – obličeje ani logo do nich nedávej." : "") +
+        (lb.orez === "story" ? " <b>Šrafované pruhy</b> (horních 14 % a spodních 20 %) u story zakryje rozhraní Instagramu a Facebooku (jméno účtu, pole na odpověď) – obličeje, logo ani text do nich nedávej." : "") +
         ' <span id="fo-lb-maly" hidden><b>Výřez je hodně malý</b> – z originálu může vyjít neostrý.</span>';
     } else {
       var vyb = jeVybrana(x[0]);
