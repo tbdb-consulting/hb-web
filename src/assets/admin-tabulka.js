@@ -265,10 +265,11 @@
         try { if (!st) st = JSON.parse(localStorage.getItem("hb-admin-stav-" + N.sekce) || "null"); } catch (err) {}
         if (!st) {
           // Výchozí pohled: filtry sekce + jen aktivní ročník, když tabulka ročník má (ostatní ročníky jdou vybrat ve filtru).
+          // Sekce s rokWebu (etapy) otevírají ročník na webu.
           st = JSON.parse(JSON.stringify(N.vychozi || {}));
           if (N.sloupce.some(function (x) { return x.pole === "rok"; })) {
             try {
-              var akt = await HBA.rpc("web_aktivni_rok");
+              var akt = await HBA.rpc(N.rokWebu ? "web_rocnik_webu" : "web_aktivni_rok");
               if (akt) st.h = (st.h || []).filter(function (f) { return f.field !== "rok"; }).concat([{ field: "rok", value: [akt] }]);
             } catch (err) { /* bez aktivního ročníku ukáže všechny */ }
           }

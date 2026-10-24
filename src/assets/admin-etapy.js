@@ -16,6 +16,7 @@
     var j = await HBA.vyzadovat(); if (!j) return;
     HBT({
       sekce: "etapy",
+      rokWebu: true, // trasa patří k ročníku na webu (rocnik_na_webu), ne k aktivnímu ročníku plánovače
       nazev: "Etapy a předávky",
       idPole: "klic",
       nacist: function () { return HBA.db("web_v_etapy?select=*&order=rok.desc,cislo.asc"); },
@@ -92,7 +93,7 @@
         }).filter(function (x) { return x.html; });
       },
       info: async function () {
-        var r = await HBA.db("web_v_etapy?select=rok,zajisteni_overeno,karta_z10&rok=eq." + encodeURIComponent(await HBA.rpc("web_aktivni_rok")));
+        var r = await HBA.db("web_v_etapy?select=rok,zajisteni_overeno,karta_z10&rok=eq." + encodeURIComponent(await HBA.rpc("web_rocnik_webu")));
         if (!r.length) return "";
         var neover = r.filter(function (x) { return !x.zajisteni_overeno; }).length;
         var bezkarty = r.filter(function (x) { return (x.karta_z10 || 0) < 10; }).length;
