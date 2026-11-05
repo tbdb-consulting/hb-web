@@ -43,7 +43,12 @@ export default function (eleventyConfig) {
         .replace(/(\d)[  ](?=\d{3}(?!\d))/g, "$1" + nbsp)
         .replace(/(\d) (?=(?:Kč|km|min|m|h|%)(?![\p{L}\d]))/gu, "$1" + nbsp)
         // datum 24. 11. 2026 drží pohromadě, rozsah se láme až u pomlčky
-        .replace(/\b(\d{1,2}\.) (\d{1,2}\.) (\d{4})\b/g, "$1" + nbsp + "$2" + nbsp + "$3");
+        .replace(/\b(\d{1,2}\.) (\d{1,2}\.) (\d{4})\b/g, "$1" + nbsp + "$2" + nbsp + "$3")
+        // jednopísmenné předložky a spojky nezůstanou na konci řádku (nový vzhled 11/2026)
+        .replace(/(?<![\p{L}\d&;])([KkSsVvZzAaIiOoUu])[ \t\r\n]+/gu, "$1" + nbsp)
+        .replace(/\b(cca|do|od) (?=\d)/g, "$1" + nbsp)
+        // časový rozsah 18:00–21:30 se nedělí mezi řádky
+        .replace(/\d{1,2}:\d{2} ?[–-] ?\d{1,2}:\d{2}/g, '<span class="nz">$&</span>');
     }).join("");
   });
 

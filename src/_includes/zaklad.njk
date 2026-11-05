@@ -19,18 +19,27 @@
 <link rel="alternate" hreflang="cs" href="{{ web.zaklad }}{{ altCs }}">
 <link rel="alternate" hreflang="en" href="{{ web.zaklad }}{{ altEn }}">
 {%- endif %}
+<link rel="icon" href="{{ web.zaklad }}/assets/img/HB-faviconA.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/styl.css">
+<link rel="stylesheet" href="{{ web.zaklad }}/assets/vzhled.css">
 {%- if jaz == "en" %}
 <script>window.HB_T = {{ anglictina | dump | safe }};</script>{# slovník pro skripty stránky (výsledky, galerie, seznamka, registrace) #}
 {%- endif %}
 </head>
-<body>
+{#- Nový vzhled (11/2026): plovoucí hlavička, na české úvodní stránce velké logo v bílém kruhu, po odscrollování minimální logo.
+    Hlavní položky menu jsou v hlavičce, ostatní pod „Další“. Obsahové stránky (stranky.njk) jdou přes celou šířku. -#}
+{%- set uvodni = stranka and stranka.kod == "uvod" and jaz == "cs" -%}
+{%- set hlavniKody = ["o-zavodu", "trasa", "pravidla", "startovne", "vysledky", "fotky"] -%}
+<body class="{{ 'uvodni' if uvodni else 'podstrana' }}{% if stranka %} str-{{ stranka.kod }}{% endif %}">
 
 <a class="preskocit" href="#obsah">{{ "Přeskočit na obsah" | t(jaz) }}</a>
 
-<header class="hlavicka">
+<header class="hlavicka" id="hlavicka">
   <div class="obal hlavicka-obal">
-    <a class="znacka" href="{{ web.zaklad }}{{ '/en/' if jaz == 'en' else '/' }}">Hory&nbsp;Bory</a>
+    <a class="znacka" href="{{ web.zaklad }}{{ '/en/' if jaz == 'en' else '/' }}" aria-label="Hory Bory – {{ 'úvod' | t(jaz) }}">
+      <span class="znacka-kruh"><img src="{{ web.zaklad }}/assets/img/HB-logo-colors.svg" alt="Hory Bory" width="409" height="417"></span>
+      <img class="znacka-mini" src="{{ web.zaklad }}/assets/img/HB-logo-minimal-colors.svg" alt="" width="244" height="150">
+    </a>
     {#- Přepínač jazyka (20. 10. 2026): vede na stejnou stránku v druhém jazyce, když existuje, jinak na úvod.
         Na českých stránkách se ukáže až po zveřejnění angličtiny (web_jazyky.na_webu). #}
     {%- if jaz == "en" or obsah.enNaWebu %}
@@ -39,49 +48,75 @@
       <a href="{{ web.zaklad }}{{ altEn or '/en/' }}" lang="en" hreflang="en"{% if jaz == 'en' %} aria-current="true"{% endif %}>EN</a>
     </nav>
     {%- endif %}
-    <button class="menu-tlacitko" aria-expanded="false" aria-controls="menu">Menu</button>
+    <button class="menu-tlacitko" aria-expanded="false" aria-controls="menu">
+      <span class="menu-ikona" aria-hidden="true"></span><span class="menu-popis">Menu</span>
+    </button>
     <nav id="menu" class="menu" aria-label="{{ 'Hlavní nabídka' | t(jaz) }}">
       <ul>
-        {% for s in menuStranky %}
-          {% if s.kod != "uvod" and s.kod != "gdpr" %}
-          <li><a href="{{ web.zaklad }}{{ s.adresa }}"{% if s.adresa == adresa %} aria-current="page"{% endif %}>{{ s.titulek }}</a></li>
-          {% endif %}
-        {% endfor %}
-        <li><a href="{{ web.zaklad }}{{ kapitanAdresy["/kapitan/"] if jaz == "en" else "/kapitan/" }}"{% if page.url and (page.url.indexOf("/kapitan/") == 0 or page.url.indexOf("/en/captain/") == 0) %} aria-current="page"{% endif %}>{{ "Pro kapitány" | t(jaz) }}</a></li>
+        {%- for s in menuStranky %}{% if s.kod in hlavniKody %}
+        <li><a href="{{ web.zaklad }}{{ s.adresa }}"{% if s.adresa == adresa %} aria-current="page"{% endif %}>{{ s.titulek }}</a></li>
+        {%- endif %}{% endfor %}
+        <li class="vice">
+          <button class="vice-tlacitko" aria-expanded="false">{{ "Další" | t(jaz) }}</button>
+          <ul class="vice-seznam">
+            {%- for s in menuStranky %}{% if not (s.kod in hlavniKody) and s.kod != "uvod" and s.kod != "gdpr" %}
+            <li><a href="{{ web.zaklad }}{{ s.adresa }}"{% if s.adresa == adresa %} aria-current="page"{% endif %}>{{ s.titulek }}</a></li>
+            {%- endif %}{% endfor %}
+          </ul>
+        </li>
+        <li class="menu-kapitan"><a class="tl tl-zelena" href="{{ web.zaklad }}{{ kapitanAdresy["/kapitan/"] if jaz == "en" else "/kapitan/" }}"{% if page.url and (page.url.indexOf("/kapitan/") == 0 or page.url.indexOf("/en/captain/") == 0) %} aria-current="page"{% endif %}>{{ "Pro kapitány" | t(jaz) }}</a></li>
       </ul>
     </nav>
   </div>
 </header>
 
-<main id="obsah" class="obal">
+<main id="obsah">
+  {%- if stranka %}
+  {{ content | safe }}
+  {%- else %}
+  <div class="obal obecny">
   {% if stav == "rozpracovana" %}
   <p class="upozorneni">{{ upozorneni or ("Na této stránce se pracuje. Obsah zatím nemusí být úplný ani aktuální." | t(jaz)) }}</p>
   {% endif %}
   {{ content | safe }}
+  </div>
+  {%- endif %}
 </main>
 
+{%- macro odkaz(kod) -%}
+{%- for s in menuStranky %}{% if s.kod == kod %}<li><a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a></li>{% endif %}{% endfor -%}
+{%- endmacro %}
 <footer class="paticka">
-  <div class="obal">
-    <p><strong>Hory Bory</strong> — {{ "štafetový běh z Beskyd na Pálavu." | t(jaz) }}</p>
-    <p>
-      <a href="mailto:info@horybory.cz">info@horybory.cz</a> ·
-      <a href="{{ web.zaklad }}{{ kapitanAdresy["/kapitan/prihlaseni/"] if jaz == "en" else "/kapitan/prihlaseni/" }}" id="paticka-kapitan">{{ "Přihlášení do kapitánské sekce" | t(jaz) }}</a> ·
-      {% for s in menuStranky %}{% if s.kod == "gdpr" %}<a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a>{% endif %}{% endfor %}
-    </p>
+  <div class="obal paticka-mrizka">
+    <div class="paticka-znacka">
+      <img src="{{ web.zaklad }}/assets/img/HB-logo-WH.svg" alt="Hory Bory" width="409" height="417">
+      <p>{{ "Štafetový běh z Beskyd na Pálavu." | t(jaz) }}<br>{{ "30 etap, nepřetržitě dnem i nocí." | t(jaz) }}</p>
+    </div>
+    <nav aria-label="{{ 'Závod' | t(jaz) }}">
+      <p class="paticka-nadpis">{{ "Závod" | t(jaz) }}</p>
+      <ul>{{ odkaz("o-zavodu") }}{{ odkaz("trasa") }}{{ odkaz("pravidla") }}{{ odkaz("startovne") }}{{ odkaz("casto-se-ptate") }}</ul>
+    </nav>
+    <nav aria-label="{{ 'Ročníky' | t(jaz) }}">
+      <p class="paticka-nadpis">{{ "Ročníky" | t(jaz) }}</p>
+      <ul>{{ odkaz("vysledky") }}{{ odkaz("fotky") }}{{ odkaz("seznamka") }}{{ odkaz("partneri") }}</ul>
+    </nav>
+    <div>
+      <p class="paticka-nadpis">{{ "Kontakt" | t(jaz) }}</p>
+      <ul>
+        <li><a href="mailto:info@horybory.cz">info@horybory.cz</a></li>
+        {{ odkaz("kontakt") }}
+        <li><a href="{{ web.zaklad }}{{ kapitanAdresy["/kapitan/prihlaseni/"] if jaz == "en" else "/kapitan/prihlaseni/" }}" id="paticka-kapitan">{{ "Přihlášení do kapitánské sekce" | t(jaz) }}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="obal paticka-spodek">
+    <p>© Hory Bory · {% for s in menuStranky %}{% if s.kod == "gdpr" %}<a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a>{% endif %}{% endfor %}</p>
     <p class="verze" title="{{ web.commit }}">{{ "verze" | t(jaz) }} {{ web.verze }} · {{ web.sestaveno }}</p>
   </div>
 </footer>
 
+<script src="{{ web.zaklad }}/assets/vzhled.js"></script>
 <script>
-  (function () {
-    var t = document.querySelector('.menu-tlacitko');
-    var m = document.getElementById('menu');
-    if (!t || !m) return;
-    t.addEventListener('click', function () {
-      var otevreno = m.classList.toggle('menu-otevrene');
-      t.setAttribute('aria-expanded', otevreno ? 'true' : 'false');
-    });
-  })();
   // Přihlášený kapitán (v prohlížeči je uložené přihlášení Supabase) vidí v patičce odkaz rovnou do sekce (revize vzhledu 18. 10. 2026).
   (function () {
     var a = document.getElementById('paticka-kapitan'); if (!a) return;

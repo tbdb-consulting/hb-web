@@ -1,0 +1,120 @@
+{#- Česká úvodní stránka v novém vzhledu (11/2026): slider, čísla, základní fakta (blok infoList z databáze),
+    pás s heslem, důležité termíny 2027 (z bloku proposition) a výzva pro týmy. -#}
+<!-- ============ SLIDER ============ -->
+<section class="hero" aria-roledescription="carousel" aria-label="Úvodní fotografie">
+  <div class="hero-snimky">
+    <figure class="snimek aktivni" style="--pozice: 62% 40%"><img src="{{ web.zaklad }}/assets/img/hero-1.jpg" alt="Běžec na polní cestě v Bílých Karpatech při západu slunce" width="2400" height="1597"></figure>
+    <figure class="snimek" style="--pozice: 58% 45%"><img src="{{ web.zaklad }}/assets/img/hero-2.jpg" alt="Běžkyně s reflexní vestou v protisvětle na horské louce" width="2048" height="1365" loading="lazy"></figure>
+    <figure class="snimek" style="--pozice: 50% 30%"><img src="{{ web.zaklad }}/assets/img/hero-3.jpg" alt="Tým v objetí po doběhu do cíle" width="1488" height="992" loading="lazy"></figure>
+    <figure class="snimek" style="--pozice: 50% 35%"><img src="{{ web.zaklad }}/assets/img/hero-4.jpg" alt="Tým spojuje ruce a hlasitě fandí v cíli" width="2400" height="1600" loading="lazy"></figure>
+  </div>
+
+  <div class="obal hero-text">
+    <p class="hero-datum">
+      <span class="tecka" aria-hidden="true"></span>
+      <span><time datetime="2027-09-04">4.</time>–<time datetime="2027-09-05">5. září 2027</time></span>
+      <span class="oddel" aria-hidden="true">·</span> Dolní Lomná → Mikulov
+    </p>
+    <h1>Hory Bory</h1>
+    <p class="hero-podnadpis">Štafetový běh z&nbsp;Beskyd na Pálavu</p>
+    <a class="tl tl-hlavni tl-velke" href="{{ web.zaklad }}/registrace/">Registruj tým do závodu <span aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="hero-ovladani">
+    <div class="tecky" role="tablist" aria-label="Vybrat fotku"></div>
+  </div>
+</section>
+
+<!-- ============ METRIKY ============ -->
+<section class="metriky" aria-label="Závod v číslech">
+  <div class="obal metriky-mrizka">
+    <div class="metrika m-vinova">
+      <p class="metrika-cislo">10</p>
+      <p class="metrika-popis">běžců v&nbsp;týmu<br><span>tým má šest až deset závodníků</span></p>
+    </div>
+    <div class="metrika m-zelena">
+      <p class="metrika-cislo">30</p>
+      <p class="metrika-popis">etap trasy<br><span>na každé běží jeden člen týmu</span></p>
+    </div>
+    <div class="metrika m-hneda">
+      <p class="metrika-cislo">318<small>&nbsp;km</small></p>
+      <p class="metrika-popis">z&nbsp;Beskyd na Pálavu<br><span>nepřetržitě dnem i&nbsp;nocí</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ZÁKLADNÍ FAKTA ============ -->
+<section class="sekce fakta">
+  <div class="obal dva-sloupce">
+    <div class="text">
+      <p class="nadtitulek">O závodu</p>
+      <h2>Štafetový běh s&nbsp;nejkrásnější trasou</h2>
+      {%- set fakta = stranka.bloky[0] %}
+      <div class="fakta-text">{{ fakta.obsah | nezalom | safe }}</div>
+    </div>
+    <figure class="foto foto-zaoblena">
+      <img src="{{ web.zaklad }}/assets/img/foto-38.jpg" alt="Běžec na cestě po hřebeni u Kohútky" width="1600" height="1067" loading="lazy">
+    </figure>
+  </div>
+</section>
+
+<!-- ============ PÁS S FOTKOU ============ -->
+<section class="pas" aria-label="Babí léto? Zase spolu!">
+  <img src="{{ web.zaklad }}/assets/img/foto-01.jpg" alt="Běžkyně mává při východu slunce nad krajinou" width="1600" height="1067" loading="lazy">
+  <div class="obal pas-text">
+    <p class="pas-oblasti">Beskydy · Javorníky · Bílé Karpaty · Pálava</p>
+    <p class="pas-heslo">Babí léto?<br>Zase spolu!</p>
+  </div>
+</section>
+
+<!-- ============ HARMONOGRAM ============ -->
+<section class="sekce harmonogram">
+  <div class="obal">
+    <p class="nadtitulek">Ročník 2027</p>
+    <h2>Důležité termíny</h2>
+    <ol class="casova-osa">
+      <li>
+        <p class="termin">do 23. 8. 2027</p>
+        <h3>Poslední den registrace týmů</h3>
+        <p>Do stejného dne přiřadí kapitán členy týmu k etapám.</p>
+      </li>
+      <li>
+        <p class="termin">3.–4. 9. 2027</p>
+        <h3>Prezentace týmů</h3>
+        <dl class="casy">
+          <dt>pátek</dt><dd><span class="nz">18:00–21:30</span></dd>
+          <dt>sobota</dt><dd><span class="nz">6:00–11:00</span></dd>
+        </dl>
+        <p>Autokemp U&nbsp;viaduktu, Dolní Lomná</p>
+      </li>
+      <li class="hlavni">
+        <p class="termin">sobota 4. 9. 2027</p>
+        <h3>Start závodu</h3>
+        <p><span class="nz">6:00–12:00</span>, autokemp U&nbsp;viaduktu, Dolní Lomná. Přesný čas startu dostanou kapitáni týden předem.</p>
+      </li>
+      <li>
+        <p class="termin">neděle 5. 9. 2027</p>
+        <h3>Cíl v&nbsp;Mikulově</h3>
+        <p>Vyhlášení výsledků <span class="nz">cca 14:30–17:00</span>, ukončení závodu <span class="nz">cca 19:30</span>.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ TÝM / VÝZVA ============ -->
+<section class="sekce tym">
+  <div class="obal dva-sloupce obracene">
+    <figure class="foto foto-zaoblena foto-na-vysku">
+      <img src="{{ web.zaklad }}/assets/img/foto-21.jpg" alt="Členové týmu drží v kruhu dřevěné medaile Hory Bory" width="1200" height="1600" loading="lazy">
+    </figure>
+    <div class="text">
+      <p class="nadtitulek">Pro týmy</p>
+      <h2>Sežeň partu. Zbytek je na&nbsp;trase.</h2>
+      <p>Stačí, když běžec zvládne 10&nbsp;km po rovině <span class="nz">pod 1&nbsp;h 5&nbsp;min</span> (tempo <span class="nz">6:30 min/km</span>). Průměr týmu by měl být <span class="nz">pod 1&nbsp;h 2&nbsp;min</span> (tempo <span class="nz">6:12 min/km</span>).</p>
+      <p>Nemáš celý tým? Zkus <a href="{{ web.zaklad }}/seznamka/">Seznamku</a>, kde se týmy a běžci hledají navzájem.</p>
+      <div class="tlacitka">
+        <a class="tl tl-hneda" href="{{ web.zaklad }}/registrace/">Registruj tým do závodu</a>
+      </div>
+    </div>
+  </div>
+</section>

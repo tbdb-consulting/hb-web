@@ -52,7 +52,10 @@ src/_data/trasa.js, gpx.js   etapy a trasy
 src/_includes/          kostry: zaklad.njk (veřejný web), kapitan.njk, admin.njk
 src/stranky.njk         šablona pro obsahové stránky z databáze
 src/kapitan/, src/admin/     kapitánská sekce a administrace
-src/assets/             styly, skripty, písmo Nunito, obrázky etap, loga partnerů
+src/assets/             styly, skripty, písma, obrázky etap, loga partnerů
+src/assets/vzhled.css   nový vzhled (návrh 11/2026); načítá se po styl.css a přebíjí ho
+src/assets/img/         logo, favikona, fotky do slideru a záhlaví podstran
+src/_includes/uvod-cs.njk    česká úvodní stránka (slider, čísla, termíny)
 misto/                  zkušební data pro sestavení bez databáze
 nastroje/               pomocné skripty (tisk karet etap)
 ```
@@ -66,7 +69,7 @@ nastroje/               pomocné skripty (tisk karet etap)
   Tuhle kontrolu neobcházej.
 - Odkazy v textech z databáze se píšou od kořene (`/kapitan/...`); základ `/hb-web`
   doplňuje `sZakladem()` v `obsah.js`. V šablonách používej `{{ web.zaklad }}`.
-- Žádná externí písma (Nunito je přímo na webu). Veřejný web nenačítá nic z cizích serverů;
+- Žádná externí písma (Lato a Nunito jsou přímo na webu v `src/assets/fonty`). Veřejný web nenačítá nic z cizích serverů;
   výjimkou je administrace (Tabulator a xlsx z jsDelivr v `admin.njk`).
 - Stránky se zveřejňují přepnutím `viditelna` v databázi.
 - Obsah je zatím o ročníku 2026 (termíny, startovné A–E, dresy); před registrací HB27 se přepisuje.

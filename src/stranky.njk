@@ -15,126 +15,177 @@ eleventyComputed:
   altCs: "{{ stranka.alt.cs }}"
   altEn: "{{ stranka.alt.en }}"
 ---
-{#- Obsahové stránky z databáze v obou jazycích (čeština na /, angličtina na /en/, 20. 10. 2026). -#}
+{#- Obsahové stránky z databáze v obou jazycích (čeština na /, angličtina na /en/, 20. 10. 2026).
+    Nový vzhled 11/2026: záhlaví s fotkou, text v čitelném sloupci, u dlouhých stránek boční obsah. -#}
 {%- set jaz = stranka.jazyk -%}
 {%- set en = jaz == "en" -%}
 {%- set otazky = obsah.otazkyEn if en else obsah.otazky -%}
-<h1>{{ stranka.titulek }}</h1>
+{%- set fotkaZahlavi = { "o-zavodu": "str-o-zavodu.jpg", "trasa": "str-trasa.jpg", "pravidla": "str-pravidla.jpg", "startovne": "str-startovne.jpg",
+  "casto-se-ptate": "str-casto-se-ptate.jpg", "vysledky": "str-vysledky.jpg", "fotky": "str-fotky.jpg", "seznamka": "str-seznamka.jpg",
+  "partneri": "str-partneri.jpg", "kontakt": "str-kontakt.jpg" } -%}
+{%- set sObsahem = stranka.kod in ["o-zavodu", "pravidla", "startovne"] -%}
 
-{% if stranka.kod == "uvod" %}
-  <p class="perex">{{ web.popis | t(jaz) }}</p>
-  {% endif %}
-  {% if stranka.kod == "uvod" and not en %}
+{% if stranka.kod == "uvod" and not en %}
   {# vyskakovací okno (obsah je jen česky, proto jen na české úvodní stránce) – nastavení z administrace se čte až v prohlížeči (19. 10. 2026) #}
   <script>window.HB = window.HB || { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}" };</script>
   <script src="{{ web.zaklad }}/assets/popup.js" data-auto="ano" defer></script>
-{% endif %}
+  {% include "uvod-cs.njk" %}
+{% else %}
 
-{% if stranka.text %}
-  <div class="text">{{ stranka.text | nezalom | safe }}</div>
-{% endif %}
+<section class="podstrana-zahlavi{% if fotkaZahlavi[stranka.kod] %} s-fotkou{% endif %}">
+  {% if fotkaZahlavi[stranka.kod] %}<img class="pz-foto" src="{{ web.zaklad }}/assets/img/{{ fotkaZahlavi[stranka.kod] }}" alt="" width="1800" height="1200">{% endif %}
+  <div class="obal pz-text">
+    {% if stranka.kod != "uvod" %}
+    <nav class="drobky" aria-label="{{ 'Drobečková navigace' | t(jaz) }}"><ol><li><a href="{{ web.zaklad }}{{ '/en/' if en else '/' }}">{{ "Úvod" | t(jaz) }}</a></li><li><a href="{{ web.zaklad }}{{ stranka.adresa }}" aria-current="page">{{ stranka.titulek }}</a></li></ol></nav>
+    {% endif %}
+    <h1>{{ stranka.titulek }}</h1>
+    {% if stranka.kod == "uvod" %}<p class="pz-perex">{{ web.popis | t(jaz) }}</p>{% elif stranka.metaPopis %}<p class="pz-perex">{{ stranka.metaPopis | nezalom | safe }}</p>{% endif %}
+  </div>
+</section>
 
-{% for blok in stranka.bloky %}
-  <section class="blok">
-    {% if blok.titulek %}<h2>{{ blok.titulek }}</h2>{% endif %}
-    {% if blok.obsah %}<div class="text">{{ blok.obsah | nezalom | safe }}</div>{% endif %}
-  </section>
-{% endfor %}
+{% if stranka.stav == "rozpracovana" %}
+<div class="obal"><p class="upozorneni">{{ stranka.upozorneni or ("Na této stránce se pracuje. Obsah zatím nemusí být úplný ani aktuální." | t(jaz)) }}</p></div>
+{% endif %}
 
 {% if stranka.kod == "trasa" and trasa.etapy.length %}
-  <p class="trasa-souhrn">
-    {% if en %}
-    {{ trasa.celkem.etap }} stages, {{ trasa.celkem.km }}&nbsp;km, {{ trasa.celkem.prevyseni }}&nbsp;m of climbing in total.
-    Every stage has its own page with an elevation profile, map and route description.
-    {% else %}
-    {{ trasa.celkem.etap }} etap, {{ trasa.celkem.km | cz }}&nbsp;km, celkem {{ trasa.celkem.prevyseni }} m stoupání.
-    Každá etapa má vlastní stránku s profilem, mapou a popisem trasy.
-    {% endif %}
-  </p>
-  <div class="table-responsive">
-  <table class="trasa-tabulka">
-    <thead>
-      <tr><th>{{ "Č." | t(jaz) }}</th><th>{{ "Etapa" | t(jaz) }}</th><th>{{ "Délka" | t(jaz) }}</th><th>{{ "Stoupání" | t(jaz) }}</th><th>{{ "Klesání" | t(jaz) }}</th><th>{{ "Povrch" | t(jaz) }}</th><th>{{ "Karta" | t(jaz) }}</th></tr>
-    </thead>
-    <tbody>
-      {% for e in trasa.etapy %}
-      <tr>
-        <td class="trasa-cislo">{{ e.cislo }}</td>
-        <td><a href="{{ web.zaklad }}{{ e.adresaEn if en else e.adresa }}">{{ e.nazev }}</a></td>
-        <td>{{ e.delkaKm if en else (e.delkaKm | cz) }}&nbsp;km</td>
-        <td>{{ e.prevyseni }}&nbsp;m</td>
-        <td>{{ e.klesani }}&nbsp;m</td>
-        <td class="trasa-povrch">{{ e.povrchEn if en else e.povrch }}</td>
-        <td>{% if e.pdf %}<a href="{{ web.zaklad }}{{ e.pdf }}">PDF</a>{% endif %}</td>
-      </tr>
+<section class="souhrn"><div class="obal souhrn-mrizka">
+  <div><b>{{ trasa.celkem.etap }}</b><span>{{ "etap" | t(jaz) }}</span></div>
+  <div><b>{{ trasa.celkem.km if en else (trasa.celkem.km | cz) }}<small>&nbsp;km</small></b><span>{{ "celková délka" | t(jaz) }}</span></div>
+  <div><b>{{ trasa.celkem.prevyseni }}<small>&nbsp;m</small></b><span>{{ "stoupání" | t(jaz) }}</span></div>
+  <div><b>{{ trasa.etapy[0].start.nazev }} → {{ trasa.etapy[trasa.etapy.length - 1].cil.nazev }}</b><span>{{ "start a cíl" | t(jaz) }}</span></div>
+</div></section>
+{% endif %}
+
+{% if stranka.text or stranka.bloky.length %}
+<section class="sekce cteni{% if sObsahem %} s-obsahem{% endif %}">
+  <div class="obal cteni-mrizka">
+    {% if sObsahem %}<aside class="obsah-stranky" aria-label="{{ 'Na této stránce' | t(jaz) }}"><p class="obsah-nadpis">{{ "Na této stránce" | t(jaz) }}</p><ol></ol></aside>{% endif %}
+    <div class="prose">
+      {% if stranka.text %}{{ stranka.text | nezalom | safe }}{% endif %}
+      {% for blok in stranka.bloky %}
+        {% if blok.titulek %}<h2>{{ blok.titulek }}</h2>{% endif %}
+        {% if blok.obsah %}{{ blok.obsah | nezalom | safe }}{% endif %}
       {% endfor %}
-    </tbody>
-  </table>
+    </div>
   </div>
+</section>
+{% endif %}
+
+{% if stranka.kod == "trasa" and trasa.etapy.length %}
+<section class="sekce etapy">
+  <div class="obal">
+    <p class="nadtitulek">{{ "Ročník" | t(jaz) }} {{ trasa.rokCislo }}</p>
+    <h2>{{ "Všech" | t(jaz) }} {{ trasa.celkem.etap }} {{ "etap" | t(jaz) }}</h2>
+    <p class="uvodni-veta">{{ "Každá etapa má vlastní stránku s profilem, mapou a popisem trasy." | t(jaz) }}</p>
+    <div class="etapy-mrizka">
+      {% for e in trasa.etapy %}
+      <a class="etapa-karta" href="{{ web.zaklad }}{{ e.adresaEn if en else e.adresa }}">
+        <span class="ek-cislo">{{ e.poradi }}</span>
+        <span class="ek-nazev">{{ e.nazev }}</span>
+        <span class="ek-udaje"><span>{{ e.delkaKm if en else (e.delkaKm | cz) }}&nbsp;km</span><span>↑ {{ e.prevyseni }}&nbsp;m</span><span>↓ {{ e.klesani }}&nbsp;m</span></span>
+        <span class="ek-povrch">{{ e.povrchEn if en else e.povrch }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
 {% endif %}
 
 {% if stranka.kod == "casto-se-ptate" %}
-  <div class="faq">
-  {% for o in otazky %}
-    <details class="otazka">
-      <summary>{{ o.otazka | striptags | trim }}</summary>
-      <div class="text">{{ o.odpoved | nezalom | safe }}</div>
-    </details>
-  {% endfor %}
+<section class="sekce cteni">
+  <div class="obal faq-obal">
+    <label class="hledani"><span>{{ "Hledat v otázkách" | t(jaz) }}</span><input type="search" id="faq-hledat" placeholder="{{ 'např. auto, výbava, startovné…' | t(jaz) }}"></label>
+    <div class="faq">
+    {% for o in otazky %}
+      <details class="otazka">
+        <summary>{{ o.otazka | striptags | trim }}</summary>
+        <div class="text prose">{{ o.odpoved | nezalom | safe }}</div>
+      </details>
+    {% endfor %}
+    </div>
+    <p class="pocet">{{ "Otázek celkem:" | t(jaz) }} {{ otazky.length }}.</p>
   </div>
-  <p class="pocet">{{ "Otázek celkem:" | t(jaz) }} {{ otazky.length }}.</p>
+</section>
 {% endif %}
 
 {% if stranka.kod == "vysledky" %}
-  <div id="vysledky-online" class="vysledky-online"></div>
-  <script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}", jazyk: "{{ jaz }}" };</script>
-  <script src="{{ web.zaklad }}/assets/vysledky-model.js" defer></script>
-  <script src="{{ web.zaklad }}/assets/vysledky.js" defer></script>
-  {% if obsah.archiv and obsah.archiv.length %}
-  <section class="vitezove">
+<section class="sekce online">
+  <div class="obal">
+    <div id="vysledky-online" class="vysledky-online"></div>
+  </div>
+</section>
+<script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}", jazyk: "{{ jaz }}" };</script>
+<script src="{{ web.zaklad }}/assets/vysledky-model.js" defer></script>
+<script src="{{ web.zaklad }}/assets/vysledky.js" defer></script>
+{% if obsah.archiv and obsah.archiv.length %}
+<section class="sekce vitezove">
+  <div class="obal">
+    <p class="nadtitulek">{{ "Archiv" | t(jaz) }} {{ obsah.archiv[obsah.archiv.length - 1].letopocet }}–{{ obsah.archiv[0].letopocet }}</p>
     <h2>{{ "Vítězové ročníků" | t(jaz) }}</h2>
     <div class="vit-mrizka">
     {% for r in obsah.archiv %}
       <article class="vit">
-        {% if r.fotoCelkem %}<img src="{{ r.fotoCelkem }}" alt="{{ 'Vítězný tým Hory Bory' | t(jaz) }} {{ r.letopocet }} – {{ r.vitez.tym }}" loading="lazy" width="768" height="512">{% endif %}
+        {% if r.fotoCelkem %}<img src="{{ r.fotoCelkem }}" alt="{{ 'Vítězný tým Hory Bory' | t(jaz) }} {{ r.letopocet }} – {{ r.vitez.tym }}" loading="lazy" width="768" height="512">{% else %}<div class="vit-bez-fotky">{{ r.letopocet }}</div>{% endif %}
         <div class="vit-text">
           <p class="vit-rok">Hory Bory {{ r.letopocet }}</p>
           <p class="vit-jmeno">{{ r.vitez.tym }}</p>
-          <p class="vit-cas">{{ r.vitez.cas }}</p>
-          <ol start="2">{% for d in r.dalsi %}<li>{{ d.tym }} <span class="vit-cas">{{ d.cas }}</span></li>{% endfor %}</ol>
+          <p class="cas vit-cas">{{ r.vitez.cas }}</p>
+          <ol start="2">{% for d in r.dalsi %}<li><span>{{ d.tym }}</span> <span class="cas">{{ d.cas }}</span></li>{% endfor %}</ol>
           {% if r.zeny %}
-          <div class="vit-zeny">
-            {% if r.fotoZeny %}<img src="{{ r.fotoZeny }}" alt="{{ 'Vítězky ženské kategorie Hory Bory' | t(jaz) }} {{ r.letopocet }} – {{ r.zeny.tym }}" loading="lazy" width="768" height="512">{% endif %}
-            {{ "Ženy:" | t(jaz) }} <strong>{{ r.zeny.tym }}</strong> <span class="vit-cas">{{ r.zeny.cas }}</span>
-          </div>
+          <p class="vit-zeny">{{ "Ženy:" | t(jaz) }} <strong>{{ r.zeny.tym }}</strong> <span class="cas">{{ r.zeny.cas }}</span></p>
           {% endif %}
-          <a href="{{ web.zaklad }}{{ ('/en/results/' + r.letopocet + '/') if en else r.adresa }}">{{ "Celé výsledky" | t(jaz) }} {{ r.letopocet }}</a>
+          <a class="tl tl-text" href="{{ web.zaklad }}{{ ('/en/results/' + r.letopocet + '/') if en else r.adresa }}">{{ "Celé výsledky" | t(jaz) }} {{ r.letopocet }} →</a>
         </div>
       </article>
     {% endfor %}
     </div>
-  </section>
-  {% endif %}
+  </div>
+</section>
+{% endif %}
 {% endif %}
 
 {% if stranka.kod == "seznamka" %}
-  <link rel="stylesheet" href="{{ web.zaklad }}/assets/seznamka.css">
-  <div id="seznamka" class="seznamka"><p class="prazdno">{{ "Načítám inzeráty…" | t(jaz) }}</p></div>
-  <script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}", jazyk: "{{ jaz }}" };</script>
-  <script src="{{ web.zaklad }}/assets/seznamka.js" defer></script>
+<section class="sekce seznamka-sekce">
+  <div class="obal">
+    <link rel="stylesheet" href="{{ web.zaklad }}/assets/seznamka.css">
+    <div id="seznamka" class="seznamka"><p class="prazdno">{{ "Načítám inzeráty…" | t(jaz) }}</p></div>
+  </div>
+</section>
+<script>window.HB = { url: "{{ web.supabaseUrl }}", klic: "{{ web.supabaseKlic }}", zaklad: "{{ web.zaklad }}", jazyk: "{{ jaz }}" };</script>
+<script src="{{ web.zaklad }}/assets/seznamka.js" defer></script>
 {% endif %}
 
 {% if stranka.kod == "fotky" and obsah.galerie and obsah.galerie.length %}
-  <div class="gal-roky">
-  {% for g in obsah.galerie %}
-    <a class="gal-rok" href="{{ web.zaklad }}{{ ('/en/photos/' + g.letopocet + '/') if en else g.adresa }}">
-      <img src="{{ g.obal }}" alt="Hory Bory {{ g.letopocet }}" loading="lazy" width="768" height="512">
-      <span class="gal-rok-text"><strong>Hory Bory {{ g.letopocet }}</strong> {{ g.pocet }} {{ "fotek" | t(jaz) }}</span>
-    </a>
-  {% endfor %}
+<section class="sekce">
+  <div class="obal">
+    <div class="gal-mrizka">
+    {% for g in obsah.galerie %}
+      <a class="gal-rok" href="{{ web.zaklad }}{{ ('/en/photos/' + g.letopocet + '/') if en else g.adresa }}">
+        <img src="{{ g.obal }}" alt="Hory Bory {{ g.letopocet }}" loading="lazy" width="768" height="512">
+        <span class="gal-rok-text"><strong>{{ g.letopocet }}</strong><span>{{ g.pocet }} {{ "fotek" | t(jaz) }}</span></span>
+      </a>
+    {% endfor %}
+    </div>
   </div>
+</section>
 {% endif %}
 
-{% if not stranka.text and stranka.bloky.length == 0 and stranka.kod != "casto-se-ptate" and stranka.kod != "vysledky" and stranka.kod != "seznamka" and not (stranka.kod == "fotky" and obsah.galerie and obsah.galerie.length) %}
-  <p class="prazdno">{{ "Obsah téhle stránky se teprve připravuje." | t(jaz) }}</p>
+{% if not stranka.text and stranka.bloky.length == 0 and stranka.kod != "casto-se-ptate" and stranka.kod != "vysledky" and stranka.kod != "seznamka" and stranka.kod != "trasa" and not (stranka.kod == "fotky" and obsah.galerie and obsah.galerie.length) %}
+<section class="sekce cteni"><div class="obal cteni-mrizka"><p class="prazdno">{{ "Obsah téhle stránky se teprve připravuje." | t(jaz) }}</p></div></section>
+{% endif %}
+
+{% if stranka.kod in ["o-zavodu", "pravidla", "startovne"] and not en %}
+<section class="vyzva">
+  <div class="obal vyzva-obal">
+    <div>
+      <h2>Postav tým na Hory Bory {{ trasa.rokCislo }}</h2>
+      <p>Start v sobotu 4.&nbsp;září 2027 v&nbsp;Dolní Lomné, cíl v&nbsp;neděli v&nbsp;Mikulově. Registrace týmů do 23.&nbsp;8.&nbsp;2027.</p>
+    </div>
+    <div class="tlacitka">
+      <a class="tl tl-vinova" href="{{ web.zaklad }}/registrace/">Registruj tým do závodu</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
 {% endif %}
