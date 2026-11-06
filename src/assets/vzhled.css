@@ -548,3 +548,12 @@ h1, h2 { color: var(--cerna); }
 .hlavicka-obal .jazyky a:hover { background: var(--zluta-100); }
 .menu .vice-seznam { display: block; }
 .menu .vice-seznam a { padding: 10px 14px; }
+
+/* dotykové plochy (kontrola vzhledu 6. 11. 2026): odkazy aspoň 24 px na výšku (WCAG 2.2), ovládání v hlavičce 44 px.
+   Odsazení se odečítá z mezer, takže rozložení zůstává stejné. */
+.paticka li { margin-bottom: 2px; }
+.paticka li a, .paticka-spodek a { display: inline-block; padding: 3px 0; }
+.drobky ol { margin: -4px 0 14px; }
+.drobky a { display: inline-block; padding: 4px 0; }
+.hlavicka-obal .jazyky a:not([aria-current="true"]) { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
+.menu-tlacitko { min-height: 44px; }
