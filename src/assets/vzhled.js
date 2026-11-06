@@ -39,7 +39,7 @@
   snimky.forEach(function (_, i) {
     var b = document.createElement("button");
     b.setAttribute("role", "tab");
-    b.setAttribute("aria-label", "Fotka " + (i + 1) + " z " + snimky.length);
+    b.setAttribute("aria-label", (document.documentElement.lang === "en" ? "Photo " + (i + 1) + " of " : "Fotka " + (i + 1) + " z ") + snimky.length);
     b.addEventListener("click", function () { ukaz(i, true); });
     tecky.appendChild(b);
   });

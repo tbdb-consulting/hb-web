@@ -26,9 +26,9 @@
 <script>window.HB_T = {{ anglictina | dump | safe }};</script>{# slovník pro skripty stránky (výsledky, galerie, seznamka, registrace) #}
 {%- endif %}
 </head>
-{#- Nový vzhled (11/2026): plovoucí hlavička, na české úvodní stránce velké logo v bílém kruhu, po odscrollování minimální logo.
+{#- Nový vzhled (11/2026): plovoucí hlavička, na úvodní stránce (česky i anglicky) velké logo v bílém kruhu, po odscrollování minimální logo.
     Hlavní položky menu jsou v hlavičce, ostatní pod „Další“. Obsahové stránky (stranky.njk) jdou přes celou šířku. -#}
-{%- set uvodni = stranka and stranka.kod == "uvod" and jaz == "cs" -%}
+{%- set uvodni = stranka and stranka.kod == "uvod" -%}
 {%- set hlavniKody = ["o-zavodu", "trasa", "pravidla", "startovne", "vysledky", "fotky"] -%}
 <body class="{{ 'uvodni' if uvodni else 'podstrana' }}{% if stranka %} str-{{ stranka.kod }}{% endif %}">
 

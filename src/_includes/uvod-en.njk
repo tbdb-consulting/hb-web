@@ -1,0 +1,120 @@
+{#- Anglická úvodní stránka v novém vzhledu (6. 11. 2026): stejné bloky jako uvod-cs.njk (Kubův návrh 11/2026), texty přeložené.
+    Základní fakta jsou blok z anglické úvodní stránky v databázi. Při změně české úvodní stránky upravit i tuhle. -#}
+<!-- ============ SLIDER ============ -->
+<section class="hero" aria-roledescription="carousel" aria-label="Featured photos">
+  <div class="hero-snimky">
+    <figure class="snimek aktivni" style="--pozice: 62% 40%"><img src="{{ web.zaklad }}/assets/img/hero-1.jpg" alt="Runner on a field track in the White Carpathians at sunset" width="2400" height="1597"></figure>
+    <figure class="snimek" style="--pozice: 58% 45%"><img src="{{ web.zaklad }}/assets/img/hero-2.jpg" alt="Runner in a reflective vest against the light on a mountain meadow" width="2048" height="1365" loading="lazy"></figure>
+    <figure class="snimek" style="--pozice: 50% 30%"><img src="{{ web.zaklad }}/assets/img/hero-3.jpg" alt="Team hugging after reaching the finish" width="1488" height="992" loading="lazy"></figure>
+    <figure class="snimek" style="--pozice: 50% 35%"><img src="{{ web.zaklad }}/assets/img/hero-4.jpg" alt="Team joining hands and cheering at the finish" width="2400" height="1600" loading="lazy"></figure>
+  </div>
+
+  <div class="obal hero-text">
+    <p class="hero-datum">
+      <span class="tecka" aria-hidden="true"></span>
+      <span><time datetime="2027-09-04">4</time>–<time datetime="2027-09-05">5 September 2027</time></span>
+      <span class="oddel" aria-hidden="true">·</span> Dolní Lomná → Mikulov
+    </p>
+    <h1>Hory Bory</h1>
+    <p class="hero-podnadpis">A relay run from the Beskydy Mountains to Pálava</p>
+    <a class="tl tl-hlavni tl-velke" href="{{ web.zaklad }}/en/registration/">Register your team <span aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="hero-ovladani">
+    <div class="tecky" role="tablist" aria-label="Choose a photo"></div>
+  </div>
+</section>
+
+<!-- ============ METRIKY ============ -->
+<section class="metriky" aria-label="The race in numbers">
+  <div class="obal metriky-mrizka">
+    <div class="metrika m-vinova">
+      <p class="metrika-cislo">10</p>
+      <p class="metrika-popis">runners per team<br><span>a team has six to ten runners</span></p>
+    </div>
+    <div class="metrika m-zelena">
+      <p class="metrika-cislo">30</p>
+      <p class="metrika-popis">stages<br><span>one team member runs each stage</span></p>
+    </div>
+    <div class="metrika m-hneda">
+      <p class="metrika-cislo">318<small>&nbsp;km</small></p>
+      <p class="metrika-popis">from Beskydy to Pálava<br><span>non-stop, day and night</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ZÁKLADNÍ FAKTA ============ -->
+<section class="sekce fakta">
+  <div class="obal dva-sloupce">
+    <div class="text">
+      <p class="nadtitulek">About the race</p>
+      <h2>The relay run with the most beautiful route</h2>
+      {%- set fakta = stranka.bloky[0] %}
+      <div class="fakta-text">{{ fakta.obsah | nezalom | safe }}</div>
+    </div>
+    <figure class="foto foto-zaoblena">
+      <img src="{{ web.zaklad }}/assets/img/foto-38.jpg" alt="Runner on a ridge path near Kohútka" width="1600" height="1067" loading="lazy">
+    </figure>
+  </div>
+</section>
+
+<!-- ============ PÁS S FOTKOU ============ -->
+<section class="pas" aria-label="Indian summer? Together again!">
+  <img src="{{ web.zaklad }}/assets/img/foto-01.jpg" alt="Runner waving at sunrise above the landscape" width="1600" height="1067" loading="lazy">
+  <div class="obal pas-text">
+    <p class="pas-oblasti">Beskydy · Javorníky · White Carpathians · Pálava</p>
+    <p class="pas-heslo">Indian summer?<br>Together again!</p>
+  </div>
+</section>
+
+<!-- ============ HARMONOGRAM ============ -->
+<section class="sekce harmonogram">
+  <div class="obal">
+    <p class="nadtitulek">2027 race</p>
+    <h2>Key dates</h2>
+    <ol class="casova-osa">
+      <li>
+        <p class="termin">by 23 Aug 2027</p>
+        <h3>Last day of team registration</h3>
+        <p>By the same day, the captain assigns team members to stages.</p>
+      </li>
+      <li>
+        <p class="termin">3–4 Sep 2027</p>
+        <h3>Team check-in</h3>
+        <dl class="casy">
+          <dt>Friday</dt><dd><span class="nz">18:00–21:30</span></dd>
+          <dt>Saturday</dt><dd><span class="nz">6:00–11:00</span></dd>
+        </dl>
+        <p>Autokemp U&nbsp;viaduktu, Dolní Lomná</p>
+      </li>
+      <li class="hlavni">
+        <p class="termin">Saturday 4 Sep 2027</p>
+        <h3>Race start</h3>
+        <p><span class="nz">6:00–12:00</span>, Autokemp U&nbsp;viaduktu, Dolní Lomná. Captains get their exact start time a week before.</p>
+      </li>
+      <li>
+        <p class="termin">Sunday 5 Sep 2027</p>
+        <h3>Finish in Mikulov</h3>
+        <p>Award ceremony <span class="nz">approx. 14:30–17:00</span>, race closes <span class="nz">approx. 19:30</span>.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ TÝM / VÝZVA ============ -->
+<section class="sekce tym">
+  <div class="obal dva-sloupce obracene">
+    <figure class="foto foto-zaoblena foto-na-vysku">
+      <img src="{{ web.zaklad }}/assets/img/foto-21.jpg" alt="Team members holding Hory Bory wooden medals in a circle" width="1200" height="1600" loading="lazy">
+    </figure>
+    <div class="text">
+      <p class="nadtitulek">For teams</p>
+      <h2>Get your crew together. The route does the rest.</h2>
+      <p>Each runner should manage 10&nbsp;km on the flat in <span class="nz">under 1&nbsp;h 5&nbsp;min</span> (pace <span class="nz">6:30 min/km</span>). The team average should be <span class="nz">under 1&nbsp;h 2&nbsp;min</span> (pace <span class="nz">6:12 min/km</span>).</p>
+      <p>Don't have a full team? Try the <a href="{{ web.zaklad }}/en/team-finder/">Team finder</a>, where teams and runners look for each other.</p>
+      <div class="tlacitka">
+        <a class="tl tl-hneda" href="{{ web.zaklad }}/en/registration/">Register your team</a>
+      </div>
+    </div>
+  </div>
+</section>
