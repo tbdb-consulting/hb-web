@@ -54,8 +54,8 @@ eleventyComputed:
 <section class="souhrn"><div class="obal souhrn-mrizka">
   <div><b>{{ trasa.celkem.etap }}</b><span>{{ "etap" | t(jaz) }}</span></div>
   <div><b>{{ trasa.celkem.km if en else (trasa.celkem.km | cz) }}<small>&nbsp;km</small></b><span>{{ "celková délka" | t(jaz) }}</span></div>
-  <div><b>{{ trasa.celkem.prevyseni }}<small>&nbsp;m</small></b><span>{{ "stoupání" | t(jaz) }}</span></div>
-  <div><b>{{ trasa.etapy[0].start.nazev }} → {{ trasa.etapy[trasa.etapy.length - 1].cil.nazev }}</b><span>{{ "start a cíl" | t(jaz) }}</span></div>
+  <div><b>{{ (trasa.celkem.prevyseni | string | replace(r/\B(?=(\d{3})+(?!\d))/g, ",")) if en else trasa.celkem.prevyseni }}<small>&nbsp;m</small></b><span>{{ "stoupání" | t(jaz) }}</span></div>
+  <div><b>{{ (trasa.etapy[0].start.nazevEn if en else trasa.etapy[0].start.nazev) }} → {{ (trasa.etapy[trasa.etapy.length - 1].cil.nazevEn if en else trasa.etapy[trasa.etapy.length - 1].cil.nazev) }}</b><span>{{ "start a cíl" | t(jaz) }}</span></div>
 </div></section>
 {% endif %}
 
@@ -77,14 +77,14 @@ eleventyComputed:
 {% if stranka.kod == "trasa" and trasa.etapy.length %}
 <section class="sekce etapy">
   <div class="obal">
-    <p class="nadtitulek">{{ "Ročník" | t(jaz) }} {{ trasa.rokCislo }}</p>
+    <p class="nadtitulek">{% if en %}{{ trasa.rokCislo }} race{% else %}Ročník {{ trasa.rokCislo }}{% endif %}</p>
     <h2>{{ "Všech" | t(jaz) }} {{ trasa.celkem.etap }} {{ "etap" | t(jaz) }}</h2>
     <p class="uvodni-veta">{{ "Každá etapa má vlastní stránku s profilem, mapou a popisem trasy." | t(jaz) }}</p>
     <div class="etapy-mrizka">
       {% for e in trasa.etapy %}
       <a class="etapa-karta" href="{{ web.zaklad }}{{ e.adresaEn if en else e.adresa }}">
         <span class="ek-cislo">{{ e.poradi }}</span>
-        <span class="ek-nazev">{{ e.nazev }}</span>
+        <span class="ek-nazev">{{ e.nazevEn if en else e.nazev }}</span>
         <span class="ek-udaje"><span>{{ e.delkaKm if en else (e.delkaKm | cz) }}&nbsp;km</span><span>↑ {{ e.prevyseni }}&nbsp;m</span><span>↓ {{ e.klesani }}&nbsp;m</span></span>
         <span class="ek-povrch">{{ e.povrchEn if en else e.povrch }}</span>
       </a>

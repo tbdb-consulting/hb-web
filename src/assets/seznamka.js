@@ -78,7 +78,7 @@
   function formPridat() {
     return '<form class="sz-form" id="sz-form-pridat" novalidate><h2>' + L("Hledám tým", "I'm looking for a team") + '</h2>' +
       '<div class="sz-radek"><label>' + L("Jméno *", "First name *") + '<input name="jmeno" autocomplete="given-name"></label><label>' + L("Příjmení *", "Surname *") + '<input name="prijmeni" autocomplete="family-name"><small>' + L("Na webu jen první písmeno.", "Only the initial appears on the website.") + '</small></label></div>' +
-      '<label>E-mail *<input name="email" type="email" autocomplete="email"><small>' + L("Nikde se neukáže. Přijde na něj odkaz, kterým inzerát zveřejníš, upravíš nebo stáhneš.", "It is never shown. You'll receive a link to publish, edit or remove your listing.") + '</small></label>' +
+      '<label>E-mail *<input name="email" type="email" autocomplete="email"><small>' + L("Nikde se neukáže. Přijde na něj odkaz, kterým inzerát zveřejníš, upravíš nebo stáhneš.", "It is never shown. You'll receive a link to publish, edit or withdraw your listing.") + '</small></label>' +
       '<div class="sz-radek"><label>' + L("Kraj", "Region") + HBS.krajSelect("sz-kraj") + '</label><label>' + L("Výkonnost na 10 km", "10 km time") + '<input name="vykonnost" inputmode="numeric" placeholder="52:30"></label>' +
       '<label>' + L("Kolik etap zvládneš", "How many stages can you run") + '<input name="etap" type="number" min="1" max="30" inputmode="numeric"></label></div>' +
       '<label>' + L("O mně *", "About me *") + '<textarea name="text" rows="4" maxlength="1000" placeholder="' + L("Jak běháš, odkud jsi, jestli máš auto…", "How you run, where you're from, whether you have a car…") + '"></textarea></label>' +
@@ -112,7 +112,7 @@
     if (f.id === "sz-form-pridat") {
       if (!v("jmeno") || !v("prijmeni")) return hlaska(f, L("Vyplň jméno a příjmení.", "Please enter your first name and surname."), true);
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v("email"))) return hlaska(f, L("E-mail nemá správný tvar.", "The e-mail address isn't valid."), true);
-      if (v("vykonnost") && !/^\d{1,2}:\d{2}$/.test(v("vykonnost"))) return hlaska(f, L("Výkonnost napiš jako čas na 10 km, např. 52:30.", "Enter your fitness as a 10 km time, e.g. 52:30."), true);
+      if (v("vykonnost") && !/^\d{1,2}:\d{2}$/.test(v("vykonnost"))) return hlaska(f, L("Výkonnost napiš jako čas na 10 km, např. 52:30.", "Enter your 10 km time, e.g. 52:30."), true);
       if (!v("text")) return hlaska(f, L("Napiš pár slov o sobě.", "Please write a few words about yourself."), true);
       b.disabled = true;
       try { await rpc("web_seznamka_pridat", { p_jmeno: v("jmeno"), p_prijmeni: v("prijmeni"), p_email: v("email"), p_kraj: document.getElementById("sz-kraj").value || null,

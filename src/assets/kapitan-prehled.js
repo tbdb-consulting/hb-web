@@ -9,9 +9,15 @@
     return "<dt>" + nazev + '</dt><dd class="k-kopie"><span>' + e(hodnota || "–") + "</span>" +
       (hodnota ? '<button type="button" class="k-odkaz" data-kopie="' + e(kopie || hodnota) + '" aria-label="' + e(tf("Zkopírovat {0}", nazev.toLowerCase())) + '">' + t("Zkopírovat") + "</button>" : "") + "</dd>";
   }
+  // Pro platbu ze zahraničí: IBAN se bere z QR platby (SPAYD, pole ACC), ukazuje se jen v angličtině (kontrola překladu 6. 11. 2026).
+  function iban(p) {
+    if (document.documentElement.lang !== "en" || !p.qr_spayd) return "";
+    var m = /ACC:([A-Z]{2}[0-9A-Z]{10,32})/.exec(p.qr_spayd);
+    return m ? radekKopie("IBAN", m[1].replace(/(.{4})/g, "$1 ").trim(), m[1]) : "";
+  }
   function platba(p) {
     return '<div class="k-platba"><dl class="k-dl k-dl-platba">' +
-      radekKopie(t("Účet"), p.ucet) + radekKopie(t("Variabilní symbol"), p.vs) +
+      radekKopie(t("Účet"), p.ucet) + iban(p) + radekKopie(t("Variabilní symbol"), p.vs) +
       radekKopie(t("Částka"), HBK.kc(p.castka_kc), String(p.castka_kc || "")) + "</dl>" +
       // Na telefonu je QR schovaný pod rozbalením – z vlastního displeje ho kapitán nenaskenuje (revize vzhledu 18. 10. 2026).
       (p.qr_spayd ? '<details class="k-qr-obal"' + (window.matchMedia && matchMedia("(max-width: 600px)").matches ? "" : " open") + "><summary>" + t("QR kód pro bankovní aplikaci") + "</summary>" +

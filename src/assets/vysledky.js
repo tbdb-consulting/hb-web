@@ -22,7 +22,7 @@
     { k: "predavky", n: L("Předávky", "Handovers") },
     { k: "etapy", n: L("Časy etap", "Stage times") }
   ];
-  var KAT = { "muzi-mix": L("Muži + mix", "Men + mixed"), "zeny": L("Ženy", "Women") };
+  var KAT = { "muzi-mix": L("Muži + mix", "Men/mixed"), "zeny": L("Ženy", "Women") };
   var data = null, model = null, ted = null, chyba = null, nacteno = null;
   var st = { pohled: "poradi", etapa: null, kat: "", tym: null, etapaCasy: null, hledat: "" };
 
@@ -182,15 +182,15 @@
       var naPred, casE = "", proti = "";
       if (e.dobeh != null) {
         naPred = hms(e.dobeh);
-        if (e.nelogicky || e.proveruje) casE = '<span class="v-chybi">' + L("čas se prověřuje", "time being checked") + '</span>';
-        else if (e.cas != null) { casE = trvani(e.cas) + (e.pausal != null ? ' <small class="v-pausal">' + L("paušál", "flat rate") + '</small>' : ""); proti = e.plan && e.pausal == null ? rozdil(e.cas - e.plan) : ""; }
+        if (e.nelogicky || e.proveruje) casE = '<span class="v-chybi">' + L("čas se prověřuje", "time under review") + '</span>';
+        else if (e.cas != null) { casE = trvani(e.cas) + (e.pausal != null ? ' <small class="v-pausal">' + L("paušál", "fixed time") + '</small>' : ""); proti = e.plan && e.pausal == null ? rozdil(e.cas - e.plan) : ""; }
         else casE = '<span class="v-chybi">' + L("chybí čas předávky ", "missing time at handover ") + e.i + "</span>";
       } else if (t.dnf && e.i >= t.dnf) {
         naPred = e.i === t.dnf ? '<span class="v-dnf">DNF</span>' : "";
       } else if (e.odhad) {
         naPred = '<span class="v-odhad">' + odhadText(e.odhad) + "</span>" + (e.zpozdeni ? ' <span class="v-zpozdeni">' + L("déle, než se čekalo", "taking longer than expected") + '</span>' : "");
       } else if (t.posledni > e.i) {
-        naPred = '<span class="v-chybi">' + (e.proveruje ? L("čas se prověřuje", "time being checked") : L("chybí", "missing")) + "</span>";
+        naPred = '<span class="v-chybi">' + (e.proveruje ? L("čas se prověřuje", "time under review") : L("chybí", "missing")) + "</span>";
       } else naPred = "";
       h += "<tr" + tr + "><td>P" + e.i + " → P" + (e.i + 1) + ' <small class="v-misto">' + esc(misto(e.i)) + " → " + esc(misto(e.i + 1)) + L(" · etapa ", " · stage ") + e.i + "</small></td><td>" + esc(e.jm) +
         (e.i === t.bezi ? ' <small class="v-bezi-znacka">' + L("běží", "running") + '</small>' : "") + "</td><td>" + naPred + "</td><td>" + casE + '</td><td class="v-mimo-mobil">' + proti + "</td></tr>";

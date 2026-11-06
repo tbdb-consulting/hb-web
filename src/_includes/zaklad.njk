@@ -111,7 +111,7 @@
   </div>
   <div class="obal paticka-spodek">
     <p>© Hory Bory · {% for s in menuStranky %}{% if s.kod == "gdpr" %}<a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a>{% endif %}{% endfor %}</p>
-    <p class="verze" title="{{ web.commit }}">{{ "verze" | t(jaz) }} {{ web.verze }} · {{ web.sestaveno }}</p>
+    <p class="verze" title="{{ web.commit }}">{{ "verze" | t(jaz) }} {{ web.verze | t(jaz) }} · {{ web.sestavenoEn if jaz == "en" else web.sestaveno }}</p>
   </div>
 </footer>
 

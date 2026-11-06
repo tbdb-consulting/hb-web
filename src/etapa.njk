@@ -6,8 +6,8 @@ pagination:
 permalink: "{{ st.adresa }}index.html"
 layout: zaklad.njk
 eleventyComputed:
-  titulek: "{% if st.jazyk == 'en' %}Stage {{ st.e.cislo }}: {{ st.e.nazev }}{% else %}Etapa {{ st.e.cislo }}: {{ st.e.nazev }}{% endif %}"
-  metaPopis: "{% if st.jazyk == 'en' %}Stage {{ st.e.cislo }} of the Hory Bory race: {{ st.e.nazev }}, {{ st.e.delkaKm }} km, {{ st.e.prevyseni }} m of climbing.{% else %}Etapa {{ st.e.cislo }} závodu Hory Bory: {{ st.e.nazev }}, {{ st.e.delkaKm | cz }} km, převýšení {{ st.e.prevyseni }} m.{% endif %}"
+  titulek: "{% if st.jazyk == 'en' %}Stage {{ st.e.cislo }}: {{ st.e.nazevEn }}{% else %}Etapa {{ st.e.cislo }}: {{ st.e.nazev }}{% endif %}"
+  metaPopis: "{% if st.jazyk == 'en' %}Stage {{ st.e.cislo }} of the Hory Bory race: {{ st.e.nazevEn }}, {{ st.e.delkaKm }} km, {{ st.e.prevyseni }} m of climbing.{% else %}Etapa {{ st.e.cislo }} závodu Hory Bory: {{ st.e.nazev }}, {{ st.e.delkaKm | cz }} km, převýšení {{ st.e.prevyseni }} m.{% endif %}"
   adresa: "{{ '/en/route/' if st.jazyk == 'en' else '/trasa/' }}"
   jazyk: "{{ st.jazyk }}"
   altCs: "{{ st.e.adresa }}"
@@ -25,7 +25,7 @@ eleventyComputed:
   <a href="{{ web.zaklad }}{{ '/en/route/' if en else '/trasa/' }}">{{ "Trasa a etapy" | t(jaz) }}</a> <span aria-hidden="true">›</span> {{ "Etapa" | t(jaz) }} {{ e.cislo }}
 </nav>
 
-<h1 class="etapa-nadpis"><span class="etapa-cislo">{{ e.cislo }}</span> {{ e.nazev }}</h1>
+<h1 class="etapa-nadpis"><span class="etapa-cislo">{{ e.cislo }}</span> {{ e.nazevEn if en else e.nazev }}</h1>
 
 <ul class="etapa-cisla">
   <li><strong>{{ km }}&nbsp;km</strong><span>{{ "délka" | t(jaz) }}</span></li>
@@ -50,9 +50,9 @@ eleventyComputed:
       {% endfor %}
     </div>
     <figcaption>
-      <span>{{ e.start.kod | t(jaz) }} {{ e.start.nazev }} · {{ e.profil.startV }} {{ "m n. m." | t(jaz) }}</span>
+      <span>{{ e.start.kod | t(jaz) }} {{ e.start.nazevEn if en else e.start.nazev }} · {{ e.profil.startV }} {{ "m n. m." | t(jaz) }}</span>
       <span class="profil-vrchol">{{ "nejvýše" | t(jaz) }} {{ e.profil.max }} {{ "m n. m." | t(jaz) }}</span>
-      <span>{{ e.cil.kod | t(jaz) }} {{ e.cil.nazev }} · {{ e.profil.cilV }} {{ "m n. m." | t(jaz) }}</span>
+      <span>{{ e.cil.kod | t(jaz) }} {{ e.cil.nazevEn if en else e.cil.nazev }} · {{ e.profil.cilV }} {{ "m n. m." | t(jaz) }}</span>
     </figcaption>
   </figure>
 </section>
@@ -60,13 +60,13 @@ eleventyComputed:
 <section class="etapa-blok etapa-body">
   <div class="etapa-bod">
     <h2>Start</h2>
-    <p class="etapa-misto"><span class="etapa-kod">{{ e.start.kod | t(jaz) }}</span> {{ e.start.nazev }}</p>
-    {% if e.start.detail %}<p class="etapa-gps">{{ e.start.detail }}</p>{% endif %}
+    <p class="etapa-misto"><span class="etapa-kod">{{ e.start.kod | t(jaz) }}</span> {{ e.start.nazevEn if en else e.start.nazev }}</p>
+    {% if e.start.detail %}<p class="etapa-gps">{{ e.start.detailEn if en else e.start.detail }}</p>{% endif %}
   </div>
   <div class="etapa-bod">
     <h2>{{ "Cíl" | t(jaz) }}</h2>
-    <p class="etapa-misto"><span class="etapa-kod">{{ e.cil.kod | t(jaz) }}</span> {{ e.cil.nazev }}</p>
-    {% if e.cil.detail %}<p class="etapa-gps">{{ e.cil.detail }}</p>{% endif %}
+    <p class="etapa-misto"><span class="etapa-kod">{{ e.cil.kod | t(jaz) }}</span> {{ e.cil.nazevEn if en else e.cil.nazev }}</p>
+    {% if e.cil.detail %}<p class="etapa-gps">{{ e.cil.detailEn if en else e.cil.detail }}</p>{% endif %}
   </div>
 </section>
 
@@ -82,10 +82,10 @@ eleventyComputed:
 <section class="etapa-blok etapa-mapa">
   <h2>{{ "Mapa trasy" | t(jaz) }}</h2>
   <img src="{{ web.zaklad }}{{ e.obrazky.mapa }}" alt="{{ 'Mapa trasy etapy' | t(jaz) }} {{ e.cislo }}" loading="lazy" width="900" height="1100">
-  {% if e.mapaUrl %}
+  {% if e.mapaUrl %}{% set mapa = e.mapaUrlEn if en else e.mapaUrl %}
   <div class="etapa-qr">
-    <a href="{{ e.mapaUrl }}" rel="noopener"><img src="{{ web.zaklad }}{{ e.obrazky.qr }}" alt="{{ 'QR kód na trasu etapy v mapách' | t(jaz) }} {{ e.cislo }}" width="120" height="120"></a>
-    <p>{{ "Trasa v mapě" | t(jaz) }}<br><a href="{{ e.mapaUrl }}" rel="noopener">{{ "otevřít na mapy.com" | t(jaz) }}</a></p>
+    <a href="{{ mapa }}" rel="noopener"><img src="{{ web.zaklad }}{{ e.obrazky.qr }}" alt="{{ 'QR kód na trasu etapy v mapách' | t(jaz) }} {{ e.cislo }}" width="120" height="120"></a>
+    <p>{{ "Trasa v mapě" | t(jaz) }}<br><a href="{{ mapa }}" rel="noopener">{{ "otevřít na mapy.com" | t(jaz) }}</a></p>
   </div>
   {% endif %}
 </section>
@@ -126,8 +126,8 @@ eleventyComputed:
 {% endif %}
 
 <nav class="etapa-sousedi" aria-label="{{ 'Další etapy' | t(jaz) }}">
-  {% if e.predchozi %}<a class="etapa-zpet" href="{{ web.zaklad }}{{ e.predchozi.adresaEn if en else e.predchozi.adresa }}">‹ {{ e.predchozi.cislo }}. {{ e.predchozi.nazev }}</a>{% endif %}
-  {% if e.dalsi %}<a class="etapa-vpred" href="{{ web.zaklad }}{{ e.dalsi.adresaEn if en else e.dalsi.adresa }}">{{ e.dalsi.cislo }}. {{ e.dalsi.nazev }} ›</a>{% endif %}
+  {% if e.predchozi %}<a class="etapa-zpet" href="{{ web.zaklad }}{{ e.predchozi.adresaEn if en else e.predchozi.adresa }}">‹ {{ e.predchozi.cislo }}{{ '' if en else '.' }} {{ e.predchozi.nazevEn if en else e.predchozi.nazev }}</a>{% endif %}
+  {% if e.dalsi %}<a class="etapa-vpred" href="{{ web.zaklad }}{{ e.dalsi.adresaEn if en else e.dalsi.adresa }}">{{ e.dalsi.cislo }}{{ '' if en else '.' }} {{ e.dalsi.nazevEn if en else e.dalsi.nazev }} ›</a>{% endif %}
 </nav>
 
 <p class="etapa-tisk">
@@ -139,7 +139,7 @@ eleventyComputed:
 {#  Tištěná karta etapy. Na obrazovce se nezobrazuje, v tisku naopak nahrazuje
     celou stránku. Je to samostatná struktura — dva listy A4, každý s vlastní
     hlavičkou a patičkou — aby se nemusela ohýbat podoba webové stránky.  #}
-<div class="karta" aria-hidden="true">
+<div class="karta" aria-hidden="true" lang="cs">
   {% set hlavicka %}
   <div class="karta-hlavicka">
     <img src="{{ web.zaklad }}/assets/etapy/karta-hlavicka.png" alt="">

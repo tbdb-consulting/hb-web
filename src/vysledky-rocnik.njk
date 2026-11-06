@@ -25,7 +25,7 @@ eleventyComputed:
   <thead><tr><th>#</th>{% if r.sCisly %}<th class="archiv-cislo">{{ "Číslo" | t(jaz) }}</th>{% endif %}<th>{{ "Tým" | t(jaz) }}</th>{% if r.sKategorii %}<th>{{ "Kat." | t(jaz) }}</th>{% endif %}<th>{{ "Čas na trase" | t(jaz) }}</th></tr></thead>
   <tbody>
   {% for t in r.tymy %}
-    <tr{% if t.kategorie == "Z" %} class="archiv-z"{% endif %}><td>{{ t.poradi }}.</td>{% if r.sCisly %}<td class="archiv-cislo">{{ t.cislo }}</td>{% endif %}<td>{{ t.tym }}</td>{% if r.sKategorii %}<td>{{ "Z" if t.kategorie == "Z" else "" }}</td>{% endif %}<td class="archiv-cas">{{ t.cas }}</td></tr>
+    <tr{% if t.kategorie == "Z" %} class="archiv-z"{% endif %}><td>{{ t.poradi }}{{ '' if jaz == 'en' else '.' }}</td>{% if r.sCisly %}<td class="archiv-cislo">{{ t.cislo }}</td>{% endif %}<td>{{ t.tym }}</td>{% if r.sKategorii %}<td>{{ "Z" if t.kategorie == "Z" else "" }}</td>{% endif %}<td class="archiv-cas">{{ t.cas }}</td></tr>
   {% endfor %}
   </tbody>
 </table>

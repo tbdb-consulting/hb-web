@@ -7,6 +7,9 @@ const zaklad = balicek.version.split(".").slice(0, 2).join(".");
 const sestaveni = process.env.GITHUB_RUN_NUMBER;
 const sestaveno = new Date().toLocaleString("cs-CZ", { timeZone: "Europe/Prague", day: "numeric", month: "numeric",
   year: "numeric", hour: "2-digit", minute: "2-digit" });
+// anglická patička: „6 Nov 2026, 12:07“ (kontrola překladu 6. 11. 2026)
+const sestavenoEn = new Date().toLocaleString("en-GB", { timeZone: "Europe/Prague", day: "numeric", month: "short",
+  year: "numeric", hour: "2-digit", minute: "2-digit" });
 
 // Nastavení webu. Klíč je veřejný (publishable) — sám o sobě neotevře nic,
 // dovnitř pouštějí až pravidla (policy) v databázi.
@@ -22,4 +25,5 @@ export default {
   verze: sestaveni ? "v" + zaklad + "." + sestaveni : "místní",
   commit: (process.env.GITHUB_SHA || "").slice(0, 7),
   sestaveno,
+  sestavenoEn,
 };

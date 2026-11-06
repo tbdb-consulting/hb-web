@@ -24,6 +24,22 @@ function povrchAnglicky(t) {
   return POVRCH_EN.reduce((s, [cs, en]) => s.split(cs).join(en), String(t));
 }
 
+// Popisy míst předávek anglicky (kontrola překladu 6. 11. 2026). Názvy obcí zůstávají česky.
+const MISTA_EN = [
+  ["Autokemp U viaduktu", "U viaduktu campsite"], ["fotbalové hřiště", "football pitch"],
+  ["horní parkoviště SKI park Gruň", "upper car park, SKI park Gruň"], ["parkoviště SKI areálu", "ski resort car park"],
+  ["parkoviště Úspolka", "Úspolka car park"], ["parkoviště Hájenka", "Hájenka car park"],
+  ["konečná autobusu", "bus terminus"], ["koupaliště", "outdoor pool"], ["obecní úřad", "municipal office"],
+  ["hasičská zbrojnice", "fire station"], ["sportovní hala", "sports hall"], ["Javořina, rozcestí", "Javořina junction"],
+  ["amfiteátr", "amphitheatre"], ["hřiště", "sports ground"], ["parkoviště", "car park"],
+];
+function mistoAnglicky(t) {
+  if (!t) return t;
+  return MISTA_EN.reduce((s, [cs, en]) => s.split(cs).join(en), String(t));
+}
+// „70 % asfalt“ → „70% asphalt“ (v angličtině bez mezery před %)
+const povrchEn = (t) => (t ? povrchAnglicky(t).replace(/(\d)\s+%/g, "$1%") : t);
+
 const cislo = (x) => (x === null || x === undefined || x === "" ? null : Number(x));
 
 // Z času 01:52:00 udělá „1:52 h“.
@@ -140,15 +156,16 @@ export default async function () {
         adresa: `/trasa/etapa-${poradi}/`,
         adresaEn: `/en/route/stage-${poradi}/`,
         nazev: e.nazev,
+        nazevEn: mistoAnglicky(e.nazev),
         start: {
-          nazev: e.start_nazev, kod: kod(e.cislo),
+          nazev: e.start_nazev, nazevEn: mistoAnglicky(e.start_nazev), kod: kod(e.cislo),
           lat: cislo(e.start_lat), lon: cislo(e.start_lon), vyska: cislo(e.start_vyska),
-          detail: e.start_detail, plny: e.start_detail || e.start_nazev,
+          detail: e.start_detail, detailEn: mistoAnglicky(e.start_detail), plny: e.start_detail || e.start_nazev,
         },
         cil: {
-          nazev: e.cil_nazev, kod: kod(e.cislo + 1),
+          nazev: e.cil_nazev, nazevEn: mistoAnglicky(e.cil_nazev), kod: kod(e.cislo + 1),
           lat: cislo(e.cil_lat), lon: cislo(e.cil_lon), vyska: cislo(e.cil_vyska),
-          detail: e.cil_detail, plny: e.cil_detail || e.cil_nazev,
+          detail: e.cil_detail, detailEn: mistoAnglicky(e.cil_detail), plny: e.cil_detail || e.cil_nazev,
         },
         delkaKm: cislo(e.delka_km),
         prevyseni: cislo(e.prevyseni_m),
@@ -159,13 +176,14 @@ export default async function () {
         autoKm: cislo(e.auto_km),
         autoMin: cislo(e.auto_min),
         mapaUrl: e.mapa_url,
+        mapaUrlEn: e.mapa_url ? String(e.mapa_url).replace("mapy.com/cs/", "mapy.com/en/") : e.mapa_url,
         // QR na kartě vede řidiče doprovodu do cíle etapy; trasa běžce je
         // na druhé straně karty přímo v mapě a na stránce jako odkaz.
         qrAuto: e.qr_auto,
         popis: e.popis_trasy,
         // anglický popis trasy z web_trasa_preklady, povrch se překládá slovníkem (20. 10. 2026)
         popisEn: ((data.preklady || []).find((x) => x.rok === e.rok && x.cislo === e.cislo && x.jazyk === "en") || {}).popis || null,
-        povrchEn: povrchAnglicky(e.povrch),
+        povrchEn: povrchEn(e.povrch),
         video: e.video,
         useky: moje,
         profil: p,
