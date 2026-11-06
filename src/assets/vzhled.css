@@ -127,6 +127,9 @@ p { margin: 0 0 1em; }
 }
 .stazena .znacka-kruh { transform: scale(.35); opacity: 0; pointer-events: none; }
 .stazena .znacka-mini { opacity: 1; transform: translateY(-50%) scale(1); }
+/* otevřené mobilní menu: velké logo by menu překrylo a ořízlo, ukáže se minimální (kontrola vzhledu 6. 11. 2026) */
+.hlavicka:has(.menu.otevrene) .znacka-kruh { transform: scale(.35); opacity: 0; pointer-events: none; }
+.hlavicka:has(.menu.otevrene) .znacka-mini { opacity: 1; transform: translateY(-50%) scale(1); }
 /* podstránky: rovnou minimální logo */
 body:not(.uvodni) .znacka-kruh { display: none; }
 body:not(.uvodni) .znacka-mini { opacity: 1; transform: translateY(-50%); }
@@ -341,6 +344,8 @@ body:not(.uvodni) .znacka-mini { opacity: 1; transform: translateY(-50%); }
 
 /* záhlaví podstrany */
 .podstrana-zahlavi { position: relative; isolation: isolate; overflow: hidden; background: var(--olivova-100); padding: 72px 0 56px; }
+/* záhlaví bez fotky (anglický úvod, zásady údajů): text začíná až pod plovoucí hlavičkou (kontrola vzhledu 6. 11. 2026) */
+.podstrana-zahlavi:not(.s-fotkou) { padding-top: calc(var(--hlavicka) + 56px); }
 .podstrana-zahlavi.s-fotkou { color: var(--bila); min-height: 380px; display: flex; align-items: flex-end; background: var(--zelena); }
 .pz-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
 .s-fotkou::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(34,34,33,.7) 0%, rgba(34,34,33,.35) 55%, rgba(34,34,33,.1) 100%), linear-gradient(0deg, rgba(34,34,33,.45), rgba(34,34,33,0) 60%); }
