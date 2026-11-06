@@ -54,11 +54,11 @@
           BEZCI.map(function (b) { return '<option value="' + b.soupiska_id + '"' + (VYBER[x.etapa] === b.soupiska_id ? " selected" : "") + ">" +
             e(b.startovni_cislo + " " + b.jmeno + " " + b.prijmeni) + "</option>"; }).join("") + "</select>"
           : e(jmeno(VYBER[x.etapa]) || "—");
-        var i = info(x), useka = i.start_nazev && i.cil_nazev ? i.start_nazev + " – " + i.cil_nazev : (i.nazev || x.nazev || "");
+        var i = info(x), useka = HBK.misto(i.start_nazev && i.cil_nazev ? i.start_nazev + " – " + i.cil_nazev : (i.nazev || x.nazev || ""));
         return '<tr' + (k.zaSebou[x.etapa] ? ' class="k-spatne"' : "") + '><td class="k-cislo k-etapa-cislo"><a href="' + HB.zaklad + (HBK.en ? "/en/route/stage-" : "/trasa/etapa-") + String(x.etapa).padStart(2, "0") +
           '/" target="_blank" rel="noopener" title="' + e(tf("Stránka etapy {0}", x.etapa)) + '">' + x.etapa + '</a></td><td class="k-etapa-nazev">' + e(useka) +
           '</td><td class="k-cislo" data-popis="km">' + cislo(i.delka_km != null ? i.delka_km : x.delka_km) + '</td><td class="k-cislo" data-popis="↑">' + (i.prevyseni_m != null ? cislo(i.prevyseni_m) + " m" : "") +
-          '</td><td class="k-cislo" data-popis="↓">' + (i.klesani_m != null ? cislo(i.klesani_m) + " m" : "") + '</td><td class="k-etapa-povrch">' + e(i.povrch || "") + '</td><td class="k-etapa-bezec">' + sel +
+          '</td><td class="k-cislo" data-popis="↓">' + (i.klesani_m != null ? cislo(i.klesani_m) + " m" : "") + '</td><td class="k-etapa-povrch">' + e(HBK.povrch(i.povrch) || "") + '</td><td class="k-etapa-bezec">' + sel +
           (k.zaSebou[x.etapa] ? '<small class="k-chyba-radek">' + t("Dvě etapy hned za sebou") + "</small>" : "") + "</td></tr>";
       }).join("") + "</tbody></table></div>");
     // lišta dole na obrazovce: stav rozdělení a Uložit, ať se nemusí rolovat pod 30 řádků (UX revize 5. 10. 2026)

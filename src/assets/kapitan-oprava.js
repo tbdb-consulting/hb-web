@@ -12,7 +12,7 @@
   var F_DEN = new Intl.DateTimeFormat(JAZYK, { timeZone: "Europe/Prague", weekday: "short", day: "numeric", month: "numeric" });
   function hms(iso) { return iso ? F_HMS.format(new Date(iso)) : ""; }
   function denHms(iso) { return iso ? F_DEN.format(new Date(iso)) + " " + hms(iso) : ""; }
-  function predavka(x) { return "P" + x.cislo + " " + (x.misto || ""); }
+  function predavka(x) { return "P" + x.cislo + " " + (HBK.misto(x.misto) || ""); }
 
   function formular() {
     var z = upravuji, h = [];
@@ -38,7 +38,7 @@
     if (!D.zadosti.length) return "";
     return '<div class="k-karta"><h2>' + t("Tvoje žádosti") + '</h2><ul class="k-zadosti">' + D.zadosti.map(function (z) {
       var s = STAV[z.stav] || [z.stav, ""];
-      return '<li><div><b>P' + (z.etapa + 1) + " " + e(z.misto || "") + "</b> · " + e(DRUH[z.druh] || z.druh) +
+      return '<li><div><b>P' + (z.etapa + 1) + " " + e(HBK.misto(z.misto) || "") + "</b> · " + e(DRUH[z.druh] || z.druh) +
         (z.cas ? " · " + e(tf("správný čas {0}", denHms(z.cas))) : "") + ' <span class="k-stitek' + s[1] + '">' + s[0] + "</span></div>" +
         '<div class="k-zadost-popis">' + e(z.popis) + "</div>" +
         (z.odpoved ? '<div class="k-zadost-odpoved"><b>' + t("Odpověď:") + "</b> " + e(z.odpoved) + "</div>" : "") +

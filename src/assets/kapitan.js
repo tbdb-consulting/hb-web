@@ -326,10 +326,22 @@
     });
   }
 
+  // Názvy míst a povrch etap z databáze jsou česky; v angličtině se popisy přeloží (stejné jako src/_data/trasa.js, 6. 11. 2026).
+  var MISTA_EN = [["Autokemp U viaduktu", "U viaduktu campsite"], ["fotbalové hřiště", "football pitch"],
+    ["horní parkoviště SKI park Gruň", "upper car park, SKI park Gruň"], ["parkoviště SKI areálu", "ski resort car park"],
+    ["parkoviště Úspolka", "Úspolka car park"], ["parkoviště Hájenka", "Hájenka car park"], ["konečná autobusu", "bus terminus"],
+    ["koupaliště", "outdoor pool"], ["obecní úřad", "municipal office"], ["hasičská zbrojnice", "fire station"],
+    ["sportovní hala", "sports hall"], ["Javořina, rozcestí", "Javořina junction"], ["amfiteátr", "amphitheatre"],
+    ["hřiště", "sports ground"], ["parkoviště", "car park"]];
+  var POVRCH_EN = [["lesní a polní cesta", "forest and field tracks"], ["lesní cesta", "forest track"], ["polní cesta", "field track"], ["asfalt", "asphalt"]];
+  function nahrad(s, seznam) { return seznam.reduce(function (x, p) { return x.split(p[0]).join(p[1]); }, String(s)); }
+  function misto(s) { return !EN || !s ? s : nahrad(s, MISTA_EN); }
+  function povrch(s) { return !EN || !s ? s : nahrad(s, POVRCH_EN).replace(/(\d)\s+%/g, "$1%"); }
+
   window.HBK = { poslatOdkaz: poslatOdkaz, prevezmiZOdkazu: prevezmiZOdkazu, platnyToken: platnyToken,
                  odhlasit: odhlasit, db: db, rpc: rpc, esc: esc, datum: datum, cas: cas, kc: kc,
                  vykonnost: vykonnost, hlaska: hlaska, toast: toast, vyzadovat: vyzadovat,
                  kroky: vykresliKroky, navigace: navigace, bezStartovneho: bezStartovneho, krok: krok, hotovo: hotovo, hlaskaDal: hlaskaDal, prevezmiHlasku: prevezmiHlasku,
                  konceptKlic: konceptKlic, konceptNacti: konceptNacti, konceptUloz: konceptUloz, konceptZahod: konceptZahod, koncepty: koncepty, rokyVykonnosti: rokyVykonnosti,
-                 en: EN, t: t, tf: tf, adresa: adresa, prelozHlasku: prelozHlasku };
+                 en: EN, t: t, tf: tf, adresa: adresa, prelozHlasku: prelozHlasku, misto: misto, povrch: povrch };
 })();
