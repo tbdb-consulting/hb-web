@@ -7,6 +7,8 @@
   // Angličtina (20. 10. 2026): L("česky", "anglicky") podle jazyka stránky.
   var EN = C && C.jazyk === "en";
   function L(cs, en) { return EN ? en : cs; }
+  // název kraje anglicky ze slovníku stránky (window.HB_T), jinak beze změny
+  function krajEn(s) { return (EN && s && window.HB_T && window.HB_T[s]) || s; }
   // hlášky z databáze jsou česky; slovník window.HB_T je má i s % na místě hodnot (23. 10. 2026, jako kapitan.js)
   var vzory = null;
   function prelozHlasku(s) {
@@ -36,7 +38,7 @@
   }, krajSelect: function (id, vybrany) {
     var Z = { CZ: L("Česko", "Czech Republic"), SK: L("Slovensko", "Slovakia"), PL: L("Polsko", "Poland"), XX: L("Jiná země", "Other country") }, z = null, h = '<select id="' + id + '"><option value="">' + L("— neuvádím —", "— not stated —") + '</option>';
     KRAJE.forEach(function (k) { if (k.zeme !== z) { if (z) h += "</optgroup>"; z = k.zeme; h += '<optgroup label="' + esc(Z[z] || z) + '">'; }
-      h += '<option value="' + esc(k.kod) + '"' + (k.kod === vybrany ? " selected" : "") + ">" + esc(k.kod === "jina-zeme" ? L("Jiná země", "Other country") : k.kod === "polsko" ? L("Polsko", "Poland") : k.nazev) + "</option>"; });
+      h += '<option value="' + esc(k.kod) + '"' + (k.kod === vybrany ? " selected" : "") + ">" + esc(krajEn(k.nazev)) + "</option>"; });
     return h + (z ? "</optgroup>" : "") + "</select>";
   } };
 
@@ -48,7 +50,7 @@
     return '<article class="sz-inzerat" id="sz-' + x.id + '"><h3>' + esc(tym ? x.tym : x.jmeno) + "</h3>" +
       '<p class="sz-meta">' + [tym ? (EN ? "looking for " + x.pocet + (x.pocet === 1 ? " runner" : " runners") : "hledá " + x.pocet + (x.pocet < 5 ? " běžce" : " běžců"))
           : (x.etap ? (EN ? "can run " + x.etap + (x.etap === 1 ? " stage" : " stages") : "zvládne " + x.etap + (x.etap === 1 ? " etapu" : x.etap < 5 ? " etapy" : " etap")) : ""),
-        x.kraj, x.vykonnost ? x.vykonnost + " min / 10 km" : "", L("přidáno ", "posted ") + F.format(new Date(x.vytvoreno))].filter(Boolean).map(esc).join(" · ") + "</p>" +
+        krajEn(x.kraj), x.vykonnost ? x.vykonnost + " min / 10 km" : "", L("přidáno ", "posted ") + F.format(new Date(x.vytvoreno))].filter(Boolean).map(esc).join(" · ") + "</p>" +
       '<p class="sz-text">' + esc(x.text) + "</p>" +
       '<div class="sz-napsat-misto"><button type="button" class="sz-vedlejsi" data-napsat="' + x.id + '">' + (tym ? L("Napsat týmu", "Write to the team") : L("Napsat běžci", "Write to the runner")) + "</button></div></article>";
   }
