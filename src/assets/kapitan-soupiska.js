@@ -6,7 +6,7 @@
   var P = null, RADKY = [], KRAJE = [];
   var POHLAVI = { zena: t("žena"), muz: t("muž"), jine: t("jiné") };
 
-  function kraj(kod) { var k = KRAJE.filter(function (x) { return x.kod === kod; })[0]; return k ? k.nazev : (kod || ""); }
+  function kraj(kod) { var k = KRAJE.filter(function (x) { return x.kod === kod; })[0]; return k ? t(k.nazev) : (kod || ""); }
   function chybi(r) {
     return [[r.rok_narozeni, t("rok narození")], [r.pohlavi, t("pohlaví")], [r.kraj, t("kraj")], [r.mesto, t("město")], [r.velikost, t("tričko")], [r.vykonnost_10km, t("čas na 10 km")]]
       .filter(function (x) { return !x[0]; }).map(function (x) { return x[1]; });

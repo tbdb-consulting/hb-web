@@ -34,9 +34,9 @@
     var r = await fetch(C.url + "/rest/v1/web_kraj?select=kod,nazev,zeme&aktivni=eq.true&order=poradi", { headers: { apikey: C.klic, Authorization: "Bearer " + C.klic } });
     KRAJE = r.ok ? await r.json() : []; return KRAJE;
   }, krajSelect: function (id, vybrany) {
-    var Z = { CZ: L("Česko", "Czech Republic"), SK: L("Slovensko", "Slovakia"), PL: L("Polsko", "Poland") }, z = null, h = '<select id="' + id + '"><option value="">' + L("— neuvádím —", "— not stated —") + '</option>';
+    var Z = { CZ: L("Česko", "Czech Republic"), SK: L("Slovensko", "Slovakia"), PL: L("Polsko", "Poland"), XX: L("Jiná země", "Other country") }, z = null, h = '<select id="' + id + '"><option value="">' + L("— neuvádím —", "— not stated —") + '</option>';
     KRAJE.forEach(function (k) { if (k.zeme !== z) { if (z) h += "</optgroup>"; z = k.zeme; h += '<optgroup label="' + esc(Z[z] || z) + '">'; }
-      h += '<option value="' + esc(k.kod) + '"' + (k.kod === vybrany ? " selected" : "") + ">" + esc(k.nazev) + "</option>"; });
+      h += '<option value="' + esc(k.kod) + '"' + (k.kod === vybrany ? " selected" : "") + ">" + esc(k.kod === "jina-zeme" ? L("Jiná země", "Other country") : k.kod === "polsko" ? L("Polsko", "Poland") : k.nazev) + "</option>"; });
     return h + (z ? "</optgroup>" : "") + "</select>";
   } };
 

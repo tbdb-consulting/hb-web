@@ -134,6 +134,7 @@ export default {
   "Česko": "Czech Republic",
   "Slovensko": "Slovakia",
   "Polsko": "Poland",
+  "Jiná země": "Other country",
   "— vyber —": "— choose —",
   "Číselník se nenačetl – obnov stránku": "The options didn't load – refresh the page",
   "Možnosti se nenačetly – obnov stránku.": "The options didn't load – refresh the page.",

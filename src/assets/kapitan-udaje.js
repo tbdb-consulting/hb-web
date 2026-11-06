@@ -27,7 +27,7 @@
       '<label class="k-pole" for="f-telefon">' + t("Telefon") + ' *<input id="f-telefon" type="tel" value="' + e(r.telefon || "") + '" required><small>' + t("Např. 777 123 456.") + "</small></label>" +
       '<label class="k-pole" for="f-rok">' + t("Rok narození") + ' *<input id="f-rok" inputmode="numeric" maxlength="4" value="' + e(r.rok_narozeni || "") + '" required><small>' + t("Např. 1990.") + "</small></label>" +
       '<label class="k-pole" for="f-pohlavi">' + t("Pohlaví") + " *" + vyber("f-pohlavi", [["zena", t("žena")], ["muz", t("muž")], ["jine", t("jiné")]], r.pohlavi) + "</label>" +
-      '<label class="k-pole" for="f-kraj">' + t("Kraj") + " *" + vyber("f-kraj", KRAJE.map(function (k) { return [k.kod, k.nazev]; }), r.kraj) + "</label>" +
+      '<label class="k-pole" for="f-kraj">' + t("Kraj") + " *" + vyber("f-kraj", KRAJE.map(function (k) { return [k.kod, t(k.nazev)]; }), r.kraj) + "</label>" +
       '<label class="k-pole" for="f-mesto">' + t("Město") + ' *<input id="f-mesto" value="' + e(r.mesto || "") + '" required></label>' +
       '<label class="k-pole" for="f-velikost">' + t("Velikost trička") + " *" + vyber("f-velikost", VELIKOSTI.map(function (v) { return [v.rada + "|" + v.kod, t(v.rada) + " " + v.kod]; }),
         r.velikost ? r.velikost_rada + "|" + r.velikost : "") + "</label>" +

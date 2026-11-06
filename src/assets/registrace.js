@@ -106,7 +106,7 @@
   }
 
   // --- Číselníky ---
-  var ZEME = { CZ: "Česko", SK: "Slovensko", PL: "Polsko" };
+  var ZEME = { CZ: "Česko", SK: "Slovensko", PL: "Polsko", XX: "Jiná země" };
   var POPIS = {};
   function ciselniky() {
     cist("web_kraj?select=kod,nazev,zeme&aktivni=eq.true&order=poradi").then(function (r) {
@@ -114,7 +114,7 @@
       sel.innerHTML = '<option value="">' + t("— vyber —") + '</option>';
       r.forEach(function (k) {
         if (k.zeme !== zeme) { zeme = k.zeme; cil = document.createElement("optgroup"); cil.label = t(ZEME[zeme] || zeme); sel.appendChild(cil); }
-        var o = document.createElement("option"); o.value = k.kod; o.textContent = k.nazev; cil.appendChild(o);
+        var o = document.createElement("option"); o.value = k.kod; o.textContent = t(k.nazev); cil.appendChild(o);
       });
     }).catch(function () { el("rg-kraj").innerHTML = '<option value="">' + t("Číselník se nenačetl – obnov stránku") + '</option>'; });
     cist("web_kategorie?select=kod,nazev,popis&aktivni=eq.true&order=poradi").then(function (r) {

@@ -4,9 +4,9 @@
 (function () {
   var e = HBK.esc, t = HBK.t, tf = HBK.tf, D = null, KRAJE = [];
   function krajSelect(vybrany) {
-    var Z = { CZ: t("Česko"), SK: t("Slovensko"), PL: t("Polsko") }, z = null, h = '<select id="s-kraj"><option value="">' + t("— neuvedeno —") + "</option>";
+    var Z = { CZ: t("Česko"), SK: t("Slovensko"), PL: t("Polsko"), XX: t("Jiná země") }, z = null, h = '<select id="s-kraj"><option value="">' + t("— neuvedeno —") + "</option>";
     KRAJE.forEach(function (k) { if (k.zeme !== z) { if (z) h += "</optgroup>"; z = k.zeme; h += '<optgroup label="' + e(Z[z] || z) + '">'; }
-      h += '<option value="' + e(k.kod) + '"' + (k.kod === vybrany ? " selected" : "") + ">" + e(k.nazev) + "</option>"; });
+      h += '<option value="' + e(k.kod) + '"' + (k.kod === vybrany ? " selected" : "") + ">" + e(t(k.nazev)) + "</option>"; });
     return h + (z ? "</optgroup>" : "") + "</select>";
   }
   // „Hledáš 1 běžce / 3 běžce / 5 běžců“; anglicky „1 runner / 3 runners“
