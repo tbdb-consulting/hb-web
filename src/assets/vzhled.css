@@ -557,3 +557,8 @@ h1, h2 { color: var(--cerna); }
 .drobky a { display: inline-block; padding: 4px 0; }
 .hlavicka-obal .jazyky a:not([aria-current="true"]) { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
 .menu-tlacitko { min-height: 44px; }
+
+/* galerie: starý styl.css barvil rok zeleně (na tmavé fotce nečitelné) a přidával rámeček a odsazení (6. 11. 2026) */
+.gal-rok { border: 0; background: var(--cerna); }
+.gal-rok-text { padding: 0; }
+.gal-rok-text strong { color: var(--bila); }

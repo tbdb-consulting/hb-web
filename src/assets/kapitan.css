@@ -237,3 +237,11 @@ a.k-vedlejsi.k-tlacitko-s-napovedou, a.k-tlacitko.k-tlacitko-s-napovedou { displ
   h2 { margin: 2px 0 4px; }
   @page { size: A4; margin: 10mm; }
 }
+
+/* Nový vzhled webu (6. 11. 2026): obecné a:hover z vzhled.css barví text tlačítek vínově – tlačítka zůstanou bílá. */
+a.k-nav-dal:hover, a.k-nav-dal:focus-visible, a.k-tlacitko:hover, a.k-tlacitko:focus-visible { color: #fff; }
+/* Platba: popisky nad hodnotou, aby se dlouhé popisky (anglicky „Variable symbol (payment reference)“) a číslo účtu vešly do úzké karty. */
+.k-dl.k-dl-platba { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.k-dl-platba dt { margin-top: 8px; }
+.k-dl-platba dt:first-child { margin-top: 0; }
+.k-kopie .k-odkaz { flex: none; }
