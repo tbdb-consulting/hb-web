@@ -1,0 +1,74 @@
+# Sestavení ostrého webu Hory Bory a nahrání přes FTP na Wedos (připraveno 7. 11. 2026, spuštění webu 11. 11. 2026).
+#
+# Spouští se JEN RUČNĚ (Actions → Nahrát na Wedos → Run workflow) a cíl se vybírá:
+#   zkusebni = /www/subdom/novy/        → http://novy.horybory.cz (zkouška před přepnutím, starý web se nedotkne)
+#   ostry    = /www/domains/horybory.cz/ → www.horybory.cz (až PO přepnutí složek 11. 11., do té doby tam leží starý web!)
+# Zkušební adresa tbdb-consulting.github.io/hb-web se dál nasazuje souborem build.yml jako dosud.
+#
+# Potřebné tajné údaje (GitHub → Settings → Secrets and variables → Actions), zadává Keksa:
+#   FTP_UZIVATEL, FTP_HESLO
+# Nahrává se šifrovaně (FTPS). Akce si na serveru vede seznam nahraných souborů (.ftp-deploy-sync-state.json)
+# a příště nahraje jen změny; smaže jen soubory, které sama dřív nahrála.
+
+name: Nahrát na Wedos
+
+on:
+  workflow_dispatch:
+    inputs:
+      cil:
+        description: "Kam nahrát"
+        required: true
+        type: choice
+        options: [zkusebni, ostry]
+
+concurrency:
+  group: wedos
+  cancel-in-progress: false
+
+jobs:
+  nahrat:
+    runs-on: ubuntu-24.04  # Playwright 1.56 neumí ubuntu 26.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Nainstalovat Eleventy
+        run: npm install --no-audit --no-fund
+
+      - name: Sestavit web (kořen domény)
+        env:
+          ZAKLAD_URL: ""
+        run: npm run build
+
+      - name: Zkontrolovat sestavení
+        run: |
+          test -f _site/index.html || { echo "Chybí index.html"; exit 1; }
+          test -f _site/.htaccess || { echo "Chybí .htaccess"; exit 1; }
+          test -f _site/404.html || { echo "Chybí 404.html"; exit 1; }
+          pocet=$(find _site -name 'index.html' | wc -l)
+          echo "Vygenerováno stránek: $pocet"
+          [ "$pocet" -ge 10 ] || { echo "Málo stránek – obsah se nenatáhl z databáze."; exit 1; }
+
+      - name: Nainstalovat prohlížeč pro tisk karet
+        run: npx playwright install --with-deps chromium
+
+      - name: Vytisknout karty etap do PDF
+        env:
+          ZAKLAD_URL: ""
+        run: |
+          node nastroje/karty-pdf.mjs
+          pocet=$(find _site/karty -name '*.pdf' | wc -l)
+          [ "$pocet" -ge 30 ] || { echo "Karet je míň než 30."; exit 1; }
+
+      - name: Nahrát přes FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: 203920.w20.wedos.net
+          username: ${{ secrets.FTP_UZIVATEL }}
+          password: ${{ secrets.FTP_HESLO }}
+          protocol: ftps
+          local-dir: ./_site/
+          server-dir: ${{ inputs.cil == 'ostry' && '/www/domains/horybory.cz/' || '/www/subdom/novy/' }}

@@ -1,0 +1,51 @@
+---
+permalink: "/.htaccess"
+eleventyExcludeFromCollections: true
+---
+{#- Jen pro ostrý web na Wedosu (ZAKLAD_URL prázdné); na zkušební adrese se vynechá (eleventy.config.js).
+    Přesměrování starých adres webu od Q2 (tabulka horybory_route_alias ze zálohy 12. 9. 2026 + projití živého webu 7. 11. 2026).
+    Wedos domény směruje kořenovým /www/.htaccess do /www/domains/horybory.cz/, tady je tedy kořen webu. -#}
+# Hory Bory – ostrý web (Wedos). Vygenerováno při sestavení, ručně neupravovat.
+RewriteEngine On
+
+<IfModule mod_autoindex.c>
+  Options -Indexes
+</IfModule>
+
+# jedna adresa: https://www.horybory.cz (http → https zařizuje už CDN Wedosu, tady by vznikla smyčka)
+RewriteCond %{HTTP_HOST} ^horybory\.cz$ [NC]
+RewriteRule ^(.*)$ https://www.horybory.cz/$1 [R=301,L]
+
+# staré adresy (web od Q2) → nové
+RewriteRule ^(o-zavodu|o-nas)$ /o-zavodu/ [R=301,L]
+RewriteRule ^faq/?$ /casto-se-ptate/ [R=301,L]
+RewriteRule ^fotky-ze-zavodu/?$ /fotky/ [R=301,L]
+RewriteRule ^fotky-ze-zavodu/zavod-(\d{4})/?$ /fotky/$1/ [R=301,L]
+RewriteRule ^(gdpr|zasady-pouziti-cookies-a-zpracovani-dat-z-pouzivani-nasich-sluzeb)$ /gdpr/ [R=301,L]
+RewriteRule ^zmena-hesla/?$ /kapitan/prihlaseni/ [R=301,L]
+RewriteRule ^(kapitanska-sekce(/.*)?|stranka-tymu|rozdeleni-tymu|informace-pro-zavodniky|nastenka|evidence)/?$ /kapitan/ [R=301,L]
+RewriteRule ^(etapa|stage(/.*)?)/?$ /trasa/? [R=301,L]
+RewriteRule ^en/o-zavodu/?$ /en/about/ [R=301,L]
+RewriteRule ^en/vysledky/?$ /en/results/ [R=301,L]
+RewriteRule ^(saucony-trail|podobne-a-presto-zcela-odlisne|ktery-model-je-pro-tebe-ten-pravy|test-slug2?)/?$ / [R=301,L]
+RewriteRule ^(vysledky|seznamka)$ /$1/ [R=301,L]
+
+ErrorDocument 404 /404.html
+
+# seznam nahraných souborů z automatu (FTP-Deploy-Action) není pro návštěvníky
+<Files ".ftp-deploy-sync-state.json">
+  Require all denied
+</Files>
+
+# zkušební kopie na novy.horybory.cz se neindexuje
+<IfModule mod_headers.c>
+  SetEnvIfNoCase Host "^novy\." HB_ZKUSEBNI
+  Header set X-Robots-Tag "noindex, nofollow" env=HB_ZKUSEBNI
+</IfModule>
+
+# HTML se nedrží v mezipaměti (obsah se mění s každým sestavením), skripty a styly mají v adrese ?v=číslo sestavení
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

@@ -12,7 +12,9 @@
 <meta property="og:description" content="{{ metaPopis or popisWebu }}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="{{ 'en_GB' if jaz == 'en' else 'cs_CZ' }}">
-{%- if jaz == "en" and not obsah.enNaWebu %}
+{%- if web.zaklad %}
+<meta name="robots" content="noindex">{# zkušební adresa GitHub Pages – po spuštění www.horybory.cz (11. 11. 2026) se nemá indexovat #}
+{%- elif jaz == "en" and not obsah.enNaWebu %}
 <meta name="robots" content="noindex">{# angličtina se teprve kontroluje (20. 10. 2026) #}
 {%- endif %}
 {%- if obsah.enNaWebu and altCs and altEn %}

@@ -1,0 +1,21 @@
+---
+permalink: "/404.html"
+layout: zaklad.njk
+titulek: "Stránka nenalezena"
+metaPopis: "Tahle stránka na webu Hory Bory není."
+eleventyExcludeFromCollections: true
+---
+{# Stránka 404 pro ostrý web na Wedosu (spuštění 11. 11. 2026). Server ji vrací přes ErrorDocument v .htaccess.
+   Dvojjazyčná, protože server neví, jestli návštěvník přišel z české, nebo anglické části. #}
+<meta name="robots" content="noindex">
+<h1>Stránka nenalezena</h1>
+<p>Tahle stránka na webu Hory Bory není. Web je od listopadu 2026 nový, takže starý odkaz už nemusí platit.</p>
+<p><a class="tlacitko" href="{{ web.zaklad }}/">Na úvodní stránku</a></p>
+<ul>
+  <li><a href="{{ web.zaklad }}/trasa/">Trasa a etapy</a></li>
+  <li><a href="{{ web.zaklad }}/registrace/">Registrace týmu</a></li>
+  <li><a href="{{ web.zaklad }}/kapitan/">Kapitánská sekce</a></li>
+  <li><a href="{{ web.zaklad }}/vysledky/">Výsledky</a></li>
+</ul>
+<h2 lang="en">Page not found</h2>
+<p lang="en">This page doesn't exist on the Hory Bory website. The site is new since November 2026, so an old link may no longer work. <a href="{{ web.zaklad }}/en/">Go to the English home page</a>.</p>
