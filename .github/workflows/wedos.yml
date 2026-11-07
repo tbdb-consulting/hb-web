@@ -72,3 +72,10 @@ jobs:
           protocol: ftps
           local-dir: ./_site/
           server-dir: ${{ inputs.cil == 'ostry' && '/www/domains/horybory.cz/' || '/www/subdom/novy/' }}
+
+      # Wedos nahrává s právy 750/640, která webový server nepřečte (403 „unable to read htaccess“, 7. 11. 2026).
+      - name: Nastavit práva souborů (755/644)
+        env:
+          FTP_UZIVATEL: ${{ secrets.FTP_UZIVATEL }}
+          FTP_HESLO: ${{ secrets.FTP_HESLO }}
+        run: python3 nastroje/ftp_prava.py ${{ inputs.cil == 'ostry' && '/www/domains/horybory.cz' || '/www/subdom/novy' }}
