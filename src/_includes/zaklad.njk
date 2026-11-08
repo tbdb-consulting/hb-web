@@ -118,7 +118,7 @@
 </footer>
 
 <script src="{{ web.zaklad }}/assets/vzhled.js"></script>
-<script>if (/[?&]orez\b/.test(location.search) && document.querySelector(".hero")) { var s = document.createElement("script"); s.src = "{{ web.zaklad }}/assets/orez.js"; document.body.appendChild(s); }</script>{# ladění ořezu úvodních fotek: adresa ?orez #}
+<script>if (/[?&]orez\b/.test(location.search) && document.querySelector(".hero, .s-fotkou")) { var s = document.createElement("script"); s.src = "{{ web.zaklad }}/assets/orez.js"; document.body.appendChild(s); }</script>{# ladění ořezu úvodních fotek: adresa ?orez #}
 <script>
   // Přihlášený kapitán (v prohlížeči je uložené přihlášení Supabase) vidí v patičce odkaz rovnou do sekce (revize vzhledu 18. 10. 2026).
   (function () {

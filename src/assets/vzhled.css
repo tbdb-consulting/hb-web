@@ -347,8 +347,12 @@ body:not(.uvodni) .znacka-mini { opacity: 1; transform: translateY(-50%); }
 .podstrana-zahlavi { position: relative; isolation: isolate; overflow: hidden; background: var(--olivova-100); padding: 72px 0 56px; }
 /* záhlaví bez fotky (anglický úvod, zásady údajů): text začíná až pod plovoucí hlavičkou (kontrola vzhledu 6. 11. 2026) */
 .podstrana-zahlavi:not(.s-fotkou) { padding-top: calc(var(--hlavicka) + 56px); }
-.podstrana-zahlavi.s-fotkou { color: var(--bila); min-height: 380px; display: flex; align-items: flex-end; background: var(--zelena); }
-.pz-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.podstrana-zahlavi.s-fotkou { color: var(--bila); min-height: var(--pz-vyska, 380px); display: flex; align-items: flex-end; background: var(--zelena); }
+.pz-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; object-position: var(--pozice, center); transform-origin: var(--pozice, center); transform: scale(var(--zoom, 1)); }
+@media (max-width: 760px) {
+  .podstrana-zahlavi.s-fotkou { min-height: var(--pz-vyska-mobil, var(--pz-vyska, 380px)); }
+  .pz-foto { object-position: var(--pozice-mobil, var(--pozice, center)); transform-origin: var(--pozice-mobil, var(--pozice, center)); }
+}
 .s-fotkou::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(34,34,33,.7) 0%, rgba(34,34,33,.35) 55%, rgba(34,34,33,.1) 100%), linear-gradient(0deg, rgba(34,34,33,.45), rgba(34,34,33,0) 60%); }
 .pz-text { width: 100%; }
 .podstrana-zahlavi h1 { font-size: clamp(36px, 5vw, 60px); line-height: 1.05; letter-spacing: -.02em; margin: 0 0 14px; max-width: 18ch; }
@@ -482,7 +486,6 @@ body:not(.uvodni) .znacka-mini { opacity: 1; transform: translateY(-50%); }
 /* partneři */
 .str-partneri .prose img { max-height: 90px; width: auto; display: inline-block; margin: 12px 24px 12px 0; vertical-align: middle; }
 
-.str-trasa .pz-foto { object-position: 50% 40%; }
 
 /* =====================================================================
    NAPOJENÍ NA PŮVODNÍ STYL (styl.css)
