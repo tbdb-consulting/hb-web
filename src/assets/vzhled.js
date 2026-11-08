@@ -34,6 +34,7 @@
   var INTERVAL = 6000;
   var aktualni = 0, casovac = null;
   var klid = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var orez = /[?&]orez\b/.test(location.search); // režim ladění ořezu fotek (assets/orez.js) – slider stojí
   hero.style.setProperty("--interval", INTERVAL + "ms");
 
   snimky.forEach(function (_, i) {
@@ -60,7 +61,7 @@
   }
   function spust() {
     clearInterval(casovac);
-    if (klid) return;
+    if (klid || orez) return;
     casovac = setInterval(function () { ukaz(aktualni + 1); }, INTERVAL);
   }
   hero.querySelectorAll(".sipka").forEach(function (b) {
@@ -78,6 +79,7 @@
     x0 = null;
   });
 
+  window.HB_heroUkaz = ukaz;
   ukaz(0);
   spust();
 })();

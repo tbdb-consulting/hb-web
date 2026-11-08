@@ -196,10 +196,10 @@ body:not(.uvodni) .znacka-mini { opacity: 1; transform: translateY(-50%); }
 .hero-snimky, .snimek { position: absolute; inset: 0; margin: 0; }
 .hero-snimky { z-index: -1; }
 .snimek { opacity: 0; transition: opacity 1.2s ease; }
-.snimek img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pozice, center); transform: scale(1.08); }
+.snimek img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pozice, center); transform-origin: var(--pozice, center); transform: scale(calc(var(--zoom, 1) * 1.08)); }
 .snimek.aktivni { opacity: 1; }
 .snimek.aktivni img { animation: priblizeni 9s ease-out forwards; }
-@keyframes priblizeni { from { transform: scale(1.08); } to { transform: scale(1); } }
+@keyframes priblizeni { from { transform: scale(calc(var(--zoom, 1) * 1.08)); } to { transform: scale(var(--zoom, 1)); } }
 .hero::after {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background:
@@ -226,6 +226,7 @@ body:not(.uvodni) .znacka-mini { opacity: 1; transform: translateY(-50%); }
 .tecky button[aria-selected="true"] { opacity: 1; transform: scale(1.25); }
 @media (max-width: 760px) {
   .hero { height: min(88svh, 760px); min-height: 520px; }
+  .snimek img { object-position: var(--pozice-mobil, var(--pozice, center)); transform-origin: var(--pozice-mobil, var(--pozice, center)); }
   .hero::after { background: linear-gradient(0deg, rgba(34,34,33,.75) 0%, rgba(34,34,33,.2) 60%, rgba(34,34,33,.1) 100%); }
   .hero-text { padding-bottom: 104px; }
   .hero-ovladani { bottom: 52px; }
