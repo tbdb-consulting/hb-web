@@ -72,6 +72,7 @@ export default {
   "Otázek celkem:": "Questions in total:",
   "Vítězové ročníků": "Winners by year",
   "Vítězný tým Hory Bory": "Winning team of Hory Bory",
+  "Vítězky Hory Bory": "Winning women's team of Hory Bory",
   "Vítězky ženské kategorie Hory Bory": "Winners of the women's category of Hory Bory",
   "Ženy:": "Women:",
   "Celé výsledky": "Full results",

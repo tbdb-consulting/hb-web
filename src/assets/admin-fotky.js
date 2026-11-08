@@ -17,6 +17,7 @@
     $("fo-prehled").innerHTML = '<p class="adm-sub">Načítám…</p>';
     try {
       prehled = await HBA.rpc("web_admin_fotky_prehled", { p_rok: rokSel.value });
+      try { vitezove = await HBA.rpc("web_admin_vitezove", { p_rok: rokSel.value }); } catch (e) { vitezove = null; }
       var s = prehled.sekce || {};
       $("fo-prehled").innerHTML =
         "<p><b>" + prehled.celkem + "</b> fotek v katalogu, <b>" + prehled.s_nahledem + "</b> má náhled, chybí <b>" + prehled.chybi.length + "</b>.</p>" +
@@ -38,7 +39,7 @@
   // Označuje se jen ručně, anotace fotek se hromadně (ani AI) nedoplňují.
   // Náhled v galerii = [soubor, náhled, sekce, feed, story, výřez feed, výřez story, předávka].
   // Lupa na dlaždici otevře fotku ve velkém (prohlížeč níž), klik jinam na dlaždici fotku vybírá jako dřív.
-  var NAHLEDY = HB.url + "/storage/v1/object/public/fotky-nahledy/", vybrana = null, filtr = "", filtrK = "", rezim = "uvodni", vyber = {}, posledni = null;
+  var NAHLEDY = HB.url + "/storage/v1/object/public/fotky-nahledy/", vitezove = null, vybrana = null, filtr = "", filtrK = "", rezim = "uvodni", vyber = {}, posledni = null;
   var SEKCE = { start: "Start", trasa: "Trasa", cil: "Cíl" };
   var KAMPAN = { feed: "Přidat do feedu", story: "Přidat do story" };
   function sVyberem() { return rezim === "trideni" || rezim === "kampan"; }
@@ -67,6 +68,19 @@
         ' <button type="button" class="adm-tlacitko-male" data-predavka="0"' + (n ? "" : " disabled") + ">Bez předávky</button>" +
         ' <button type="button" class="adm-tlacitko-male" id="fo-vse">Vybrat vše zobrazené</button>' +
         ' <button type="button" class="adm-tlacitko-male" id="fo-zrusit"' + (n ? "" : " disabled") + ">Zrušit výběr</button>";
+    } else if (rezim === "vitezove") {
+      // Fotka vítězů (8. 11. 2026): karta ročníku na stránce Výsledky ukazuje fotku vítězného týmu a fotku vítězek (kategorie Ženy).
+      var v = vitezove || {}, fo = v.foto || {};
+      [["celkem", "Vítězný tým", v.celkem], ["zeny", "Vítězky (Ženy)", v.zeny]].forEach(function (k) {
+        if (!k[2]) { if (k[0] === "zeny") h += '<span class="adm-sub">Ročník nemá ženský tým, fotka vítězek se nezobrazí.</span>'; return; }
+        var f = fo[k[0]];
+        h += '<span class="fo-vitez">' + (f ? '<img src="' + HBA.esc(NAHLEDY + f.nahled) + '" alt="">' : "") +
+          "<span>" + k[1] + ": <b>" + HBA.esc(k[2]) + "</b><br>" + (f ? "teď " + HBA.esc(f.soubor || f.nahled) : "fotka chybí") + "</span>" +
+          (vybrana ? ' <button type="button" class="adm-tlacitko" data-vitez="' + k[0] + '">Nastavit vybranou</button>' : "") +
+          (f ? ' <button type="button" class="adm-tlacitko-male" data-vitez-smazat="' + k[0] + '">Odebrat</button>' : "") + "</span>";
+      });
+      if (!vybrana) h += '<span class="adm-sub">Klikni na fotku v mřížce (filtr Cíl), pak ji nastav k vítězům nebo vítězkám.</span>';
+      else h += '<span>Vybraná: <b>' + HBA.esc(vybrana[0]) + "</b></span>";
     } else {
       var u = prehled && prehled.uvodni;
       if (u) h += '<img src="' + HBA.esc(NAHLEDY + u.nahled) + '" alt=""><span>Teď: <b>' + HBA.esc(u.soubor) + "</b></span>";
@@ -98,7 +112,10 @@
       ? "Klikáním vyber fotky (Shift+klik vybere rozsah), pak je přidej do feedu (výřez 4:5) nebo do story (výřez 9:16). Fotka může být v obou. Značka je jen tady v administraci, na webu se neukazuje."
       : rezim === "trideni"
       ? "Klikáním vyber fotky (Shift+klik vybere rozsah), pak je zařaď tlačítkem. Tlačítkem Předávka označíš fotky, na kterých se předává štafeta (jen v administraci). Na webu se změna sekce objeví po dalším sestavení webu."
+      : rezim === "vitezove"
+      ? "Klikni na fotku vítězů (Lupa ⤢ ji zvětší) a nastav ji tlačítkem u vítězného týmu nebo u vítězek. Na webu se změna objeví po dalším sestavení webu."
       : "Klikni na fotku a potvrď. Na webu se změna objeví po dalším sestavení webu.";
+    if (rezim === "vitezove" && !filtr) { filtr = "cil"; $("fo-filtr").querySelectorAll("button").forEach(function (x) { x.classList.toggle("fo-akt", x.dataset.s === "cil"); }); }
     kresliUvodni(); kresliMrizku();
   });
   $("fo-mrizka").addEventListener("click", function (e) {
@@ -160,6 +177,16 @@
       try {
         await HBA.rpc("web_admin_fotky_sekce", { p_rok: rokSel.value, p_soubory: soubory, p_sekce: t.dataset.zarad || null });
         vyber = {}; posledni = null; await nacti();
+      } catch (err) { t.disabled = false; $("fo-uvodni").insertAdjacentHTML("beforeend", '<span class="adm-chyba">' + HBA.esc(err.message) + "</span>"); }
+      return;
+    }
+    if (t.dataset && (t.dataset.vitez || t.dataset.vitezSmazat) && rezim === "vitezove") {
+      var kat = t.dataset.vitez || t.dataset.vitezSmazat;
+      if (t.dataset.vitezSmazat && !confirm("Odebrat fotku z karty ročníku na webu? (fotka sama zůstane v galerii)")) return;
+      t.disabled = true;
+      try {
+        await HBA.rpc("web_admin_fotka_vitezu", { p_rok: rokSel.value, p_soubor: t.dataset.vitez ? vybrana[0] : null, p_kategorie: kat });
+        await nacti(true);
       } catch (err) { t.disabled = false; $("fo-uvodni").insertAdjacentHTML("beforeend", '<span class="adm-chyba">' + HBA.esc(err.message) + "</span>"); }
       return;
     }

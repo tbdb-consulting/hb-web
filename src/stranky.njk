@@ -139,6 +139,7 @@ eleventyComputed:
           <p class="cas vit-cas">{{ r.vitez.cas }}</p>
           <ol start="2">{% for d in r.dalsi %}<li><span>{{ d.tym }}</span> <span class="cas">{{ d.cas }}</span></li>{% endfor %}</ol>
           {% if r.zeny %}
+          {% if r.fotoZeny %}<img class="vit-foto-zeny" src="{{ r.fotoZeny }}" alt="{{ 'Vítězky Hory Bory' | t(jaz) }} {{ r.letopocet }} – {{ r.zeny.tym }}" loading="lazy" width="768" height="512">{% endif %}
           <p class="vit-zeny">{{ "Ženy:" | t(jaz) }} <strong>{{ r.zeny.tym }}</strong> <span class="cas">{{ r.zeny.cas }}</span></p>
           {% endif %}
           <a class="tl tl-text" href="{{ web.zaklad }}{{ ('/en/results/' + r.letopocet + '/') if en else r.adresa }}">{{ "Celé výsledky" | t(jaz) }} {{ r.letopocet }} →</a>

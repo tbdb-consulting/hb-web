@@ -462,6 +462,7 @@ body:not(.uvodni) .znacka-mini { opacity: 1; transform: translateY(-50%); }
 .vit ol li { margin: 4px 0; }
 .vit ol li span:first-child { margin-right: 8px; }
 .vit-zeny { font-size: 15px; margin: 0 0 12px; }
+.vit .vit-foto-zeny { aspect-ratio: 3/2; width: 100%; height: auto; object-position: 50% 30%; object-fit: cover; border-radius: 10px; margin: 4px 0 8px; }
 .vit .tl-text { margin-top: auto; align-self: flex-start; padding-left: 0; }
 
 /* fotky */
