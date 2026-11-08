@@ -25,7 +25,7 @@
   var puvodniFotky = cile.map(function (c) {
     return { pc: cti(c.nosic, "--pozice") || [50, 50], mob: cti(c.nosic, "--pozice-mobil"), zoom: Math.round((parseFloat(c.nosic.style.getPropertyValue("--zoom")) || 1) * 100), soubor: (c.img.getAttribute("src") || "").split("/").pop() };
   });
-  var PUV_VYSKA = { uvod: { minH: 560, maxH: 860, celaVyska: false, mobPct: 88 }, podstrany: { pc: 380, mob: 380 } };
+  var PUV_VYSKA = { uvod: { minH: 560, maxH: 860, celaVyska: false, mobPct: 88 }, podstrany: { pc: 560, mob: 380 } };
 
   var vse;
   try { vse = JSON.parse(localStorage.getItem(KLIC)); } catch (e) {}
@@ -270,7 +270,7 @@
   function vystup() {
     var v = vse.vyska, t = ["OŘEZ FOTEK NA WEBU – nové nastavení (laděno na " + location.host + ", okno " + window.innerWidth + " × " + window.innerHeight + " px)", ""];
     t.push("Výška úvodu – počítač: nejméně " + v.uvod.minH + " px, " + (v.uvod.celaVyska ? "vždy celá výška okna" : "nejvíc " + v.uvod.maxH + " px") + "; mobil " + v.uvod.mobPct + " % obrazovky  (původně 560 / 860 px, 88 %)");
-    t.push("Výška záhlaví podstran – počítač nejméně " + v.podstrany.pc + " px, mobil nejméně " + v.podstrany.mob + " px  (původně 380 / 380 px)");
+    t.push("Výška záhlaví podstran – počítač nejméně " + v.podstrany.pc + " px, mobil nejméně " + v.podstrany.mob + " px  (původně 560 / 380 px)");
     var nic = true;
     Object.keys(vse.stranky).forEach(function (k) {
       var pu = vse.puvodni[k]; if (!pu) return;

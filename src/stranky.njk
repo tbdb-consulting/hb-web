@@ -24,7 +24,9 @@ eleventyComputed:
   "casto-se-ptate": "str-casto-se-ptate.jpg", "vysledky": "str-vysledky.jpg", "fotky": "str-fotky.jpg", "seznamka": "str-seznamka.jpg",
   "partneri": "str-partneri.jpg", "kontakt": "str-kontakt.jpg" } -%}
 {#- ořez fotek v záhlaví podstran (ladí se na adrese ?orez, assets/orez.js): --pozice, --pozice-mobil, --zoom -#}
-{%- set orezZahlavi = { "trasa": "--pozice: 50% 40%" } -%}
+{%- set orezZahlavi = { "o-zavodu": "--pozice: 50% 31%", "trasa": "--pozice: 50% 25%", "pravidla": "--pozice: 50% 38%", "startovne": "--pozice: 50% 61%",
+  "casto-se-ptate": "--pozice: 50% 66%", "vysledky": "--pozice: 50% 22%", "fotky": "--pozice: 50% 54%", "seznamka": "--pozice: 50% 0%",
+  "partneri": "--pozice: 50% 0%", "kontakt": "--pozice: 50% 18%" } -%}
 {%- set sObsahem = stranka.kod in ["o-zavodu", "pravidla", "startovne"] -%}
 
 {% if stranka.kod == "uvod" and en %}
