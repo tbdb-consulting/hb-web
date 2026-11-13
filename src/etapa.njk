@@ -98,33 +98,6 @@ eleventyComputed:
   {% endif %}
 </section>
 
-{% if e.useky.length %}
-<section class="etapa-blok etapa-useky-blok">
-  <h2>{{ "Úseky etapy" | t(jaz) }}</h2>
-  <div class="table-responsive">
-  <table class="etapa-useky">
-    <thead>
-      <tr><th>{{ "Od km" | t(jaz) }}</th><th>{{ "Do km" | t(jaz) }}</th><th>{{ "Délka" | t(jaz) }}</th><th>{{ "Ráz" | t(jaz) }}</th><th>{{ "Povrch" | t(jaz) }}</th><th>{{ "Sklon" | t(jaz) }}</th><th>{{ "Auto" | t(jaz) }}</th></tr>
-    </thead>
-    <tbody>
-      {% for u in e.useky %}
-      <tr>
-        <td>{{ (u.od_m / 1000) | round(1) if en else ((u.od_m / 1000) | round(1) | cz) }}</td>
-        <td>{{ (u.do_m / 1000) | round(1) if en else ((u.do_m / 1000) | round(1) | cz) }}</td>
-        <td>{% if u.delka_m < 1000 %}{{ u.delka_m }}&nbsp;m{% else %}{{ (u.delka_m / 1000) | round(1) if en else ((u.delka_m / 1000) | round(1) | cz) }}&nbsp;km{% endif %}</td>
-        <td>{{ u.raz | t(jaz) }}</td>
-        <td>{{ u.povrch | t(jaz) }}</td>
-        <td>{{ u.sklon_pct if en else (u.sklon_pct | cz) }}&nbsp;%</td>
-        <td>{% if u.auto %}{{ "ano" | t(jaz) }}{% else %}{{ "ne" | t(jaz) }}{% endif %}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  </div>
-  <p class="etapa-vysvetlivka">{{ "Sloupec „Auto“ říká, jestli se dá úsek objet autem — doprovod podle něj pozná, kde běžce uvidí." | t(jaz) }}</p>
-</section>
-{% endif %}
-
 <nav class="etapa-sousedi" aria-label="{{ 'Další etapy' | t(jaz) }}">
   {% if e.predchozi %}<a class="etapa-zpet" href="{{ web.zaklad }}{{ e.predchozi.adresaEn if en else e.predchozi.adresa }}">‹ {{ e.predchozi.cislo }}{{ '' if en else '.' }} {{ e.predchozi.nazevEn if en else e.predchozi.nazev }}</a>{% endif %}
   {% if e.dalsi %}<a class="etapa-vpred" href="{{ web.zaklad }}{{ e.dalsi.adresaEn if en else e.dalsi.adresa }}">{{ e.dalsi.cislo }}{{ '' if en else '.' }} {{ e.dalsi.nazevEn if en else e.dalsi.nazev }} ›</a>{% endif %}
