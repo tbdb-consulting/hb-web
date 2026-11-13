@@ -39,7 +39,7 @@
 <header class="hlavicka" id="hlavicka">
   <div class="obal hlavicka-obal">
     <a class="znacka" href="{{ web.zaklad }}{{ '/en/' if jaz == 'en' else '/' }}" aria-label="Hory Bory – {{ 'úvod' | t(jaz) }}">
-      <span class="znacka-kruh"><img src="{{ web.zaklad }}/assets/img/HB-logo-colors.svg" alt="Hory Bory" width="409" height="417"></span>
+      <span class="znacka-kruh"><img class="logo-zakladni" src="{{ web.zaklad }}/assets/img/HB-logo-colors.svg" alt="Hory Bory" width="409" height="417"><img class="logo-mini" src="{{ web.zaklad }}/assets/img/HB-logo-minimal-colors.svg" alt="" width="244" height="150"></span>
       <img class="znacka-mini" src="{{ web.zaklad }}/assets/img/HB-logo-minimal-colors.svg" alt="" width="244" height="150">
     </a>
     {#- Přepínač jazyka (20. 10. 2026): vede na stejnou stránku v druhém jazyce, když existuje, jinak na úvod.

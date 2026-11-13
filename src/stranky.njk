@@ -24,7 +24,7 @@ eleventyComputed:
   "casto-se-ptate": "str-casto-se-ptate.jpg", "vysledky": "str-vysledky.jpg", "fotky": "str-fotky.jpg", "seznamka": "str-seznamka.jpg",
   "partneri": "str-partneri.jpg", "kontakt": "str-kontakt.jpg" } -%}
 {#- ořez fotek v záhlaví podstran (ladí se na adrese ?orez, assets/orez.js): --pozice, --pozice-mobil, --zoom -#}
-{%- set orezZahlavi = { "o-zavodu": "--pozice: 50% 31%", "trasa": "--pozice: 50% 25%", "pravidla": "--pozice: 50% 38%", "startovne": "--pozice: 50% 61%",
+{%- set orezZahlavi = { "o-zavodu": "--pozice: 50% 31%", "trasa": "--pozice: 50% 85%", "pravidla": "--pozice: 50% 38%", "startovne": "--pozice: 50% 61%",
   "casto-se-ptate": "--pozice: 50% 66%", "vysledky": "--pozice: 50% 22%", "fotky": "--pozice: 50% 54%", "seznamka": "--pozice: 50% 0%",
   "partneri": "--pozice: 50% 0%", "kontakt": "--pozice: 50% 18%" } -%}
 {%- set sObsahem = stranka.kod in ["o-zavodu", "pravidla", "startovne"] -%}
@@ -55,11 +55,12 @@ eleventyComputed:
 {% endif %}
 
 {% if stranka.kod == "trasa" and trasa.etapy.length %}
-<section class="souhrn"><div class="obal souhrn-mrizka">
-  <div><b>{{ trasa.celkem.etap }}</b><span>{{ "etap" | t(jaz) }}</span></div>
-  <div><b>{{ trasa.celkem.km if en else (trasa.celkem.km | cz) }}<small>&nbsp;km</small></b><span>{{ "celková délka" | t(jaz) }}</span></div>
-  <div><b>{{ (trasa.celkem.prevyseni | string | replace(r/\B(?=(\d{3})+(?!\d))/g, ",")) if en else trasa.celkem.prevyseni }}<small>&nbsp;m</small></b><span>{{ "stoupání" | t(jaz) }}</span></div>
-  <div><b>{{ (trasa.etapy[0].start.nazevEn if en else trasa.etapy[0].start.nazev) }} → {{ (trasa.etapy[trasa.etapy.length - 1].cil.nazevEn if en else trasa.etapy[trasa.etapy.length - 1].cil.nazev) }}</b><span>{{ "start a cíl" | t(jaz) }}</span></div>
+{#- čísla trasy ve stejných kartách jako na úvodní stránce, jen menší (13. 11. 2026) #}
+<section class="metriky metriky-male" aria-label="{{ 'Trasa v číslech' | t(jaz) }}"><div class="obal metriky-mrizka">
+  <div class="metrika m-vinova"><p class="metrika-cislo">{{ trasa.celkem.etap }}</p><p class="metrika-popis">{{ "etap" | t(jaz) }}</p></div>
+  <div class="metrika m-zelena"><p class="metrika-cislo">{{ trasa.celkem.km if en else (trasa.celkem.km | cz) }}<small>&nbsp;km</small></p><p class="metrika-popis">{{ "celková délka" | t(jaz) }}</p></div>
+  <div class="metrika m-hneda"><p class="metrika-cislo">{{ (trasa.celkem.prevyseni | string | replace(r/\B(?=(\d{3})+(?!\d))/g, ",")) if en else (trasa.celkem.prevyseni | string | replace(r/\B(?=(\d{3})+(?!\d))/g, " ")) }}<small>&nbsp;m</small></p><p class="metrika-popis">{{ "stoupání" | t(jaz) }}</p></div>
+  <div class="metrika m-olivova"><p class="metrika-cislo metrika-text">{{ (trasa.etapy[0].start.nazevEn if en else trasa.etapy[0].start.nazev) }} → {{ (trasa.etapy[trasa.etapy.length - 1].cil.nazevEn if en else trasa.etapy[trasa.etapy.length - 1].cil.nazev) }}</p><p class="metrika-popis">{{ "start a cíl" | t(jaz) }}</p></div>
 </div></section>
 {% endif %}
 

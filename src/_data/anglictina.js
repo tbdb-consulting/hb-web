@@ -193,4 +193,5 @@ export default {
   "30 etap, nepřetržitě dnem i nocí.": "30 stages, non-stop day and night.",
   "Závod": "Race",
   "Ročníky": "Editions",
+  "Trasa v číslech": "The route in numbers",
 };
