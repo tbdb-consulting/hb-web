@@ -595,3 +595,9 @@ body:not(.uvodni) .znacka { width: 96px; }
    Přepsáním --hlavicka se stejně posunou i všechna odsazení obsahu pod hlavičkou. */
 body:not(.uvodni) { --hlavicka: var(--hlavicka-stazena); }
 body:not(.uvodni) .hlavicka { transition: none; box-shadow: 0 2px 18px rgba(34,34,33,.08); }
+
+/* Odpočet do otevření registrace pod tlačítkem na úvodu (13. 11. 2026) */
+.hero-odpocet { margin: 18px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: clamp(15px, 1.4vw, 18px);
+  text-shadow: 0 1px 8px rgba(0,0,0,.45); }
+.hero-odpocet[hidden] { display: none; }
+.hero-odpocet .k-odpocet-cas { font-size: 1.35em; color: #EEB500; font-variant-numeric: tabular-nums; }

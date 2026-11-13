@@ -18,6 +18,12 @@
     <h1>Hory Bory</h1>
     <p class="hero-podnadpis">A relay run from the Beskydy Mountains to Pálava</p>
     <a class="tl tl-hlavni tl-velke" href="{{ web.zaklad }}/en/registration/">Register your team <span aria-hidden="true">→</span></a>
+    {#- odpočet do otevření registrace (13. 11. 2026), s otevřením registrace zmizí -#}
+    <p class="hero-odpocet" id="k-odpocet" data-url="{{ web.supabaseUrl }}" data-klic="{{ web.supabaseKlic }}" data-jazyk="en" hidden>
+      <span>Registration opens <span id="k-odpocet-od"></span>.</span>
+      <strong class="k-odpocet-cas" id="k-odpocet-cas"></strong>
+    </p>
+    <script src="{{ web.zaklad }}/assets/odpocet-registrace.js" defer></script>
   </div>
 
   <div class="hero-ovladani">

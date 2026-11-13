@@ -1,12 +1,15 @@
-// Odpočet do otevření registrace na všech stránkách kapitánské sekce (Keksa 13. 11. 2026).
+// Odpočet do otevření registrace: všechny stránky kapitánské sekce a úvodní stránka (Keksa 13. 11. 2026).
+// Adresu databáze a jazyk bere z data-url / data-klic / data-jazyk prvku #k-odpocet, jinak z window.HB (kapitánská sekce).
 // Termín čte z databáze stejně jako stránka Registrace (web_rocnik_webu + web_param_cas „registrace_od“),
 // takže změna termínu v administraci platí hned. S otevřením registrace pruh sám zmizí.
 (function () {
   "use strict";
-  var C = window.HB || {};
-  var EN = C.jazyk === "en";
   var pruh = document.getElementById("k-odpocet");
-  if (!pruh || !C.url) return;
+  if (!pruh) return;
+  var H = window.HB || {}, D = pruh.dataset;
+  var C = { url: D.url || H.url, klic: D.klic || H.klic, jazyk: D.jazyk || H.jazyk };
+  var EN = C.jazyk === "en";
+  if (!C.url) return;
   function t(s) { var T = window.HB_T; return (EN && T && T[s]) || s; }
   function sklon(n, a, b, c) { return n === 1 ? a : (n >= 2 && n <= 4 ? b : c); }
   function rpc(fce, data) {
