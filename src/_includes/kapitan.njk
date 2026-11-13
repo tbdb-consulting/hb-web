@@ -10,6 +10,7 @@ layout: zaklad.njk
   <span class="k-tym" id="k-tym"></span>
   <button type="button" class="k-odkaz" id="k-odhlasit">{{ "Odhlásit" | t(jaz) }}</button>
 </div>
+{% include "kapitan-odpocet.njk" %}
 <nav aria-label="{{ 'Kroky kapitánské sekce' | t(jaz) }}"><ol class="k-kroky" id="k-kroky" hidden></ol></nav>
 <h1>{{ titulek }}</h1>
 <div id="k-obsah"><p class="prazdno">{{ "Načítám…" | t(jaz) }}</p></div>
@@ -20,4 +21,5 @@ layout: zaklad.njk
                 jazyk: "{{ jaz }}", adresy: {{ kapitanAdresy | dump | safe }} };
 </script>
 <script src="{{ web.zaklad }}/assets/kapitan.js"></script>
+<script src="{{ web.zaklad }}/assets/kapitan-odpocet.js"></script>
 {% if skript %}<script src="{{ web.zaklad }}/assets/{{ skript }}"></script>{% endif %}

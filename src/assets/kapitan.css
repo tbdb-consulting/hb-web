@@ -245,3 +245,9 @@ a.k-nav-dal:hover, a.k-nav-dal:focus-visible, a.k-tlacitko:hover, a.k-tlacitko:f
 .k-dl-platba dt { margin-top: 8px; }
 .k-dl-platba dt:first-child { margin-top: 0; }
 .k-kopie .k-odkaz { flex: none; }
+
+/* Odpočet do otevření registrace (13. 11. 2026) */
+.k-odpocet { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; padding: 10px 14px; margin: 0 0 18px;
+  border-left: 4px solid #EEB500; background: #fdf6e3; border-radius: 6px; }
+.k-odpocet[hidden] { display: none; }
+.k-odpocet-cas { font-size: 1.25em; color: #78212E; font-variant-numeric: tabular-nums; }

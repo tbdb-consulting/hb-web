@@ -14,6 +14,7 @@ eleventyComputed:
   altEn: "/en/captain/login/"
 ---
 <link rel="stylesheet" href="{{ web.zaklad }}/assets/kapitan.css">
+{% include "kapitan-odpocet.njk" %}
 <h1>{{ "Kapitánská sekce" | t(jazyk) }}</h1>
 <div class="k-karta k-uzka" id="k-prihlaseni">
   <p>{{ "Zadej e-mail z registrace týmu (nebo e-mail, pod kterým jsi na soupisce týmu). Pošleme ti na něj odkaz, kterým se přihlásíš. Heslo není potřeba." | t(jazyk) }}</p>
@@ -30,6 +31,7 @@ eleventyComputed:
                 jazyk: "{{ jazyk }}", adresy: {{ kapitanAdresy | dump | safe }} };
 </script>
 <script src="{{ web.zaklad }}/assets/kapitan.js"></script>
+<script src="{{ web.zaklad }}/assets/kapitan-odpocet.js"></script>
 <script>
 (async function () {
   var t = HBK.t, tf = HBK.tf;
