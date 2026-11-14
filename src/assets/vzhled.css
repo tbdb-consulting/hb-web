@@ -294,7 +294,7 @@ p { margin: 0 0 1em; }
 
 /* harmonogram */
 .harmonogram { background: var(--olivova-100); }
-.casova-osa { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; counter-reset: krok; }
+.casova-osa { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; counter-reset: krok; }
 .casova-osa li { background: var(--bila); border-radius: var(--zaobleni); padding: 28px 24px; position: relative; }
 .casova-osa li::before {
   counter-increment: krok; content: counter(krok);
@@ -308,6 +308,7 @@ p { margin: 0 0 1em; }
 .termin { font-size: var(--drobny); font-weight: 700; color: var(--hneda); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .06em; }
 .casova-osa h3 { margin-bottom: .4em; }
 .casova-osa p:last-child { margin: 0; font-size: 16px; }
+@media (max-width: 1200px) { .casova-osa { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 1000px) { .casova-osa { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .casova-osa { grid-template-columns: 1fr; } }
 
