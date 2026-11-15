@@ -9,6 +9,7 @@ export default {
   // společná kostra
   "Štafetový běh z Beskyd na Pálavu. 30 etap, nepřetržitě dnem i nocí.": "A relay run from the Beskydy Mountains to Pálava. 30 stages, non-stop day and night.",
   "Přeskočit na obsah": "Skip to content",
+  "Nastavení cookies": "Cookie settings",
   "Jazyk": "Language",
   "Hlavní nabídka": "Main menu",
   "Pro kapitány": "For captains",

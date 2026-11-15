@@ -184,6 +184,7 @@
             : "<p>Na <strong>" + esc(v.email) + "</strong> ti právě posíláme potvrzení registrace a pokyny k platbě startovného.</p>")) +
         "<p>Do <a href=\"" + C.zaklad + "/kapitan/prihlaseni/\">kapitánské sekce</a> se přihlásíš e-mailem z přihlášky.</p>" +
         "<p>Když e-mail nedorazí, podívej se i do složky s nevyžádanou poštou, případně napiš na <a href=\"mailto:info@horybory.cz\">info@horybory.cz</a>.</p>";
+      if (window.HB_udalost) window.HB_udalost("sign_up", "CompleteRegistration", { content_name: nahradnik ? "nahradnik" : "registrace" });
       ukaz("rg-form", false);
       ukaz("rg-vysledek", true);
       el("rg-vysledek").scrollIntoView({ behavior: "smooth", block: "start" });

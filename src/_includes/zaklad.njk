@@ -112,11 +112,13 @@
     </div>
   </div>
   <div class="obal paticka-spodek">
-    <p>© Hory Bory · {% for s in menuStranky %}{% if s.kod == "gdpr" %}<a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a>{% endif %}{% endfor %}</p>
+    <p>© Hory Bory · {% for s in menuStranky %}{% if s.kod == "gdpr" %}<a href="{{ web.zaklad }}{{ s.adresa }}">{{ s.titulek }}</a>{% endif %}{% endfor %} · <button type="button" class="paticka-cookies" onclick="window.HB_nastaveniCookies && HB_nastaveniCookies()">{{ "Nastavení cookies" | t(jaz) }}</button></p>
     <p class="verze" title="{{ web.commit }}">{{ "verze" | t(jaz) }} {{ web.verze | t(jaz) }} · {{ web.sestavenoEn if jaz == "en" else web.sestaveno }}</p>
   </div>
 </footer>
 
+<script>window.HB_ZAKLAD = "{{ web.zaklad }}";</script>
+<script src="{{ web.zaklad }}/assets/souhlas.js"></script>{# lišta souhlasu s cookies, GA4 a Meta Pixel jen se souhlasem (15. 11. 2026) #}
 <script src="{{ web.zaklad }}/assets/vzhled.js"></script>
 <script>if (/[?&]orez\b/.test(location.search) && document.querySelector(".hero, .s-fotkou")) { var s = document.createElement("script"); s.src = "{{ web.zaklad }}/assets/orez.js"; document.body.appendChild(s); }</script>{# ladění ořezu úvodních fotek: adresa ?orez #}
 <script>

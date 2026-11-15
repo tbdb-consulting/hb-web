@@ -602,3 +602,21 @@ body:not(.uvodni) .hlavicka { transition: none; box-shadow: 0 2px 18px rgba(34,3
   text-shadow: 0 1px 8px rgba(0,0,0,.45); }
 .hero-odpocet[hidden] { display: none; }
 .hero-odpocet .k-odpocet-cas { font-size: 1.35em; color: #EEB500; font-variant-numeric: tabular-nums; }
+
+/* Lišta souhlasu s cookies (15. 11. 2026) */
+.souhlas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; padding: 12px var(--okraj) 16px; pointer-events: none; }
+.souhlas-obal { pointer-events: auto; max-width: 760px; margin: 0 auto; background: var(--bila); color: var(--cerna);
+  border-radius: var(--zaobleni); box-shadow: 0 10px 40px rgba(34, 34, 33, .25); padding: 18px 20px; font-size: 15px; line-height: 1.5; }
+.souhlas-text { margin: 0 0 12px; }
+.souhlas-text a { color: var(--vinova); }
+.souhlas-volby { margin: 0 0 12px; display: grid; gap: 6px; }
+.souhlas-volby[hidden] { display: none; }
+.souhlas-volby label { display: flex; gap: 8px; align-items: flex-start; }
+.souhlas-volby input { margin-top: 4px; accent-color: var(--vinova); }
+.souhlas-tlacitka { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.souhlas-tlacitka .tlacitko { border: 2px solid var(--vinova); background: var(--vinova); color: var(--bila); border-radius: 999px;
+  padding: 8px 18px; font: 700 15px/1.2 var(--pismo); cursor: pointer; }
+.souhlas-tlacitka .tlacitko-obrys { background: transparent; color: var(--vinova); }
+.souhlas-odkaz, .paticka-cookies { background: none; border: 0; padding: 4px; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+.souhlas-odkaz { color: var(--vinova); }
+@media (max-width: 560px) { .souhlas-tlacitka .tlacitko { flex: 1 1 100%; } }
