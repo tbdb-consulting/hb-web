@@ -24,7 +24,7 @@ eleventyExcludeFromCollections: true
 
   <h2 class="fo-nadpis">Fotky ročníku na webu</h2>
   <div class="fo-radek">
-    <label>Co dělám <select id="fo-rezim"><option value="uvodni">Úvodní fotka ročníku (na dlaždici v galerii)</option><option value="trideni">Třídění na Start / Trasa / Cíl</option><option value="kampan">Výběr do kampaně na sítě (feed 4:5, story 9:16)</option><option value="vitezove">Fotka vítězů a vítězek (karta ročníku na stránce Výsledky)</option></select></label>
+    <label>Co dělám <select id="fo-rezim"><option value="uvodni">Úvodní fotka ročníku (na dlaždici v galerii)</option><option value="trideni">Třídění na Start / Trasa / Cíl</option><option value="kampan">Výběr do kampaně na sítě (feed 4:5, story 9:16)</option><option value="vitezove">Fotka vítězů a vítězek (karta ročníku na stránce Výsledky)</option><option value="ai">Výběr podle hodnocení AI (kategorie, skóre, formáty, použití)</option></select></label>
   </div>
   <p class="adm-sub" id="fo-napoveda">Klikni na fotku a potvrď. Na webu se změna objeví po dalším sestavení webu.</p>
   <div id="fo-uvodni" class="fo-uvodni"></div>
@@ -34,6 +34,19 @@ eleventyExcludeFromCollections: true
   <div class="fo-filtr" id="fo-filtr-kampan" hidden>
     <button type="button" data-k="" class="fo-akt">Vše</button><button type="button" data-k="feed">Kampaň feed</button><button type="button" data-k="story">Kampaň story</button><button type="button" data-k="mimo">Mimo kampaň</button><button type="button" data-k="predavka">Předávka</button>
     <span class="fo-pocet" id="fo-kampan-pocet"></span>
+  </div>
+  <div class="fo-ai-filtr" id="fo-filtr-ai" hidden>
+    <div class="fo-filtr fo-ai-kat" id="fo-ai-kat"><button type="button" data-kat="" class="fo-akt">Všechny kategorie</button><button type="button" data-kat="K1">Předávka</button><button type="button" data-kat="K2">Týmová chvíle v cíli</button><button type="button" data-kat="K3">Běžec na trati</button><button type="button" data-kat="K4">Portrét a emoce</button><button type="button" data-kat="K5">Noc a čelovky</button><button type="button" data-kat="K6">Krajina a trasa</button><button type="button" data-kat="K7">Start a příprava</button><button type="button" data-kat="K8">Fanoušci a podpora</button><button type="button" data-kat="K9">Zákulisí</button><button type="button" data-kat="K10">Týmová tabule</button></div>
+    <div class="fo-radek fo-ai-volby" id="fo-ai-volby">
+      <label>Zobrazit <select data-fa="zobraz"><option value="vhodne">Vhodné do kampaně</option><option value="deti">Možná děti – ruční kontrola</option><option value="vse">Všechny hodnocené</option></select></label>
+      <label>Skóre od <input type="number" id="fo-ai-min" data-fa="min" value="3.8" min="1" max="5" step="0.1"></label>
+      <label>Návrh formátu <select data-fa="fmt"><option value="">jakýkoli</option><option value="feed">feed 4:5</option><option value="story">story 9:16</option><option value="ctverec">čtverec 1:1</option><option value="siroky">na šířku 1,91:1</option></select></label>
+      <label>Použití <select data-fa="pouz"><option value="">vše</option><option value="ne">ještě nepoužité</option><option value="ano">už použité</option></select></label>
+      <label>Hodnocení <select data-fa="potv"><option value="">vše</option><option value="ne">jen návrh AI</option><option value="ano">potvrzené</option></select></label>
+      <label>Řadit <select data-fa="rad"><option value="skore">podle skóre</option><option value="zadouci">podle žádoucích znaků</option><option value="rok">podle ročníku</option></select></label>
+      <span class="fo-pocet" id="fo-ai-pocet"></span>
+    </div>
+    <p class="adm-sub fo-ai-vysvetlivka">Vhodné do kampaně: bez dětí, bez týmové tabule a loga jiné akce, technicky použitelné a s kvalitou aspoň 4. Fotky s více kategoriemi ukáže každá z nich. Použité fotky jsou jen označené, níž se neřadí.</p>
   </div>
   <div id="fo-mrizka" class="fo-mrizka"></div>
 </div>
@@ -52,11 +65,13 @@ eleventyExcludeFromCollections: true
   </div>
   <div class="fo-lb-ovladani" id="fo-lb-ovladani"></div>
   <p class="fo-lb-napoveda" id="fo-lb-napoveda"></p>
+  <div class="fo-lb-panel" id="fo-lb-panel" hidden></div>
 </dialog>
 <style>
 .fo-stranka { padding: 0 16px 24px; max-width: 900px; }
 .fo-radek { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; margin: 14px 0; }
-.fo-radek label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.fo-radek label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; max-width: 100%; }
+.fo-radek select { max-width: 100%; }
 .fo-radek label:has(input[type=checkbox]) { flex-direction: row; align-items: center; }
 .fo-prehled { background: #F6EEDC; border-left: 3px solid #78212E; padding: 8px 12px; font-size: 13.5px; }
 .fo-prehled p { margin: 3px 0; }
@@ -106,7 +121,59 @@ eleventyExcludeFromCollections: true
 .fo-stitek { position: absolute; left: 4px; bottom: 4px; background: rgba(0,0,0,.6); color: #fff; font-size: 11px; padding: 0 5px; border-radius: 3px; }
 .fo-filtr[hidden] { display: none; }
 .fo-pocet { align-self: center; font-size: 13px; color: #6E665B; margin-left: 6px; }
-.fo-kampan { position: absolute; right: 4px; top: 4px; display: flex; gap: 3px; }
+.fo-kampan { position: absolute; right: 4px; top: 4px; left: 40px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 3px; }
+.fo-stitek { max-width: calc(100% - 8px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-sizing: border-box; }
 .fo-kampan span { background: #78212E; color: #fff; font-size: 10.5px; padding: 0 5px; border-radius: 3px; }
 .fo-mrizka img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; border-radius: 4px; }
+/* Výběr podle hodnocení AI */
+.fo-ai-filtr[hidden], .fo-lb-panel[hidden] { display: none; }
+.fo-ai-kat { flex-wrap: wrap; }
+.fo-ai-volby label { font-size: 12.5px; }
+.fo-ai-volby input[type=number] { width: 70px; }
+.fo-ai-vysvetlivka { margin: 0 0 8px; font-size: 12.5px; }
+.fo-kampan .fo-skore { background: #1B1916; font-weight: 600; }
+.fo-kampan .fo-varovani { background: #A3302B; }
+.fo-kampan .fo-pouzito { background: #6E665B; }
+.fo-dalsi { grid-column: 1 / -1; text-align: center; }
+.fo-lb.fo-lb-ai { width: min(98vw, 1400px); }
+.fo-lb.fo-lb-ai[open] { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto auto auto 1fr;
+  grid-template-areas: "hlava hlava" "stred panel" "ovl panel" "nap panel"; }
+.fo-lb-ai .fo-lb-hlava { grid-area: hlava; } .fo-lb-ai .fo-lb-stred { grid-area: stred; }
+.fo-lb-ai .fo-lb-ovladani { grid-area: ovl; } .fo-lb-ai .fo-lb-napoveda { grid-area: nap; }
+.fo-lb-ai .fo-lb-plocha img { max-height: calc(96vh - 150px); }
+.fo-lb-panel { grid-area: panel; overflow-y: auto; max-height: calc(96vh - 50px); padding: 0 14px 14px; font-size: 13px; line-height: 1.45; }
+.fo-ai-blok { border-top: 1px solid #3A352F; padding: 10px 0; }
+.fo-ai-blok:first-child { border-top: 0; padding-top: 0; }
+.fo-ai-blok h3 { margin: 0 0 6px; font-size: 13.5px; color: #E0AC4C; font-weight: 600; }
+.fo-ai-blok p { margin: 6px 0; }
+.fo-ai-hlava { display: flex; align-items: baseline; gap: 8px; }
+.fo-ai-skore { font-size: 24px; color: #fff; }
+.fo-ai-stav { margin-left: auto; font-size: 12px; border: 1px solid #6E665B; border-radius: 999px; padding: 1px 8px; color: #A1978A; }
+.fo-ai-stav.fo-ai-ok { border-color: #7FB27F; color: #9CD39C; }
+.fo-ai-h-radek { color: #A1978A; }
+.fo-ai-h-radek b { color: #EDE7DD; }
+.fo-lb-panel .fo-ai-kat { display: flex; flex-wrap: wrap; gap: 4px; }
+.fo-lb-panel .fo-ai-kat span, .fo-lb-panel .fo-ai-kat button { font: inherit; font-size: 12px; border: 1px solid #6E665B; border-radius: 999px; padding: 1px 9px; background: none; color: #EDE7DD; }
+.fo-lb-panel .fo-ai-kat button { cursor: pointer; }
+.fo-lb-panel .fo-ai-kat .fo-hlavni, .fo-lb-panel .fo-ai-kat button.fo-akt { background: #78212E; border-color: #78212E; color: #fff; }
+.fo-ai-popis { color: #EDE7DD; }
+.fo-ai-pozn { color: #A1978A; font-size: 12.5px; }
+.fo-ai-var { color: #F0A49A; font-size: 12.5px; }
+.fo-ai-h { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 8px 0; font-size: 12.5px; }
+.fo-ai-h select { font: inherit; }
+.fo-ai-fmt { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.fo-ai-fmt th { text-align: left; font-weight: 400; color: #A1978A; padding: 2px 4px; }
+.fo-ai-fmt td { padding: 3px 4px; border-top: 1px solid #2E2A25; }
+.fo-ano { color: #9CD39C; } .fo-ne { color: #A1978A; }
+.fo-ai-pu { margin: 0 0 8px; padding-left: 18px; }
+.fo-ai-pu li { margin: 3px 0; }
+.fo-ai-pu a { color: #E0AC4C; }
+.fo-ai-pridat { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.fo-ai-pridat input, .fo-ai-pridat select { font: inherit; font-size: 12.5px; padding: 3px 5px; min-width: 0; }
+.fo-ai-pridat button { grid-column: 1 / -1; justify-self: start; }
+@media (max-width: 900px) {
+  .fo-lb.fo-lb-ai[open] { grid-template-columns: 1fr; grid-template-areas: "hlava" "stred" "ovl" "nap" "panel"; overflow-y: auto; }
+  .fo-lb-panel { max-height: none; overflow: visible; }
+  .fo-lb-ai .fo-lb-plocha img { max-height: 60vh; }
+}
 </style>
