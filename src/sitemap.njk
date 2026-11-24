@@ -1,0 +1,21 @@
+---
+permalink: "/sitemap.xml"
+eleventyExcludeFromCollections: true
+---
+{#- Mapa webu pro vyhledávače (24. 11. 2026). Jen ostrý web (při ZAKLAD_URL se nesestavuje, viz eleventy.config.js).
+    Veřejné stránky z kolekce (stránkované šablony mají addAllPagesToCollections) + registrace, která v kolekci schválně není.
+    Administrace, kapitánská sekce, předávky a zkušební přihláška chybí stejně jako v robots.txt.
+    Anglické stránky jen tehdy, když je angličtina zveřejněná (jinak mají noindex). -#}
+{%- set ostry = "https://www.horybory.cz" -%}
+{%- set adresy = ["/registrace/", "/en/registration/"] -%}
+{%- for p in collections.all %}{% set _x = adresy.push(p.url) %}{% endfor -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- for url in adresy | sort %}
+{%- if url and url[url.length - 1] == "/"
+  and not url.match(r/^\/(admin|kapitan|en\/captain|predavka|zkusebni-prihlaska)\//)
+  and (obsah.enNaWebu or not url.match(r/^\/en\//)) %}
+  <url><loc>{{ ostry }}{{ url }}</loc></url>
+{%- endif %}
+{%- endfor %}
+</urlset>

@@ -149,7 +149,7 @@ export default async function () {
       .filter((f) => f.aktivni)
       .map((f) => {
         const p = faqPreklady.find((x) => x.faq_id === f.id && x.jazyk === jazyk);
-        return p ? { poradi: f.poradi, otazka: cistyText(p.otazka), odpoved: sZakladem(p.odpoved) } : null;
+        return p ? { poradi: f.poradi, otazka: cistyText(p.otazka), odpoved: sZakladem(p.odpoved), odpovedText: cistyText(p.odpoved) } : null;
       })
       .filter(Boolean);
   }

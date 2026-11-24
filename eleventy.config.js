@@ -21,11 +21,12 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
 
-  // .htaccess a robots.txt jen pro ostrý web na Wedosu (ZAKLAD_URL prázdné); na zkušební adrese GitHub Pages
+  // .htaccess, robots.txt a sitemap.xml jen pro ostrý web na Wedosu (ZAKLAD_URL prázdné); na zkušební adrese GitHub Pages
   // by robots.txt v podsložce nic nedělal a .htaccess GitHub nečte (spuštění webu 11. 11. 2026).
   if (process.env.ZAKLAD_URL) {
     eleventyConfig.ignores.add("src/htaccess.njk");
     eleventyConfig.ignores.add("src/robots.njk");
+    eleventyConfig.ignores.add("src/sitemap.njk");
   }
 
   // Datum ve tvaru, na který jsou lidi zvyklí: 5. 9. 2026

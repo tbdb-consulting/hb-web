@@ -1,0 +1,47 @@
+{#- Strukturovaná data schema.org (JSON-LD) pro vyhledávače a AI asistenty (24. 11. 2026).
+    Na všech stránkách: web a pořadatel. Na úvodní stránce: závod (datum a místo z web_v_rocnik).
+    Na stránce Často se ptáte: otázky a odpovědi (stejné jako na stránce).
+    Schválně bez ceny, kapacity a času startu (pravidlo pro texty HB27). Adresy vždy na ostrý web. -#}
+{%- set ostry = "https://www.horybory.cz" -%}
+{%- set en = jaz == "en" -%}
+{%- set uvod = ostry + ("/en/" if en else "/") -%}
+{%- set organizace = { "@type": "SportsOrganization", "@id": ostry + "/#poradatel", "name": "Hory Bory",
+  "legalName": "Endorphins United s.r.o.", "url": ostry + "/", "logo": ostry + "/assets/img/HB-logo-colors.svg",
+  "email": "info@horybory.cz", "sport": "Running" } -%}
+{%- set webStranka = { "@type": "WebSite", "@id": ostry + "/#web", "name": web.nazev, "url": ostry + "/",
+  "inLanguage": ["cs", "en"] if obsah.enNaWebu else "cs", "publisher": { "@id": ostry + "/#poradatel" } } -%}
+{%- set graf = [webStranka, organizace] -%}
+
+{%- if stranka and stranka.kod == "uvod" and trasa.rocnik and trasa.rocnik.datum_zavodu %}
+{%- set zavod = { "@type": "SportsEvent", "@id": ostry + "/#zavod",
+  "name": trasa.rocnik.nazev or web.nazev,
+  "description": popisWebu,
+  "url": uvod,
+  "image": [ostry + "/assets/img/hero-1.jpg"],
+  "sport": "Running",
+  "startDate": trasa.rocnik.datum_zavodu,
+  "endDate": trasa.rocnik.datum_konce or trasa.rocnik.datum_zavodu,
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "location": [
+    { "@type": "Place", "name": "Start: Autokemp U viaduktu, Dolní Lomná",
+      "address": { "@type": "PostalAddress", "addressLocality": "Dolní Lomná", "postalCode": "739 91", "addressCountry": "CZ" } },
+    { "@type": "Place", "name": ("Cíl: Mikulov" if not en else "Finish: Mikulov"),
+      "address": { "@type": "PostalAddress", "addressLocality": "Mikulov", "addressCountry": "CZ" } }
+  ],
+  "organizer": { "@id": ostry + "/#poradatel" },
+  "inLanguage": jaz } -%}
+{%- set _x = graf.push(zavod) -%}
+{%- endif %}
+
+{%- if stranka and stranka.kod == "casto-se-ptate" %}
+{%- set seznam = [] -%}
+{%- for o in (obsah.otazkyEn if en else obsah.otazky) %}
+{%- set _x = seznam.push({ "@type": "Question", "name": o.otazka,
+  "acceptedAnswer": { "@type": "Answer", "text": o.odpovedText } }) -%}
+{%- endfor %}
+{%- if seznam.length %}
+{%- set _x = graf.push({ "@type": "FAQPage", "@id": ostry + stranka.adresa + "#otazky", "inLanguage": jaz, "mainEntity": seznam }) -%}
+{%- endif %}
+{%- endif %}
+<script type="application/ld+json">{{ { "@context": "https://schema.org", "@graph": graf } | dump | replace("</", "<\\/") | safe }}</script>

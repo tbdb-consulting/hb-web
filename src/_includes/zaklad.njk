@@ -27,6 +27,7 @@
 {%- if jaz == "en" %}
 <script>window.HB_T = {{ anglictina | dump | safe }};</script>{# slovník pro skripty stránky (výsledky, galerie, seznamka, registrace) #}
 {%- endif %}
+{% include "strukturovana-data.njk" %}
 </head>
 {#- Nový vzhled (11/2026): plovoucí hlavička, na úvodní stránce (česky i anglicky) velké logo v bílém kruhu, po odscrollování minimální logo.
     Hlavní položky menu jsou v hlavičce, ostatní pod „Další“. Obsahové stránky (stranky.njk) jdou přes celou šířku. -#}
